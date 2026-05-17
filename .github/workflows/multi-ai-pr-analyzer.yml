@@ -1,0 +1,53 @@
+name: 🤖 Multi-AI PR Analyzer
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  analyze-with-all-ais:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests PyGithub
+
+      - name: Run Multi-AI Analysis
+        env:
+          GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
+          CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+          CHATGPT_API_KEY: ${{ secrets.CHATGPT_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO_NAME: ${{ github.repository }}
+        run: |
+          python scripts/multi_ai_pr_analyzer.py
+
+      - name: Post Analysis to PR
+        if: always()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const analysis = fs.readFileSync('ai_analysis.md', 'utf8');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: analysis
+            });
