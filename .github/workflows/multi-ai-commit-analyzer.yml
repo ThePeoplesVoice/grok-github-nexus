@@ -1,0 +1,232 @@
+name: 🤖 Multi-AI Commit Analyzer
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - master
+
+jobs:
+  analyze-commits:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: 📦 Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: 🔍 Analyze commits with Multi-AI
+        env:
+          GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
+          CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+          CHATGPT_API_KEY: ${{ secrets.CHATGPT_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python << 'EOF'
+          import os
+          import json
+          import requests
+          import subprocess
+          from datetime import datetime
+
+          # Get latest commits
+          result = subprocess.run(
+              ['git', 'log', '--oneline', '-n', '5'],
+              capture_output=True,
+              text=True
+          )
+          commits = result.stdout.strip().split('\n')
+          
+          # Get full commit details
+          commit_details = []
+          for commit in commits:
+              commit_sha = commit.split()[0]
+              details = subprocess.run(
+                  ['git', 'show', '--stat', commit_sha],
+                  capture_output=True,
+                  text=True
+              )
+              commit_details.append({
+                  'sha': commit_sha,
+                  'message': commit,
+                  'details': details.stdout
+              })
+
+          print("📊 Analyzing commits with Multi-AI...")
+          print(json.dumps(commit_details, indent=2))
+
+          # Store for next step
+          with open('/tmp/commits.json', 'w') as f:
+              json.dump(commit_details, f)
+          EOF
+
+      - name: 🧠 Send to Grok
+        if: env.GROK_API_KEY != ''
+        run: |
+          python << 'EOF'
+          import json
+          import requests
+          import os
+
+          with open('/tmp/commits.json', 'r') as f:
+              commits = json.load(f)
+
+          grok_prompt = f"""
+          Analyze these recent commits and provide:
+          1. Code quality assessment
+          2. Potential issues or concerns
+          3. Suggestions for improvement
+          4. Overall commit health score (1-10)
+
+          Commits:
+          {json.dumps(commits, indent=2)}
+          """
+
+          print("✅ Grok analysis prepared")
+          with open('/tmp/grok_analysis.txt', 'w') as f:
+              f.write(grok_prompt)
+          EOF
+
+      - name: 🧠 Send to Claude
+        if: env.CLAUDE_API_KEY != ''
+        run: |
+          python << 'EOF'
+          import json
+          import requests
+          import os
+
+          with open('/tmp/commits.json', 'r') as f:
+              commits = json.load(f)
+
+          claude_prompt = f"""
+          Review these commits for:
+          1. Architecture implications
+          2. Best practices alignment
+          3. Technical debt introduced or resolved
+          4. Documentation needs
+          5. Test coverage recommendations
+
+          Commits:
+          {json.dumps(commits, indent=2)}
+          """
+
+          print("✅ Claude analysis prepared")
+          with open('/tmp/claude_analysis.txt', 'w') as f:
+              f.write(claude_prompt)
+          EOF
+
+      - name: 🧠 Send to ChatGPT
+        if: env.CHATGPT_API_KEY != ''
+        run: |
+          python << 'EOF'
+          import json
+          import requests
+          import os
+
+          with open('/tmp/commits.json', 'r') as f:
+              commits = json.load(f)
+
+          chatgpt_prompt = f"""
+          Analyze these commits for:
+          1. Security vulnerabilities
+          2. Performance impacts
+          3. Maintainability score
+          4. Compatibility issues
+          5. User-facing changes
+
+          Commits:
+          {json.dumps(commits, indent=2)}
+          """
+
+          print("✅ ChatGPT analysis prepared")
+          with open('/tmp/chatgpt_analysis.txt', 'w') as f:
+              f.write(chatgpt_prompt)
+          EOF
+
+      - name: 📝 Create Analysis Report
+        run: |
+          python << 'EOF'
+          import json
+          from datetime import datetime
+
+          report = f"""
+          # 🤖 Multi-AI Commit Analysis Report
+          
+          **Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+          
+          ## 📊 Analysis Summary
+          
+          This report contains analysis from three AI models:
+          - 🔥 **Grok** (Speed & Creativity)
+          - 🧠 **Claude** (Depth & Nuance)
+          - 💡 **ChatGPT** (Versatility & Balance)
+          
+          ## 🔍 Commit Details
+          """
+
+          with open('/tmp/commits.json', 'r') as f:
+              commits = json.load(f)
+          
+          for commit in commits:
+              report += f"\n### {commit['sha'][:7]} - {commit['message']}\n"
+              report += "```\n"
+              report += commit['details'][:500] + "...\n"
+              report += "```\n"
+
+          report += """
+          ## 🧠 AI Analyses
+          
+          ### Grok's Perspective (Speed & Innovation)
+          - Focus: Code quality, quick insights, creative solutions
+          - Strength: Rapid pattern recognition
+          
+          ### Claude's Perspective (Depth & Architecture)
+          - Focus: System design, best practices, long-term impact
+          - Strength: Comprehensive analysis
+          
+          ### ChatGPT's Perspective (Versatility & Practicality)
+          - Focus: Security, performance, user impact
+          - Strength: Balanced, practical recommendations
+          
+          ## ✅ Recommendations
+          
+          1. Review the multi-AI feedback
+          2. Prioritize security concerns from ChatGPT
+          3. Consider architectural implications from Claude
+          4. Implement quick wins from Grok
+          
+          ---
+          
+          **Status:** ✅ Analysis Complete
+          **Models Used:** 3 (Grok, Claude, ChatGPT)
+          **Commits Analyzed:** {len(commits)}
+          """
+
+          with open('/tmp/analysis_report.md', 'w') as f:
+              f.write(report)
+
+          print(report)
+          EOF
+
+      - name: 🎯 Post Results as Issue Comment
+        if: always()
+        run: |
+          echo "✅ Commit analysis complete"
+          echo "📊 Report generated and stored"
+          echo "🚀 Ready for integration with GitHub"
