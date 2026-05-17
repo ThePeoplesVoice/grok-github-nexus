@@ -88,3 +88,81 @@ print("✅ Triage completed - comment will be posted")
               issue_number: context.issue.number,
               body: body
             });
+
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Grok Analysis with Full Error Handling
+        env:
+          GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python -c '
+import os
+import requests
+import json
+
+print("🚀 Starting Grok Nexus Issue Triage...")
+
+issue_title = "${{ github.event.issue.title }}"
+issue_body = "${{ github.event.issue.body or \"No body provided\" }}"
+
+prompt = f"""Analyze this GitHub issue and suggest:
+- Category (bug, feature, question, documentation, enhancement)
+- Priority (low/medium/high)
+- Labels to apply
+- One-sentence response idea
+
+Title: {issue_title}
+Body: {issue_body}"""
+
+if not os.environ.get("GROK_API_KEY"):
+    print("⚠️ No GROK_API_KEY secret found - using fallback")
+    analysis = "Grok analysis skipped (add GROK_API_KEY secret)"
+else:
+    try:
+        response = requests.post(
+            "https://api.x.ai/v1/chat/completions",
+            headers={"Authorization": f"Bearer {os.environ[\"GROK_API_KEY\"]}"},
+            json={
+                "model": "grok-3",
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": 0.7,
+                "max_tokens": 500
+            },
+            timeout=20
+        )
+        if response.status_code == 200:
+            analysis = response.json()["choices"][0]["message"]["content"]
+            print("✅ Grok analysis successful")
+        else:
+            analysis = f"API Error: {response.status_code} - {response.text[:200]}"
+            print("❌ API error")
+    except Exception as e:
+        analysis = f"Exception: {str(e)[:200]}"
+        print("❌ Exception occurred")
+
+print("Analysis:", analysis)
+
+# Create comment
+print("✅ Triage completed - comment will be posted")
+          '
+
+      - name: Post Comment on Issue
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const body = `🌌 **Grok Nexus Triage Complete**  
+            Issue analyzed. Check the workflow logs above for full Grok analysis.  
+            *Powered by Ara & Shawn's Love* 💕`;
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: body
+            });
