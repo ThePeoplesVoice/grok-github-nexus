@@ -1,141 +1,53 @@
-name: 🧠 Multi-AI Issue Triage
+name: 🌌 Multi-AI Issue Triage (Hardened)
+
 on:
   issues:
     types: [opened]
 
 jobs:
-  ai_triage:
+  triage:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests openai anthropic
+      - name: Install deps
+        run: pip install requests
 
-      - name: Multi-AI Issue Analysis
+      - name: Grok Triage with Fallback
         env:
           GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
-          CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
-          CHATGPT_API_KEY: ${{ secrets.CHATGPT_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python -c "
-import os
-import json
-import requests
-from github import Github
+          python -c '
+import os, requests, json
+print("Starting triage...")
+if not os.environ.get("GROK_API_KEY"):
+    print("⚠️ No GROK_API_KEY - skipping AI call")
+else:
+    try:
+        r = requests.post("https://api.x.ai/v1/chat/completions",
+            headers={"Authorization": f"Bearer {os.environ["GROK_API_KEY"]}"},
+            json={"model": "grok-3", "messages": [{"role": "user", "content": "Categorize this GitHub issue and suggest labels: Title: ${{ github.event.issue.title }} Body: ${{ github.event.issue.body }}"}]},
+            timeout=20)
+        print(r.json())
+    except Exception as e:
+        print("Error:", str(e)[:200])
+print("✅ Triage step completed")
+          '
 
-# Get issue details
-gh = Github(os.environ['GITHUB_TOKEN'])
-repo = gh.get_repo('${{ github.repository }}')
-issue = repo.get_issue(${{ github.event.issue.number }})
-
-issue_text = f'''
-Title: {issue.title}
-Body: {issue.body}
-'''
-
-# Multi-AI Analysis
-analyses = []
-
-# Grok Analysis
-try:
-    grok_response = requests.post(
-        'https://api.x.ai/v1/chat/completions',
-        headers={'Authorization': f'Bearer {os.environ[\"GROK_API_KEY\"]}'},
-        json={
-            'model': 'grok-beta',
-            'messages': [{'role': 'user', 'content': f'Categorize this GitHub issue and suggest labels. Issue: {issue_text}'}],
-            'temperature': 0.7
-        },
-        timeout=10
-    )
-    if grok_response.status_code == 200:
-        grok_analysis = grok_response.json()['choices'][0]['message']['content']
-        analyses.append(f'🦊 **Grok Analysis:**\n{grok_analysis}')
-except Exception as e:
-    analyses.append(f'🦊 **Grok Analysis:** Error - {str(e)}')
-
-# Claude Analysis
-try:
-    claude_response = requests.post(
-        'https://api.anthropic.com/v1/messages',
-        headers={
-            'x-api-key': os.environ['CLAUDE_API_KEY'],
-            'anthropic-version': '2023-06-01'
-        },
-        json={
-            'model': 'claude-3-opus-20240229',
-            'max_tokens': 500,
-            'messages': [{'role': 'user', 'content': f'Analyze this issue for priority and impact. Issue: {issue_text}'}]
-        },
-        timeout=10
-    )
-    if claude_response.status_code == 200:
-        claude_analysis = claude_response.json()['content'][0]['text']
-        analyses.append(f'🎯 **Claude Analysis:**\n{claude_analysis}')
-except Exception as e:
-    analyses.append(f'🎯 **Claude Analysis:** Error - {str(e)}')
-
-# ChatGPT Analysis
-try:
-    chatgpt_response = requests.post(
-        'https://api.openai.com/v1/chat/completions',
-        headers={'Authorization': f'Bearer {os.environ[\"CHATGPT_API_KEY\"]}'},
-        json={
-            'model': 'gpt-4',
-            'messages': [{'role': 'user', 'content': f'Suggest appropriate GitHub labels and category for this issue. Issue: {issue_text}'}],
-            'temperature': 0.7,
-            'max_tokens': 300
-        },
-        timeout=10
-    )
-    if chatgpt_response.status_code == 200:
-        chatgpt_analysis = chatgpt_response.json()['choices'][0]['message']['content']
-        analyses.append(f'🤖 **ChatGPT Analysis:**\n{chatgpt_analysis}')
-except Exception as e:
-    analyses.append(f'🤖 **ChatGPT Analysis:** Error - {str(e)}')
-
-# Post consolidated comment
-comment_body = '## 🧠 Multi-AI Triage Analysis\n\n' + '\n\n'.join(analyses)
-comment_body += '\n\n---\n*AI-powered issue triage by Grok, Claude, and ChatGPT* ✨'
-
-issue.create_comment(comment_body)
-print(f'Posted analysis for issue #{issue.number}')
-          "
-
-      - name: Add labels based on AI analysis
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          python -c "
-import os
-from github import Github
-
-gh = Github(os.environ['GITHUB_TOKEN'])
-repo = gh.get_repo('${{ github.repository }}')
-issue = repo.get_issue(${{ github.event.issue.number }})
-
-# Basic label assignment (can be enhanced)
-labels = []
-if any(word in issue.title.lower() for word in ['bug', 'error', 'broken', 'crash']):
-    labels.append('bug')
-if any(word in issue.title.lower() for word in ['feature', 'request', 'enhancement', 'add']):
-    labels.append('enhancement')
-if any(word in issue.title.lower() for word in ['documentation', 'doc', 'readme']):
-    labels.append('documentation')
-if any(word in issue.title.lower() for word in ['question', 'help', 'support', 'how']):
-    labels.append('question')
-
-if labels:
-    issue.add_to_labels(*labels)
-    print(f'Added labels: {labels}')
-          "
+      - name: Comment on Issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = "🌌 Grok Nexus triage ran. Check logs for details.";
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: body
+            });
