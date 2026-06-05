@@ -5,7 +5,7 @@ on:
     branches: [main, master]
   pull_request:
   schedule:
-    - cron: '0 4 * * *'  # Daily \~2 PM AEST
+    - cron: '0 4 * * *'  # Daily ~2 PM AEST
   workflow_dispatch:
 
 jobs:
@@ -26,9 +26,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            \~/.cache
+            ~/.cache
             /opt/toolchains
-          key: \( {{ matrix.project }}-toolchain- \){{ hashFiles('**/Makefile', '**/CMakeLists.txt') }}
+          key: ${{ matrix.project }}-toolchain-${{ hashFiles('**/Makefile', '**/CMakeLists.txt') }}
 
       # === AVR / TinyAPRS ===
       - name: Setup AVR Toolchain
@@ -68,7 +68,7 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: firmware-\( {{ matrix.project }}- \){{ github.sha }}
+          name: firmware-${{ matrix.project }}-${{ github.sha }}
           path: artifacts/
           retention-days: 30
 
