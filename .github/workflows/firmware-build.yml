@@ -1,1 +1,87 @@
-# This file has been deleted - use multi-ai workflows instead
+name: Firmware Build
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'firmware/**'
+      - 'Makefile'
+      - 'CMakeLists.txt'
+      - '.github/workflows/firmware-build.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'firmware/**'
+      - 'Makefile'
+      - 'CMakeLists.txt'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: [core, integration, utils]
+      fail-fast: false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache toolchain
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/opt/toolchains
+          key: "${{ matrix.project }}-toolchain-${{ hashFiles('**/Makefile', '**/CMakeLists.txt') }}"
+          restore-keys: |
+            ${{ matrix.project }}-toolchain-
+
+      - name: Setup build environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake
+
+      - name: Build firmware - ${{ matrix.project }}
+        run: |
+          mkdir -p build
+          cd build
+          cmake -DPROJECT=${{ matrix.project }} ..
+          make -j$(nproc)
+
+      - name: Run tests
+        run: |
+          cd build
+          ctest --output-on-failure
+
+      - name: Upload build artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-${{ matrix.project }}
+          path: build/artifacts/
+          retention-days: 30
+
+  test-coverage:
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup coverage tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcovr
+
+      - name: Generate coverage report
+        run: |
+          mkdir -p coverage
+          gcovr --html-details coverage/index.html
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/index.html
