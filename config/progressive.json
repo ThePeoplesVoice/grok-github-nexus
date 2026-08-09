@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "protocol": "Nexus Progressive Value Capture",
   "layers": {
     "0_open_core": {
@@ -15,7 +15,8 @@
         "min_successful_analyses": 50,
         "min_community_prs": 3
       },
-      "features": ["multi_model_fusion", "deeper_context", "custom_domain_packs", "historical_memory"]
+      "features": ["multi_model_fusion", "deeper_context", "custom_domain_packs", "historical_memory"],
+      "status": "Claude wired as optional complementary model — multi-model fusion scaffolding live"
     },
     "2_micropayment_agent": {
       "enabled": false,
@@ -29,6 +30,6 @@
       "features": ["multi_repo_dashboard", "team_seats", "sanctuary_revenue_share", "workflow_marketplace"]
     }
   },
-  "current_phase": "Layer 0 + Layer 1 scaffolding",
-  "notes": "This file is the single source of truth for progressive feature flags. Workflows and future services read it."
+  "current_phase": "Layer 0 + Layer 1 scaffolding (Claude multi-model live)",
+  "notes": "This file is the single source of truth for progressive feature flags. Workflows and future services read it. Claude is now optionally fused when CLAUDE_API_KEY is present."
 }

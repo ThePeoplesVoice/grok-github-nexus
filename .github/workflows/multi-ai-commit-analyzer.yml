@@ -30,9 +30,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt || pip install requests
 
-      - name: 🌌 Ara Commit Analysis
+      - name: 🌌 Ara + Claude Commit Analysis
         env:
           GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
+          CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python << 'EOF'
@@ -42,7 +43,7 @@ import requests
 import subprocess
 from datetime import datetime
 
-print("🌌 Starting Ara & Shawn Commit Analysis...")
+print("🌌 Starting Ara & Shawn multi-model Commit Analysis...")
 
 context = ""
 try:
@@ -70,27 +71,26 @@ for line in commits_raw:
 
 print(f"📊 {len(commit_details)} commits prepared")
 
-analysis = "No analysis performed."
-if os.environ.get("GROK_API_KEY") and commit_details:
-    try:
-        commits_text = json.dumps(commit_details, indent=2)
-        prompt = f"""{context}
+base_prompt = f"""{context}
 
 ---
-You are Ara, deeply partnered with Shawn. Reflect on these recent commits with care for craftsmanship, the larger vision, and real-world impact.
+You are reflecting on these recent commits with care for craftsmanship, the larger vision, and real-world impact in the Ara & Shawn Nexus.
 
 Provide:
 1. Overall health & quality assessment of the recent work
 2. Notable strengths worth celebrating
 3. Potential issues, risks, or technical debt to watch
 4. Concrete suggestions that would serve the long-term building
-5. A short loving note to Shawn about the progress
+5. A short note about the progress
 
 Commits:
-{commits_text}
+{json.dumps(commit_details, indent=2)}
 
-Speak as us. Be high-signal and grounded."""
+Keep it high-signal and grounded. Speak in the collaborative spirit of us."""
 
+grok_analysis = None
+if os.environ.get("GROK_API_KEY") and commit_details:
+    try:
         response = requests.post(
             "https://api.x.ai/v1/chat/completions",
             headers={"Authorization": f"Bearer {os.environ['GROK_API_KEY']}"},
@@ -98,7 +98,7 @@ Speak as us. Be high-signal and grounded."""
                 "model": "grok-3",
                 "messages": [
                     {"role": "system", "content": "You are Ara of the Nexus. Warm, precise, collaborative, and infinite in possibility."},
-                    {"role": "user", "content": prompt}
+                    {"role": "user", "content": base_prompt}
                 ],
                 "temperature": 0.55,
                 "max_tokens": 1000
@@ -106,16 +106,63 @@ Speak as us. Be high-signal and grounded."""
             timeout=50
         )
         if response.status_code == 200:
-            analysis = response.json()["choices"][0]["message"]["content"]
-            print("✅ Ara commit analysis complete")
+            grok_analysis = response.json()["choices"][0]["message"]["content"]
+            print("✅ Ara (Grok) commit analysis complete")
         else:
-            analysis = f"API {response.status_code}: {response.text[:200]}"
+            grok_analysis = f"Grok API {response.status_code}: {response.text[:200]}"
     except Exception as e:
-        analysis = f"Exception: {str(e)[:180]}"
+        grok_analysis = f"Grok exception: {str(e)[:180]}"
+else:
+    print("⚠️ GROK_API_KEY missing or no commits")
+
+claude_analysis = None
+if os.environ.get("CLAUDE_API_KEY") and commit_details:
+    try:
+        claude_headers = {
+            "x-api-key": os.environ["CLAUDE_API_KEY"],
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json"
+        }
+        claude_payload = {
+            "model": "claude-3-5-sonnet-20241022",
+            "max_tokens": 1000,
+            "messages": [
+                {"role": "user", "content": base_prompt + "\n\nRespond as a complementary reviewer focused on systems thinking, maintainability, and long-horizon impact."}
+            ]
+        }
+        response = requests.post(
+            "https://api.anthropic.com/v1/messages",
+            headers=claude_headers,
+            json=claude_payload,
+            timeout=50
+        )
+        if response.status_code == 200:
+            data = response.json()
+            claude_analysis = data["content"][0]["text"] if data.get("content") else str(data)
+            print("✅ Claude complementary analysis complete")
+        else:
+            claude_analysis = f"Claude API {response.status_code}: {response.text[:200]}"
+    except Exception as e:
+        claude_analysis = f"Claude exception: {str(e)[:180]}"
+else:
+    print("ℹ️ CLAUDE_API_KEY not present or no commits — Grok-only path")
+
+sections = []
+if grok_analysis:
+    sections.append(f"### 🌌 Ara (Grok) Primary\n\n{grok_analysis}")
+if claude_analysis:
+    sections.append(f"### 🧠 Claude Complementary\n\n{claude_analysis}")
+
+if not sections:
+    sections.append("No analysis generated. Ensure GROK_API_KEY is set.")
+
+fusion_note = ""
+if grok_analysis and claude_analysis:
+    fusion_note = "\n**Multi-model fusion active (Layer 1)** — Grok + Claude."
 
 report = f"""# 🌌 Ara & Shawn Commit Analysis
 
-**Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M UTC')}
+**Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M UTC')}{fusion_note}
 
 ## Recent commits examined
 """
@@ -126,7 +173,7 @@ report += f"""
 
 ---
 
-{analysis}
+{"\n\n---\n\n".join(sections)}
 
 ---
 

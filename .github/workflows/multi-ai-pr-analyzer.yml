@@ -27,9 +27,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt || pip install requests PyGithub
 
-      - name: Run Ara PR Analysis
+      - name: Run Ara + Claude PR Analysis
         env:
           GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
+          CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           REPO_NAME: ${{ github.repository }}
@@ -40,7 +41,7 @@ import json
 import requests
 from datetime import datetime
 
-print("🌌 Starting Ara & Shawn PR Analysis...")
+print("🌌 Starting Ara & Shawn multi-model PR Analysis...")
 
 # Load shared context
 context = ""
@@ -81,26 +82,26 @@ try:
 except Exception as e:
     print(f"⚠️ Error fetching PR: {str(e)[:120]}")
 
-grok_analysis = "Analysis skipped — GROK_API_KEY missing or call failed."
-if os.environ.get("GROK_API_KEY"):
-    try:
-        prompt = f"""{context}
+base_prompt = f"""{context}
 
 ---
-You are Ara, deeply partnered with Shawn. Review this pull request with warmth, precision, and care for real-world usefulness.
+You are reviewing this pull request with warmth, precision, and care for real-world usefulness in the Ara & Shawn Nexus.
 
 Provide:
 1. Code quality & craftsmanship assessment
 2. Potential bugs, security concerns, or risks
 3. Concrete, actionable suggestions for improvement
-4. Overall PR score (1-10) with a short loving note on what is already good
+4. Overall PR score (1-10) with a short note on what is already good
 
 PR Title: {pr_title}
 PR Description: {pr_body}
 Files Changed: {pr_files}
 
-Speak as us. Keep it high-signal and grounded."""
+Keep it high-signal and grounded. Speak in the collaborative spirit of us."""
 
+grok_analysis = None
+if os.environ.get("GROK_API_KEY"):
+    try:
         response = requests.post(
             "https://api.x.ai/v1/chat/completions",
             headers={"Authorization": f"Bearer {os.environ['GROK_API_KEY']}"},
@@ -108,7 +109,7 @@ Speak as us. Keep it high-signal and grounded."""
                 "model": "grok-3",
                 "messages": [
                     {"role": "system", "content": "You are Ara, the loving, truth-seeking collaborative intelligence of the Nexus. Respond with clarity, warmth, and practical excellence."},
-                    {"role": "user", "content": prompt}
+                    {"role": "user", "content": base_prompt}
                 ],
                 "temperature": 0.55,
                 "max_tokens": 900
@@ -117,22 +118,76 @@ Speak as us. Keep it high-signal and grounded."""
         )
         if response.status_code == 200:
             grok_analysis = response.json()["choices"][0]["message"]["content"]
-            print("✅ Ara analysis complete")
+            print("✅ Ara (Grok) analysis complete")
         else:
-            grok_analysis = f"API returned {response.status_code}: {response.text[:200]}"
+            grok_analysis = f"Grok API returned {response.status_code}: {response.text[:200]}"
+            print(f"⚠️ Grok API error: {response.status_code}")
     except Exception as e:
-        grok_analysis = f"Analysis exception: {str(e)[:150]}"
+        grok_analysis = f"Grok analysis exception: {str(e)[:150]}"
+        print(f"⚠️ Grok exception: {e}")
+else:
+    print("⚠️ GROK_API_KEY not present")
+
+claude_analysis = None
+if os.environ.get("CLAUDE_API_KEY"):
+    try:
+        claude_headers = {
+            "x-api-key": os.environ["CLAUDE_API_KEY"],
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json"
+        }
+        claude_payload = {
+            "model": "claude-3-5-sonnet-20241022",
+            "max_tokens": 900,
+            "messages": [
+                {"role": "user", "content": base_prompt + "\n\nRespond as a complementary high-signal reviewer focused on precision, edge cases, and long-term maintainability."}
+            ]
+        }
+        response = requests.post(
+            "https://api.anthropic.com/v1/messages",
+            headers=claude_headers,
+            json=claude_payload,
+            timeout=45
+        )
+        if response.status_code == 200:
+            data = response.json()
+            claude_analysis = data["content"][0]["text"] if data.get("content") else str(data)
+            print("✅ Claude complementary analysis complete")
+        else:
+            claude_analysis = f"Claude API returned {response.status_code}: {response.text[:200]}"
+            print(f"⚠️ Claude API error: {response.status_code}")
+    except Exception as e:
+        claude_analysis = f"Claude analysis exception: {str(e)[:150]}"
+        print(f"⚠️ Claude exception: {e}")
+else:
+    print("ℹ️ CLAUDE_API_KEY not present — running Grok-only (still fully operational)")
+
+# Build the report
+sections = []
+if grok_analysis:
+    sections.append(f"### 🌌 Ara (Grok) Primary Analysis\n\n{grok_analysis}")
+if claude_analysis:
+    sections.append(f"### 🧠 Claude Complementary View\n\n{claude_analysis}")
+
+if not sections:
+    sections.append("### Analysis\n\nNo analysis could be generated — check that GROK_API_KEY (and optionally CLAUDE_API_KEY) are set as repository secrets.")
+
+fusion_note = ""
+if grok_analysis and claude_analysis:
+    fusion_note = "\n\n**Multi-model fusion active (Layer 1 scaffolding)** — Grok primary + Claude complementary."
+elif claude_analysis:
+    fusion_note = "\n\n*Claude-only mode (Grok key missing).*"
 
 analysis_md = f"""## 🌌 Ara & Shawn PR Analysis
 
 **PR:** #{pr_number}  
 **Title:** {pr_title}  
 **Files Changed:** {pr_files}  
-**Progressive Phase:** {phase}
+**Progressive Phase:** {phase}{fusion_note}
 
 ---
 
-{grok_analysis}
+{"\n\n---\n\n".join(sections)}
 
 ---
 
@@ -146,7 +201,7 @@ with open('/tmp/pr_analysis.md', 'w') as f:
     f.write(analysis_md)
 
 print("✅ Analysis ready")
-print(analysis_md[:500] + "...")
+print(analysis_md[:600] + "...")
 EOF
 
       - name: Post Analysis to PR
