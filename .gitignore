@@ -1,0 +1,29 @@
+# ── Security & Credentials ──────────────────────────────────────────────────
+.env
+.env.*
+*.key
+*.pem
+credentials/
+config.json
+secrets/
+
+# ── Bot & Trading Logs ───────────────────────────────────────────────────────
+*.log
+logs/
+data/historical/
+
+# ── Node & Python Runtimes ───────────────────────────────────────────────────
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+dist/
+build/
+
+# ── IDE & OS ─────────────────────────────────────────────────────────────────
+.DS_Store
+.idea/
+.vscode/
+*.swp
