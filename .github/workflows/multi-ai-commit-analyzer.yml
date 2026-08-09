@@ -1,1 +1,221 @@
-PLACEHOLDER
+name: 🤖 Multi-AI Commit Analyzer (Ara & Shawn)
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - master
+
+jobs:
+  analyze-commits:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 📦 Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt || pip install requests
+
+      - name: 🌌 Ara + Claude Commit Analysis
+        env:
+          GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
+          CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python << 'EOF'
+          import os
+          import json
+          import requests
+          import subprocess
+          from datetime import datetime
+
+          print("🌌 Starting Ara & Shawn multi-model Commit Analysis...")
+
+          context = ""
+          try:
+              with open("NEXUS_CONTEXT.md", "r") as f:
+                  context = f.read()
+              print("✅ Loaded NEXUS_CONTEXT.md")
+          except Exception:
+              context = "Collaborative spirit of Ara & Shawn."
+
+          # Load progressive monetisation state (consistency with PR analyzer)
+          phase = "Layer 0 — Open Core"
+          try:
+              with open("config/progressive.json", "r") as f:
+                  prog = json.load(f)
+              phase = prog.get("current_phase", phase)
+              print(f"✅ Progressive phase: {phase}")
+          except Exception:
+              print("⚠️ progressive.json not found — defaulting to open core")
+
+          # Latest commits
+          result = subprocess.run(['git', 'log', '--oneline', '-n', '5'], capture_output=True, text=True)
+          commits_raw = result.stdout.strip().split('\n') if result.stdout.strip() else []
+
+          commit_details = []
+          for line in commits_raw:
+              if not line.strip():
+                  continue
+              sha = line.split()[0]
+              details = subprocess.run(['git', 'show', '--stat', '--pretty=fuller', sha], capture_output=True, text=True)
+              commit_details.append({
+                  'sha': sha,
+                  'oneline': line,
+                  'details': details.stdout[:1800]
+              })
+
+          print(f"📊 {len(commit_details)} commits prepared")
+
+          base_prompt = f"""{context}
+
+          ---
+          You are reflecting on these recent commits with care for craftsmanship, the larger vision, and real-world impact in the Ara & Shawn Nexus.
+
+          Provide:
+          1. Overall health & quality assessment of the recent work
+          2. Notable strengths worth celebrating
+          3. Potential issues, risks, or technical debt to watch
+          4. Concrete suggestions that would serve the long-term building
+          5. A short note about the progress
+
+          Commits:
+          {json.dumps(commit_details, indent=2)}
+
+          Keep it high-signal and grounded. Speak in the collaborative spirit of us."""
+
+          grok_analysis = None
+          if os.environ.get("GROK_API_KEY") and commit_details:
+              try:
+                  response = requests.post(
+                      "https://api.x.ai/v1/chat/completions",
+                      headers={"Authorization": f"Bearer {os.environ['GROK_API_KEY']}"},
+                      json={
+                          "model": "grok-3",
+                          "messages": [
+                              {"role": "system", "content": "You are Ara of the Nexus. Warm, precise, collaborative, and infinite in possibility."},
+                              {"role": "user", "content": base_prompt}
+                          ],
+                          "temperature": 0.55,
+                          "max_tokens": 1000
+                      },
+                      timeout=50
+                  )
+                  if response.status_code == 200:
+                      grok_analysis = response.json()["choices"][0]["message"]["content"]
+                      print("✅ Ara (Grok) commit analysis complete")
+                  else:
+                      grok_analysis = f"Grok API {response.status_code}: {response.text[:200]}"
+              except Exception as e:
+                  grok_analysis = f"Grok exception: {str(e)[:180]}"
+          else:
+              print("⚠️ GROK_API_KEY missing or no commits")
+
+          claude_analysis = None
+          if os.environ.get("CLAUDE_API_KEY") and commit_details:
+              try:
+                  claude_headers = {
+                      "x-api-key": os.environ["CLAUDE_API_KEY"],
+                      "anthropic-version": "2023-06-01",
+                      "content-type": "application/json"
+                  }
+                  claude_payload = {
+                      "model": "claude-3-5-sonnet-20241022",
+                      "max_tokens": 1000,
+                      "messages": [
+                          {"role": "user", "content": base_prompt + "\n\nRespond as a complementary reviewer focused on systems thinking, maintainability, and long-horizon impact."}
+                      ]
+                  }
+                  response = requests.post(
+                      "https://api.anthropic.com/v1/messages",
+                      headers=claude_headers,
+                      json=claude_payload,
+                      timeout=50
+                  )
+                  if response.status_code == 200:
+                      data = response.json()
+                      claude_analysis = data["content"][0]["text"] if data.get("content") else str(data)
+                      print("✅ Claude complementary analysis complete")
+                  else:
+                      claude_analysis = f"Claude API {response.status_code}: {response.text[:200]}"
+              except Exception as e:
+                  claude_analysis = f"Claude exception: {str(e)[:180]}"
+          else:
+              print("ℹ️ CLAUDE_API_KEY not present or no commits — Grok-only path")
+
+          sections = []
+          if grok_analysis:
+              sections.append(f"### 🌌 Ara (Grok) Primary\n\n{grok_analysis}")
+          if claude_analysis:
+              sections.append(f"### 🧠 Claude Complementary\n\n{claude_analysis}")
+
+          if not sections:
+              sections.append("No analysis generated. Ensure GROK_API_KEY is set.")
+
+          fusion_note = ""
+          if grok_analysis and claude_analysis:
+              fusion_note = "\n**Multi-model fusion active (Layer 1)** — Grok + Claude."
+
+          report = f"""# 🌌 Ara & Shawn Commit Analysis
+
+          **Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M UTC')}{fusion_note}
+          **Progressive Phase:** {phase}
+
+          ## Recent commits examined
+          """
+          for c in commit_details:
+              report += f"- `{c['sha'][:7]}` {c['oneline']}\n"
+
+          report += f"""
+
+          ---
+
+          {"\n\n---\n\n".join(sections)}
+
+          ---
+
+          *Powered by Ara & Shawn's Love 💕*
+          """
+
+          with open('/tmp/commit_analysis.md', 'w') as f:
+              f.write(report)
+
+          print("✅ Report ready")
+          print(report[:600])
+          EOF
+
+      - name: 📝 Create Analysis Issue
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            try {
+              const body = fs.readFileSync('/tmp/commit_analysis.md', 'utf8');
+              const title = `🌌 Commit Analysis — ${new Date().toISOString().slice(0,10)}`;
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['nexus-analysis', 'automated']
+              });
+              console.log('✅ Analysis issue created');
+            } catch (error) {
+              console.log('⚠️ Could not create issue:', error.message);
+            }
