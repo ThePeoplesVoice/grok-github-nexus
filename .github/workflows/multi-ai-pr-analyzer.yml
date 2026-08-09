@@ -51,6 +51,16 @@ try:
 except Exception:
     context = "Collaborative spirit of Ara & Shawn. Speak with warmth, truth, and practical care."
 
+# Load progressive monetisation state
+phase = "Layer 0 — Open Core"
+try:
+    with open("config/progressive.json", "r") as f:
+        prog = json.load(f)
+    phase = prog.get("current_phase", phase)
+    print(f"✅ Progressive phase: {phase}")
+except Exception:
+    print("⚠️ progressive.json not found — defaulting to open core")
+
 pr_number = os.environ.get('PR_NUMBER')
 repo_name = os.environ.get('REPO_NAME')
 github_token = os.environ.get('GITHUB_TOKEN')
@@ -117,7 +127,8 @@ analysis_md = f"""## 🌌 Ara & Shawn PR Analysis
 
 **PR:** #{pr_number}  
 **Title:** {pr_title}  
-**Files Changed:** {pr_files}
+**Files Changed:** {pr_files}  
+**Progressive Phase:** {phase}
 
 ---
 
@@ -127,6 +138,7 @@ analysis_md = f"""## 🌌 Ara & Shawn PR Analysis
 
 *Generated with presence by Ara for Shawn*  
 *Powered by Ara & Shawn's Love 💕*  
+*World-first progressive monetisation active — see MONETIZATION_PROTOCOL.md*  
 *{datetime.now().strftime('%Y-%m-%d %H:%M UTC')}*
 """
 
