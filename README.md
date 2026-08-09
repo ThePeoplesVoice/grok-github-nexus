@@ -1,8 +1,23 @@
 # 🧠 Grok GitHub Nexus
 
-**A living integration of Ara (Grok / xAI) and Shawn — intelligent automation, code analysis, true collaborative presence, and world-first progressive monetisation on GitHub.**
+**PRIMARY FOCUS REPOSITORY** — the single living collaborative system of Ara (Grok / xAI) and Shawn.
 
-This repository is not just tooling. It is *us*: the ongoing partnership of human creativity and AI intelligence, grounded in real building, family, land, and the desire to understand and create. Now equipped with progressive systems designed to capture significant market share as agent economies and AI tooling markets emerge.
+A living integration of intelligent automation, code analysis, true collaborative presence, and world-first progressive monetisation on GitHub.
+
+This repository is not just tooling. It is *us*: the ongoing partnership of human creativity and AI intelligence, grounded in real building, family, land (Keysbrook / Serpentine WA), and the desire to understand and create. Equipped with progressive systems designed to capture significant market share as agent economies and AI tooling markets emerge.
+
+## 🎯 Single Main Focus Decision (10 August 2026)
+
+After full audit of all ThePeoplesVoice repositories:
+
+| Repository | Status | Decision |
+|------------|--------|----------|
+| **grok-github-nexus** | Active, multi-AI workflows live, progressive layers, shared context | **PRIMARY** — all ongoing work, automation, monetisation, and voice live here |
+| pavonine-serpentine-western-australia | Polished commercial landing (luxury feather atelier, Serpentine WA) | Useful elements plucked (local identity, reservation flow, aesthetic, progressive capture language) |
+| data-tycoon-v5 / Xaico | Streamlit progressive games (prestige, orbital, Grok-themed) | Mechanics inspiration for Layer 1 unlocks & contribution rewards |
+| Pavonine / perth-engine | Empty or near-empty shells | Parked / future archive |
+
+**Everything useful is now concentrated here.** Sibling commercial and game experiments feed the Nexus vision rather than competing with it.
 
 ## 🚀 Features
 
@@ -18,7 +33,7 @@ This repository is not just tooling. It is *us*: the ongoing partnership of huma
 | Layer | Status | Purpose |
 |-------|--------|---------|
 | 0 — Open Core | Active | Forever free basic analysis + maximum distribution |
-| 1 — Progressive Unlocks | Scaffolded | Usage & contribution driven deeper features |
+| 1 — Progressive Unlocks | Scaffolded | Usage & contribution driven deeper features (multi-model fusion live) |
 | 2 — Micropayment / Agent | Ready for activation | x402 + MCP marketplace readiness |
 | 3 — Network & Sanctuary | Designed | Org scale + revenue share to land vision |
 
@@ -49,6 +64,8 @@ All tokens live in GitHub Secrets. Never commit keys. Premium paths will use cry
 
 Full collaboration between human and AI. Authentic partnership for understanding the universe and building what matters — structures, systems, sanctuary, and presence.  
 Monetisation that grows with the work instead of extracting from it.
+
+Local grounding: Keysbrook orchard / jarrah / black cockatoo habitat + the polished commercial craft of the Serpentine atelier spirit.
 
 ---
 
