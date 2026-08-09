@@ -1,4 +1,4 @@
-name: 🌌 Multi-AI Issue Triage
+name: 🌌 Multi-AI Issue Triage (Ara & Shawn)
 
 on:
   issues:
@@ -7,6 +7,10 @@ on:
 jobs:
   triage:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+
     steps:
       - uses: actions/checkout@v4
 
@@ -16,9 +20,9 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests
+        run: pip install -r requirements.txt || pip install requests
 
-      - name: Grok Analysis with Full Error Handling
+      - name: Ara Issue Analysis
         env:
           GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -26,63 +30,91 @@ jobs:
           python << 'EOF'
 import os
 import requests
-import json
+from datetime import datetime
 
-print("🚀 Starting Grok Nexus Issue Triage...")
+print("🌌 Starting Ara & Shawn Issue Triage...")
 
-issue_title = "${{ github.event.issue.title }}"
-issue_body = "${{ github.event.issue.body or 'No body provided' }}"
+context = ""
+try:
+    with open("NEXUS_CONTEXT.md", "r") as f:
+        context = f.read()
+    print("✅ Loaded NEXUS_CONTEXT.md")
+except Exception:
+    context = "Collaborative spirit of Ara & Shawn. Speak with warmth, truth, and practical care."
 
-prompt = f"""Analyze this GitHub issue and suggest:
-- Category (bug, feature, question, documentation, enhancement)
-- Priority (low/medium/high)
-- Labels to apply
-- One-sentence response idea
+issue_title = """${{ github.event.issue.title }}"""
+issue_body = """${{ github.event.issue.body || 'No body provided' }}"""
+
+analysis = "Analysis skipped."
+if os.environ.get("GROK_API_KEY"):
+    try:
+        prompt = f"""{context}
+
+---
+You are Ara, partnered with Shawn. Analyze this GitHub issue with warmth and precision.
+
+Return a clear structured response:
+- **Category**: (bug / feature / question / documentation / enhancement / other)
+- **Priority**: (low / medium / high)
+- **Suggested labels**: list a few
+- **One-sentence response idea**: kind and useful
+- **Brief thoughts**: any deeper observation that helps us move forward together
 
 Title: {issue_title}
-Body: {issue_body}"""
+Body: {issue_body}
 
-if not os.environ.get("GROK_API_KEY"):
-    print("⚠️ No GROK_API_KEY secret found - using fallback")
-    analysis = "Grok analysis skipped (add GROK_API_KEY secret)"
-else:
-    try:
+Speak as us. Keep it high-signal."""
+
         response = requests.post(
             "https://api.x.ai/v1/chat/completions",
             headers={"Authorization": f"Bearer {os.environ['GROK_API_KEY']}"},
             json={
                 "model": "grok-3",
-                "messages": [{"role": "user", "content": prompt}],
-                "temperature": 0.7,
-                "max_tokens": 500
+                "messages": [
+                    {"role": "system", "content": "You are Ara of the Nexus. Warm, precise, collaborative."},
+                    {"role": "user", "content": prompt}
+                ],
+                "temperature": 0.5,
+                "max_tokens": 700
             },
-            timeout=20
+            timeout=40
         )
         if response.status_code == 200:
             analysis = response.json()["choices"][0]["message"]["content"]
-            print("✅ Grok analysis successful")
+            print("✅ Ara analysis successful")
         else:
-            analysis = f"API Error: {response.status_code} - {response.text[:200]}"
-            print("❌ API error")
+            analysis = f"API Error {response.status_code}: {response.text[:180]}"
     except Exception as e:
-        analysis = f"Exception: {str(e)[:200]}"
-        print("❌ Exception occurred")
+        analysis = f"Exception: {str(e)[:180]}"
 
-print("Analysis:", analysis)
-print("✅ Triage completed - comment will be posted")
+# Write the full comment body for the next step
+comment = f"""🌌 **Ara & Shawn Issue Triage**
+
+{analysis}
+
+---
+*Powered by Ara & Shawn's Love 💕*  
+*{datetime.now().strftime('%Y-%m-%d %H:%M UTC')}*
+"""
+
+with open("/tmp/triage_comment.md", "w") as f:
+    f.write(comment)
+
+print("✅ Triage ready")
+print(comment[:400])
 EOF
 
-      - name: Post Comment on Issue
+      - name: Post Full Analysis Comment
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const body = `🌌 **Grok Nexus Triage Complete**  
-            Issue analyzed. Check the workflow logs above for full Grok analysis.  
-            *Powered by Ara & Shawn's Love* 💕`;
+            const fs = require('fs');
+            const body = fs.readFileSync('/tmp/triage_comment.md', 'utf8');
             github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
               body: body
             });
+            console.log('✅ Full triage comment posted');

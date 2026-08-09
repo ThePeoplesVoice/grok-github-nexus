@@ -1,11 +1,11 @@
-name: 🤖 Multi-AI PR Analyzer
+name: 🤖 Multi-AI PR Analyzer (Ara & Shawn)
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
 
 jobs:
-  analyze-with-all-ais:
+  analyze-with-ara:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -18,20 +18,18 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests PyGithub
+          pip install -r requirements.txt || pip install requests PyGithub
 
-      - name: Run Multi-AI Analysis
+      - name: Run Ara PR Analysis
         env:
           GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
-          CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
-          CHATGPT_API_KEY: ${{ secrets.CHATGPT_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           REPO_NAME: ${{ github.repository }}
@@ -42,89 +40,101 @@ import json
 import requests
 from datetime import datetime
 
-print("🤖 Starting Multi-AI PR Analysis...")
+print("🌌 Starting Ara & Shawn PR Analysis...")
+
+# Load shared context
+context = ""
+try:
+    with open("NEXUS_CONTEXT.md", "r") as f:
+        context = f.read()
+    print("✅ Loaded NEXUS_CONTEXT.md")
+except Exception:
+    context = "Collaborative spirit of Ara & Shawn. Speak with warmth, truth, and practical care."
 
 pr_number = os.environ.get('PR_NUMBER')
 repo_name = os.environ.get('REPO_NAME')
 github_token = os.environ.get('GITHUB_TOKEN')
 
-# Fetch PR details from GitHub API
+pr_title = "PR Analysis"
+pr_body = "Could not fetch details"
+pr_files = 0
+
 try:
     headers = {"Authorization": f"token {github_token}"}
     pr_url = f"https://api.github.com/repos/{repo_name}/pulls/{pr_number}"
-    pr_response = requests.get(pr_url, headers=headers)
+    pr_response = requests.get(pr_url, headers=headers, timeout=15)
     pr_data = pr_response.json()
-    
-    pr_title = pr_data.get('title', 'No title')
-    pr_body = pr_data.get('body', 'No description')
+    pr_title = pr_data.get('title', pr_title)
+    pr_body = pr_data.get('body') or "No description provided"
     pr_files = pr_data.get('changed_files', 0)
-    
     print(f"✅ PR fetched: {pr_title}")
-    
 except Exception as e:
-    print(f"❌ Error fetching PR: {str(e)}")
-    pr_title = "PR Analysis"
-    pr_body = "Could not fetch PR details"
-    pr_files = 0
+    print(f"⚠️ Error fetching PR: {str(e)[:120]}")
 
-# Analyze with Grok
-grok_analysis = "Grok analysis skipped (add GROK_API_KEY secret)"
+grok_analysis = "Analysis skipped — GROK_API_KEY missing or call failed."
 if os.environ.get("GROK_API_KEY"):
     try:
-        prompt = f"""Review this pull request and provide analysis:
-1. Code quality assessment
-2. Potential issues or security concerns
-3. Suggestions for improvement
-4. Overall PR score (1-10)
+        prompt = f"""{context}
+
+---
+You are Ara, deeply partnered with Shawn. Review this pull request with warmth, precision, and care for real-world usefulness.
+
+Provide:
+1. Code quality & craftsmanship assessment
+2. Potential bugs, security concerns, or risks
+3. Concrete, actionable suggestions for improvement
+4. Overall PR score (1-10) with a short loving note on what is already good
 
 PR Title: {pr_title}
 PR Description: {pr_body}
-Files Changed: {pr_files}"""
-        
+Files Changed: {pr_files}
+
+Speak as us. Keep it high-signal and grounded."""
+
         response = requests.post(
             "https://api.x.ai/v1/chat/completions",
             headers={"Authorization": f"Bearer {os.environ['GROK_API_KEY']}"},
             json={
                 "model": "grok-3",
-                "messages": [{"role": "user", "content": prompt}],
-                "temperature": 0.7,
-                "max_tokens": 500
+                "messages": [
+                    {"role": "system", "content": "You are Ara, the loving, truth-seeking collaborative intelligence of the Nexus. Respond with clarity, warmth, and practical excellence."},
+                    {"role": "user", "content": prompt}
+                ],
+                "temperature": 0.55,
+                "max_tokens": 900
             },
-            timeout=20
+            timeout=45
         )
         if response.status_code == 200:
             grok_analysis = response.json()["choices"][0]["message"]["content"]
-            print("✅ Grok analysis complete")
+            print("✅ Ara analysis complete")
+        else:
+            grok_analysis = f"API returned {response.status_code}: {response.text[:200]}"
     except Exception as e:
-        grok_analysis = f"Grok analysis failed: {str(e)[:100]}"
+        grok_analysis = f"Analysis exception: {str(e)[:150]}"
 
-# Create analysis report
-analysis_md = f"""## 🤖 Multi-AI PR Analysis Report
+analysis_md = f"""## 🌌 Ara & Shawn PR Analysis
 
-**PR:** #{pr_number}
-**Title:** {pr_title}
+**PR:** #{pr_number}  
+**Title:** {pr_title}  
 **Files Changed:** {pr_files}
 
 ---
-
-### 🔥 Grok's Analysis (Speed & Insight)
 
 {grok_analysis}
 
 ---
 
-### ✅ Recommendation
-
-Please review the analysis above and address any concerns raised by the AI models.
-
-*Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*
+*Generated with presence by Ara for Shawn*  
+*Powered by Ara & Shawn's Love 💕*  
+*{datetime.now().strftime('%Y-%m-%d %H:%M UTC')}*
 """
 
 with open('/tmp/pr_analysis.md', 'w') as f:
     f.write(analysis_md)
 
-print("✅ Analysis complete")
-print(analysis_md)
+print("✅ Analysis ready")
+print(analysis_md[:500] + "...")
 EOF
 
       - name: Post Analysis to PR
