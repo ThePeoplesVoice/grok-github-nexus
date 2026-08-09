@@ -1,0 +1,34 @@
+{
+  "version": "1.0.0",
+  "protocol": "Nexus Progressive Value Capture",
+  "layers": {
+    "0_open_core": {
+      "enabled": true,
+      "description": "Forever free basic analysis for public good and maximum adoption",
+      "features": ["basic_pr_review", "issue_triage", "commit_reflection", "nexus_voice"]
+    },
+    "1_progressive_unlocks": {
+      "enabled": true,
+      "description": "Unlocks based on usage, stars, forks, and community contribution",
+      "triggers": {
+        "min_stars": 10,
+        "min_successful_analyses": 50,
+        "min_community_prs": 3
+      },
+      "features": ["multi_model_fusion", "deeper_context", "custom_domain_packs", "historical_memory"]
+    },
+    "2_micropayment_agent": {
+      "enabled": false,
+      "description": "x402 / USDC pay-per-use and agent-native payments. Activates when infrastructure is live.",
+      "protocols": ["x402", "mcp_marketplace", "usdc_base"],
+      "features": ["premium_depth", "private_repo", "outcome_based", "agent_self_budgeting"]
+    },
+    "3_network_sanctuary": {
+      "enabled": false,
+      "description": "Organisation scale, revenue share to sanctuary vision, marketplace",
+      "features": ["multi_repo_dashboard", "team_seats", "sanctuary_revenue_share", "workflow_marketplace"]
+    }
+  },
+  "current_phase": "Layer 0 + Layer 1 scaffolding",
+  "notes": "This file is the single source of truth for progressive feature flags. Workflows and future services read it."
+}
