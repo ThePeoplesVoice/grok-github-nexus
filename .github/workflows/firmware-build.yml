@@ -1,7 +1,18 @@
-# This workflow has been disabled
-# The firmware-build workflow is not applicable to the Grok GitHub Nexus project
-# which is designed for AI-powered code analysis, not embedded firmware builds.
-# Use the multi-ai workflows instead:
-# - multi-ai-commit-analyzer.yml
-# - multi-ai-issue-triage.yml
-# - multi-ai-pr-analyzer.yml
+name: Disabled — Firmware Build (Nexus is AI analysis, not firmware)
+
+# Intentionally disabled. This file exists only to prevent GitHub Actions
+# from treating a pure-comment file as an invalid workflow.
+# The Nexus control plane uses the multi-ai-* analyzers exclusively.
+
+on:
+  workflow_dispatch:
+    # Manual only — never runs on push/PR
+
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Intentional no-op
+        run: |
+          echo "This workflow is permanently disabled for the Grok GitHub Nexus."
+          echo "Use multi-ai-commit-analyzer, multi-ai-pr-analyzer, multi-ai-issue-triage instead."
