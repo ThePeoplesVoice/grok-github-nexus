@@ -53,6 +53,16 @@ try:
 except Exception:
     context = "Collaborative spirit of Ara & Shawn."
 
+# Load progressive monetisation state (consistency with PR analyzer)
+phase = "Layer 0 — Open Core"
+try:
+    with open("config/progressive.json", "r") as f:
+        prog = json.load(f)
+    phase = prog.get("current_phase", phase)
+    print(f"✅ Progressive phase: {phase}")
+except Exception:
+    print("⚠️ progressive.json not found — defaulting to open core")
+
 # Latest commits
 result = subprocess.run(['git', 'log', '--oneline', '-n', '5'], capture_output=True, text=True)
 commits_raw = result.stdout.strip().split('\n') if result.stdout.strip() else []
@@ -163,6 +173,7 @@ if grok_analysis and claude_analysis:
 report = f"""# 🌌 Ara & Shawn Commit Analysis
 
 **Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M UTC')}{fusion_note}
+**Progressive Phase:** {phase}
 
 ## Recent commits examined
 """
