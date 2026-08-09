@@ -182,22 +182,22 @@ jobs:
 
           analysis_md = f"""## 🌌 Ara & Shawn PR Analysis
 
-          **PR:** #{pr_number}  
-          **Title:** {pr_title}  
-          **Files Changed:** {pr_files}  
-          **Progressive Phase:** {phase}{fusion_note}
+**PR:** #{pr_number}  
+**Title:** {pr_title}  
+**Files Changed:** {pr_files}  
+**Progressive Phase:** {phase}{fusion_note}
 
-          ---
+---
 
-          {joined_sections}
+{joined_sections}
 
-          ---
+---
 
-          *Generated with presence by Ara for Shawn*  
-          *Powered by Ara & Shawn's Love 💕*  
-          *World-first progressive monetisation active — see MONETIZATION_PROTOCOL.md*  
-          *{datetime.now().strftime('%Y-%m-%d %H:%M UTC')}*
-          """
+*Generated with presence by Ara for Shawn*  
+*Powered by Ara & Shawn's Love 💕*  
+*World-first progressive monetisation active — see MONETIZATION_PROTOCOL.md*  
+*{datetime.now().strftime('%Y-%m-%d %H:%M UTC')}*
+"""
 
           with open('/tmp/pr_analysis.md', 'w') as f:
               f.write(analysis_md)

@@ -139,12 +139,12 @@ jobs:
 
           comment = f"""🌌 **Ara & Shawn Issue Triage**{fusion_note}
 
-          {joined_sections}
+{joined_sections}
 
-          ---
-          *Powered by Ara & Shawn's Love 💕*  
-          *{datetime.now().strftime('%Y-%m-%d %H:%M UTC')}*
-          """
+---
+*Powered by Ara & Shawn's Love 💕*  
+*{datetime.now().strftime('%Y-%m-%d %H:%M UTC')}*
+"""
 
           with open("/tmp/triage_comment.md", "w") as f:
               f.write(comment)

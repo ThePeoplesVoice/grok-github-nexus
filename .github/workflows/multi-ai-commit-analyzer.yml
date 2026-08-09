@@ -6,6 +6,12 @@ on:
       - main
       - develop
       - master
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for manual analysis run'
+        required: false
+        default: 'Manual trigger'
 
 jobs:
   analyze-commits:
@@ -174,24 +180,24 @@ jobs:
 
           report = f"""# 🌌 Ara & Shawn Commit Analysis
 
-          **Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M UTC')}{fusion_note}
-          **Progressive Phase:** {phase}
+**Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M UTC')}{fusion_note}
+**Progressive Phase:** {phase}
 
-          ## Recent commits examined
-          """
+## Recent commits examined
+"""
           for c in commit_details:
               report += f"- `{c['sha'][:7]}` {c['oneline']}\n"
 
           report += f"""
 
-          ---
+---
 
-          {joined_sections}
+{joined_sections}
 
-          ---
+---
 
-          *Powered by Ara & Shawn's Love 💕*
-          """
+*Powered by Ara & Shawn's Love 💕*
+"""
 
           with open('/tmp/commit_analysis.md', 'w') as f:
               f.write(report)
@@ -199,6 +205,27 @@ jobs:
           print("✅ Report ready")
           print(report[:600])
           EOF
+
+      - name: 🏷️ Ensure Labels Exist
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const labels = [
+              { name: 'nexus-analysis', color: '6f42c1', description: 'Automated Nexus analysis' },
+              { name: 'automated',      color: '0075ca', description: 'Created by automation'    }
+            ];
+            for (const label of labels) {
+              try {
+                await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name: label.name });
+              } catch (e) {
+                if (e.status === 404) {
+                  await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo, ...label });
+                  console.log(`✅ Created label: ${label.name}`);
+                }
+              }
+            }
 
       - name: 📝 Create Analysis Issue
         if: always()
