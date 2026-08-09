@@ -7,10 +7,11 @@ credentials/
 config.json
 secrets/
 
-# ── Bot & Trading Logs ───────────────────────────────────────────────────────
+# ── Bot & Trading State ──────────────────────────────────────────────────────
 *.log
 logs/
 data/historical/
+paper_state.json
 
 # ── Node & Python Runtimes ───────────────────────────────────────────────────
 node_modules/
