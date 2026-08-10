@@ -1,14 +1,18 @@
+import json
 import time
-import requests
 import hmac
 import hashlib
 from math import sqrt
 from urllib.parse import urlencode
 
+import requests
+
 # ==================== BYBIT CONFIG ====================
 API_KEY = ""          # ← Your Bybit API Key
 API_SECRET = ""       # ← Your Bybit API Secret
-TESTNET = True        # ← Set to False only when ready for real money
+TESTNET = True         # ← Set to False only when ready for real money
+ALLOW_LIVE_TRADING = False  # hard safety gate for real-money mode
+DRY_RUN = True         # set False for actual testnet/live orders
 
 # Strategy
 LOOKBACK = 24
@@ -16,10 +20,19 @@ Z_ENTRY = 2.5
 SL_ATR = 1.25
 TP_ATR = 1.8
 COOLDOWN = 3 * 3600
+MAX_HOLD_SECONDS = 24 * 3600
 
 # Risk
-RISK_PERCENT = 0.5            # Very conservative for live
-MAX_POSITION_USDT = 50        # Hard cap in USDT
+RISK_PERCENT = 0.5
+MAX_POSITION_USDT = 50
+MIN_NOTIONAL_USDT = 1.0
+MAX_QTY_ETH = 0.05
+MIN_QTY_ETH = 0.001
+
+# Market
+SYMBOL = "ETHUSDT"
+YAHOO_ETH = "ETH-USD"
+YAHOO_BTC = "BTC-USD"
 
 TELEGRAM_TOKEN = ""
 TELEGRAM_CHAT_ID = ""
@@ -27,7 +40,7 @@ TELEGRAM_CHAT_ID = ""
 
 BASE_URL = "https://api-testnet.bybit.com" if TESTNET else "https://api.bybit.com"
 last_signal_time = 0
-in_position = False
+position = None
 
 
 def send(msg):
@@ -46,30 +59,33 @@ def send(msg):
 def bybit_request(method, endpoint, params=None):
     if params is None:
         params = {}
-    timestamp = str(int(time.time() * 1000))
-    params["api_key"] = API_KEY
-    params["timestamp"] = timestamp
-    params["recv_window"] = 5000
 
-    query = urlencode(sorted(params.items()))
-    signature = hmac.new(
-        API_SECRET.encode("utf-8"),
-        query.encode("utf-8"),
-        hashlib.sha256,
-    ).hexdigest()
-    params["sign"] = signature
+    timestamp = str(int(time.time() * 1000))
+    recv_window = "5000"
+
+    if method == "GET":
+        payload = urlencode(sorted(params.items()))
+    else:
+        payload = json.dumps(params, separators=(",", ":"))
+
+    to_sign = f"{timestamp}{API_KEY}{recv_window}{payload}"
+    signature = hmac.new(API_SECRET.encode("utf-8"), to_sign.encode("utf-8"), hashlib.sha256).hexdigest()
+
+    headers = {
+        "X-BAPI-API-KEY": API_KEY,
+        "X-BAPI-TIMESTAMP": timestamp,
+        "X-BAPI-RECV-WINDOW": recv_window,
+        "X-BAPI-SIGN": signature,
+        "X-BAPI-SIGN-TYPE": "2",
+        "Content-Type": "application/json",
+    }
 
     url = BASE_URL + endpoint
     if method == "GET":
-        r = requests.get(url, params=params, timeout=10)
+        r = requests.get(url, params=params, headers=headers, timeout=12)
     else:
-        r = requests.post(url, data=params, timeout=10)
+        r = requests.post(url, json=params, headers=headers, timeout=12)
     return r.json()
-
-
-def get_eth_price():
-    eth = get_closes("ETH-USD")
-    return eth[-1] if eth else None
 
 
 def get_closes(symbol):
@@ -103,11 +119,41 @@ def calc_atr(h, l, c, period=14):
     return sum(trs[-period:]) / period
 
 
+def get_coin_balance(coin):
+    if DRY_RUN:
+        return None
+    result = bybit_request("GET", "/v5/account/wallet-balance", {"accountType": "UNIFIED", "coin": coin})
+    if result.get("retCode") != 0:
+        return None
+
+    try:
+        wallets = result["result"]["list"]
+        for wallet in wallets:
+            for item in wallet.get("coin", []):
+                if item.get("coin") == coin:
+                    bal = item.get("walletBalance") or item.get("availableToWithdraw") or "0"
+                    return float(bal)
+    except Exception:
+        return None
+    return None
+
+
 def place_order(side, qty):
+    if DRY_RUN:
+        return {
+            "retCode": 0,
+            "retMsg": "OK",
+            "result": {"orderId": f"dry-{int(time.time())}", "side": side, "qty": str(qty)},
+            "dryRun": True,
+        }
+
+    if not API_KEY or not API_SECRET:
+        return {"retCode": -1, "retMsg": "Missing API credentials"}
+
     params = {
         "category": "spot",
-        "symbol": "ETHUSDT",
-        "side": side,  # Buy or Sell
+        "symbol": SYMBOL,
+        "side": side,
         "orderType": "Market",
         "qty": str(round(qty, 5)),
         "timeInForce": "IOC",
@@ -115,20 +161,77 @@ def place_order(side, qty):
     return bybit_request("POST", "/v5/order/create", params)
 
 
-def analyse():
-    global last_signal_time, in_position
+def calc_order_qty(current_price):
+    risk_usdt = min(MAX_POSITION_USDT * (RISK_PERCENT / 100) * 20, MAX_POSITION_USDT)
 
-    if in_position:
+    usdt_balance = get_coin_balance("USDT")
+    if usdt_balance is not None:
+        risk_usdt = min(risk_usdt, usdt_balance * 0.98)
+
+    if risk_usdt < MIN_NOTIONAL_USDT:
+        return None
+
+    qty = risk_usdt / current_price
+    qty = max(MIN_QTY_ETH, min(qty, MAX_QTY_ETH))
+
+    if qty * current_price < MIN_NOTIONAL_USDT:
+        return None
+    return round(qty, 5)
+
+
+def manage_open_position(current_price):
+    global position
+
+    if not position:
         return
 
-    eth = get_closes("ETH-USD")
-    btc = get_closes("BTC-USD")
+    should_exit = False
+    reason = None
+
+    if current_price <= position["stop_loss"]:
+        should_exit = True
+        reason = "Stop loss"
+    elif current_price >= position["take_profit"]:
+        should_exit = True
+        reason = "Take profit"
+    elif (time.time() - position["opened_at"]) >= MAX_HOLD_SECONDS:
+        should_exit = True
+        reason = "Max hold time"
+
+    if not should_exit:
+        return
+
+    result = place_order("Sell", position["qty"])
+    if result.get("retCode") == 0:
+        send(
+            f"<b>EXIT EXECUTED</b>\n"
+            f"Reason: {reason}\n"
+            f"Qty: {position['qty']:.5f} ETH\n"
+            f"Entry: {position['entry_price']:.2f}\n"
+            f"Exit ≈ {current_price:.2f}\n"
+            f"{('DRY RUN' if DRY_RUN else ('TESTNET' if TESTNET else 'LIVE'))}"
+        )
+        position = None
+    else:
+        send(f"Exit failed: {result.get('retMsg', 'Unknown error')}")
+
+
+def analyse():
+    global last_signal_time, position
+
+    eth = get_closes(YAHOO_ETH)
+    btc = get_closes(YAHOO_BTC)
     if not eth or not btc:
         return
 
     min_len = min(len(eth), len(btc))
     eth, btc = eth[-min_len:], btc[-min_len:]
     if min_len < LOOKBACK + 5:
+        return
+
+    current = eth[-1]
+    if position:
+        manage_open_position(current)
         return
 
     ratios = [eth[i] / btc[i] for i in range(min_len)]
@@ -138,14 +241,14 @@ def analyse():
     std = sqrt(var) if var > 0 else 1e-8
     z = (ratios[-1] - mean) / std
 
-    eth_c, eth_h, eth_l = get_ohlc("ETH-USD")
+    eth_c, eth_h, eth_l = get_ohlc(YAHOO_ETH)
     if not eth_c:
         return
+
     atr = calc_atr(eth_h, eth_l, eth_c)
-    if atr is None:
+    if atr is None or atr <= 0:
         return
 
-    current = eth[-1]
     signal = None
     if z >= Z_ENTRY:
         signal = "Sell"
@@ -155,34 +258,58 @@ def analyse():
     if not signal:
         return
 
+    if signal == "Sell":
+        send(f"Signal=Sell z={z:.2f} ignored (spot long-only entry logic).")
+        return
+
     now = time.time()
     if now - last_signal_time < COOLDOWN:
         return
     last_signal_time = now
 
-    # Position size calculation (very conservative)
-    risk_usdt = min(MAX_POSITION_USDT * (RISK_PERCENT / 100) * 20, MAX_POSITION_USDT)  # rough
-    qty = risk_usdt / current
-    qty = max(0.001, min(qty, 0.05))  # hard safety limits
+    qty = calc_order_qty(current)
+    if qty is None:
+        send("Entry skipped: insufficient notional/balance for safe order size.")
+        return
 
-    result = place_order(signal, qty)
+    stop_loss = current - (SL_ATR * atr)
+    take_profit = current + (TP_ATR * atr)
 
+    result = place_order("Buy", qty)
     if result.get("retCode") == 0:
-        in_position = True
+        position = {
+            "side": "Buy",
+            "qty": qty,
+            "entry_price": current,
+            "stop_loss": stop_loss,
+            "take_profit": take_profit,
+            "opened_at": time.time(),
+        }
         send(
-            f"<b>BYBIT ORDER PLACED</b>\n"
-            f"Side: {signal}\n"
+            f"<b>ENTRY EXECUTED</b>\n"
+            f"Side: Buy\n"
             f"Qty: {qty:.5f} ETH\n"
-            f"Price ≈ {current:.2f}\n"
+            f"Entry ≈ {current:.2f}\n"
+            f"SL: {stop_loss:.2f}\n"
+            f"TP: {take_profit:.2f}\n"
             f"Z-Score: {z:.2f}\n"
-            f"{'TESTNET' if TESTNET else 'LIVE'}"
+            f"{('DRY RUN' if DRY_RUN else ('TESTNET' if TESTNET else 'LIVE'))}"
         )
     else:
         send(f"Order failed: {result.get('retMsg', 'Unknown error')}")
 
 
 def main():
-    mode = "TESTNET" if TESTNET else "LIVE"
+    mode = "DRY RUN" if DRY_RUN else ("TESTNET" if TESTNET else "LIVE")
+
+    if not TESTNET and not ALLOW_LIVE_TRADING:
+        send("LIVE mode blocked: set ALLOW_LIVE_TRADING=True only when ready for real money.")
+        return
+
+    if not DRY_RUN and (not API_KEY or not API_SECRET):
+        send("Missing API credentials. Populate API_KEY and API_SECRET before non-dry-run mode.")
+        return
+
     send(f"<b>SeaTrader Bybit {mode}</b>\nZ={Z_ENTRY} | Lookback={LOOKBACK}")
     print(f"Bybit bot running ({mode})...")
 
