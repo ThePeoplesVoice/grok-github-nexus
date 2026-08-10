@@ -99,6 +99,7 @@ jobs:
           Keep it high-signal and grounded. Speak in the collaborative spirit of us."""
 
           grok_analysis = None
+          grok_error = None
           if os.environ.get("GROK_API_KEY") and commit_details:
               try:
                   response = requests.post(
@@ -119,13 +120,16 @@ jobs:
                       grok_analysis = response.json()["choices"][0]["message"]["content"]
                       print("✅ Ara (Grok) commit analysis complete")
                   else:
-                      grok_analysis = f"Grok API {response.status_code}: {response.text[:200]}"
+                      grok_error = f"Grok API {response.status_code}: {response.text[:200]}"
+                      print(f"⚠️ {grok_error}")
               except Exception as e:
-                  grok_analysis = f"Grok exception: {str(e)[:180]}"
+                  grok_error = f"Grok exception: {str(e)[:180]}"
+                  print(f"⚠️ {grok_error}")
           else:
               print("⚠️ GROK_API_KEY missing or no commits")
 
           claude_analysis = None
+          claude_error = None
           if os.environ.get("CLAUDE_API_KEY") and commit_details:
               try:
                   claude_headers = {
@@ -151,9 +155,11 @@ jobs:
                       claude_analysis = data["content"][0]["text"] if data.get("content") else str(data)
                       print("✅ Claude complementary analysis complete")
                   else:
-                      claude_analysis = f"Claude API {response.status_code}: {response.text[:200]}"
+                      claude_error = f"Claude API {response.status_code}: {response.text[:200]}"
+                      print(f"⚠️ {claude_error}")
               except Exception as e:
-                  claude_analysis = f"Claude exception: {str(e)[:180]}"
+                  claude_error = f"Claude exception: {str(e)[:180]}"
+                  print(f"⚠️ {claude_error}")
           else:
               print("ℹ️ CLAUDE_API_KEY not present or no commits — Grok-only path")
 
@@ -164,11 +170,15 @@ jobs:
               sections.append(f"### 🧠 Claude Complementary\n\n{claude_analysis}")
 
           if not sections:
-              sections.append("No analysis generated. Ensure GROK_API_KEY is set.")
+              sections.append("No analysis generated. Ara/Grok and Claude were unavailable — see workflow logs for details.")
 
           fusion_note = ""
           if grok_analysis and claude_analysis:
               fusion_note = "\n**Multi-model fusion active (Layer 1)** — Grok + Claude."
+          elif grok_analysis and claude_error:
+              fusion_note = "\n*Claude complementary analysis unavailable — continuing with Ara primary only.*"
+          elif claude_analysis and grok_error:
+              fusion_note = "\n*Ara primary analysis unavailable — complementary mode only.*"
 
           joined_sections = "\n\n---\n\n".join(sections)
 
