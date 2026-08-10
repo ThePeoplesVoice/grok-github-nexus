@@ -192,7 +192,30 @@ jobs:
               sections.append(f"### 🧠 Claude Complementary\n\n{claude_analysis}")
 
           if not sections:
-              sections.append("No analysis generated. Ara/Grok and Claude were unavailable — see workflow logs for details.")
+              # Local fallback: generate a structural analysis from raw git data when no AI is available
+              def local_analysis(commits):
+                  lines = ["*AI providers were unavailable — local git analysis generated automatically.*", ""]
+                  lines.append(f"**{len(commits)} commit(s) examined.**")
+                  lines.append("")
+                  for c in commits:
+                      sha = c['sha']
+                      oneline = c['oneline']
+                      detail = c['details']
+                      # Count files changed and lines added/removed
+                      stat_lines = [l for l in detail.splitlines() if '|' in l or 'changed' in l]
+                      summary_line = next((l for l in stat_lines if 'changed' in l), "")
+                      files_touched = [l.split('|')[0].strip() for l in stat_lines if '|' in l]
+                      lines.append(f"#### `{sha[:7]}` — {' '.join(oneline.split()[1:])}")
+                      if summary_line:
+                          lines.append(f"- **Stats:** {summary_line.strip()}")
+                      if files_touched:
+                          lines.append(f"- **Files:** {', '.join(files_touched[:6])}{' …' if len(files_touched) > 6 else ''}")
+                      lines.append("")
+                  lines.append("---")
+                  lines.append("*Tip: Add `GROK_API_KEY` or `CLAUDE_API_KEY` secrets to enable AI-powered analysis.*")
+                  return "\n".join(lines)
+
+              sections.append(f"### 🔍 Local Git Analysis (Fallback)\n\n{local_analysis(commit_details)}")
 
           fusion_note = ""
           if grok_analysis and claude_success:
