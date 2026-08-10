@@ -3,6 +3,7 @@ import json
 import time
 import hmac
 import hashlib
+import random
 from itertools import product
 from math import sin, sqrt
 from statistics import mean, median
@@ -50,6 +51,26 @@ DISCIPLINE_PROFILE = {
         "max_hourly_volatility_pct": 2.5,
         "max_bar_range_bps": 180,
     },
+    "dynamic_risk": {
+        "enabled": True,
+        "upshift_pnl_pct": 2.0,
+        "downshift_drawdown_pct": 1.5,
+        "win_streak_for_boost": 2,
+        "loss_streak_for_cut": 1,
+        "upshift_step": 0.15,
+        "downshift_step": 0.20,
+        "min_multiplier": 0.40,
+        "max_multiplier": 1.60,
+    },
+    "locks": {
+        "profit_lock_pct": 6.0,
+        "loss_lock_pct": 6.0,
+    },
+    "simulation": {
+        "short_horizon_minutes": 80,
+        "sim_runs": 1200,
+        "trade_interval_minutes": 10,
+    },
 }
 
 # Backwards-compatible aliases (read from discipline profile)
@@ -77,6 +98,9 @@ MAX_SESSION_LOSS_PCT = DISCIPLINE_PROFILE["guardrails"]["max_session_loss_pct"]
 MAX_CONSECUTIVE_LOSSES = DISCIPLINE_PROFILE["guardrails"]["max_consecutive_losses"]
 MAX_HOURLY_VOLATILITY_PCT = DISCIPLINE_PROFILE["guardrails"]["max_hourly_volatility_pct"]
 MAX_BAR_RANGE_BPS = DISCIPLINE_PROFILE["guardrails"]["max_bar_range_bps"]
+DYNAMIC_RISK = DISCIPLINE_PROFILE["dynamic_risk"]
+LOCKS = DISCIPLINE_PROFILE["locks"]
+SIMULATION = DISCIPLINE_PROFILE["simulation"]
 
 TELEGRAM_TOKEN = ""
 TELEGRAM_CHAT_ID = ""
@@ -88,6 +112,8 @@ position = None
 session_state = {
     "session_start_usdt": None,
     "realized_pnl_usdt": 0.0,
+    "peak_realized_pnl_usdt": 0.0,
+    "consecutive_wins": 0,
     "consecutive_losses": 0,
     "trading_halted": False,
     "halt_reason": None,
@@ -137,6 +163,20 @@ def evaluate_guardrails(current_price=None, current_high=None, current_low=None,
         )
         return False
 
+    loss_lock_usdt = session_state["session_start_usdt"] * (LOCKS["loss_lock_pct"] / 100)
+    if session_state["realized_pnl_usdt"] <= -loss_lock_usdt:
+        halt_new_entries(
+            f"loss lock engaged ({session_state['realized_pnl_usdt']:.2f} <= -{loss_lock_usdt:.2f})"
+        )
+        return False
+
+    profit_lock_usdt = session_state["session_start_usdt"] * (LOCKS["profit_lock_pct"] / 100)
+    if session_state["realized_pnl_usdt"] >= profit_lock_usdt:
+        halt_new_entries(
+            f"profit lock engaged ({session_state['realized_pnl_usdt']:.2f} >= {profit_lock_usdt:.2f})"
+        )
+        return False
+
     if session_state["consecutive_losses"] >= MAX_CONSECUTIVE_LOSSES:
         halt_new_entries(
             f"consecutive loss cap hit ({session_state['consecutive_losses']} losses)"
@@ -165,9 +205,14 @@ def evaluate_guardrails(current_price=None, current_high=None, current_low=None,
 def record_closed_trade(entry_price, exit_price, qty):
     pnl = (exit_price - entry_price) * qty
     session_state["realized_pnl_usdt"] += pnl
+    session_state["peak_realized_pnl_usdt"] = max(
+        session_state["peak_realized_pnl_usdt"], session_state["realized_pnl_usdt"]
+    )
     if pnl < 0:
+        session_state["consecutive_wins"] = 0
         session_state["consecutive_losses"] += 1
     else:
+        session_state["consecutive_wins"] += 1
         session_state["consecutive_losses"] = 0
     return pnl
 
@@ -292,10 +337,37 @@ def place_order(side, qty):
     return bybit_request("POST", "/v5/order/create", params)
 
 
-def calc_order_qty(current_price):
-    risk_usdt = min(MAX_POSITION_USDT * (RISK_PERCENT / 100) * 20, MAX_POSITION_USDT)
+def compute_dynamic_risk_multiplier(
+    realized_pnl_usdt,
+    session_start_usdt,
+    peak_realized_pnl_usdt,
+    consecutive_wins,
+    consecutive_losses,
+):
+    if not DYNAMIC_RISK["enabled"] or session_start_usdt <= 0:
+        return 1.0
 
-    usdt_balance = get_coin_balance("USDT")
+    pnl_pct = (realized_pnl_usdt / session_start_usdt) * 100
+    realized_drawdown_usdt = max(0.0, peak_realized_pnl_usdt - realized_pnl_usdt)
+    realized_drawdown_pct = (realized_drawdown_usdt / session_start_usdt) * 100
+
+    multiplier = 1.0
+    if pnl_pct >= DYNAMIC_RISK["upshift_pnl_pct"]:
+        multiplier += DYNAMIC_RISK["upshift_step"]
+    if consecutive_wins >= DYNAMIC_RISK["win_streak_for_boost"]:
+        multiplier += DYNAMIC_RISK["upshift_step"]
+    if realized_drawdown_pct >= DYNAMIC_RISK["downshift_drawdown_pct"]:
+        multiplier -= DYNAMIC_RISK["downshift_step"]
+    if consecutive_losses >= DYNAMIC_RISK["loss_streak_for_cut"]:
+        multiplier -= DYNAMIC_RISK["downshift_step"]
+
+    return max(DYNAMIC_RISK["min_multiplier"], min(multiplier, DYNAMIC_RISK["max_multiplier"]))
+
+
+def calc_order_qty(current_price, risk_multiplier=1.0, cash_cap=None):
+    risk_usdt = min(MAX_POSITION_USDT * (RISK_PERCENT / 100) * 20, MAX_POSITION_USDT) * risk_multiplier
+
+    usdt_balance = cash_cap if cash_cap is not None else get_coin_balance("USDT")
     if usdt_balance is not None:
         risk_usdt = min(risk_usdt, usdt_balance * 0.98)
 
@@ -410,7 +482,15 @@ def analyse():
         return
     last_signal_time = now
 
-    qty = calc_order_qty(current)
+    risk_multiplier = compute_dynamic_risk_multiplier(
+        realized_pnl_usdt=session_state["realized_pnl_usdt"],
+        session_start_usdt=session_state["session_start_usdt"],
+        peak_realized_pnl_usdt=session_state["peak_realized_pnl_usdt"],
+        consecutive_wins=session_state["consecutive_wins"],
+        consecutive_losses=session_state["consecutive_losses"],
+    )
+
+    qty = calc_order_qty(current, risk_multiplier=risk_multiplier)
     if qty is None:
         send("Entry skipped: insufficient notional/balance for safe order size.")
         return
@@ -436,6 +516,7 @@ def analyse():
             f"SL: {stop_loss:.2f}\n"
             f"TP: {take_profit:.2f}\n"
             f"Z-Score: {z:.2f}\n"
+            f"Risk Multiplier: {risk_multiplier:.2f}x\n"
             f"{('DRY RUN' if DRY_RUN else ('TESTNET' if TESTNET else 'LIVE'))}"
         )
     else:
@@ -475,6 +556,10 @@ def simulate_single_scenario(eth_c, eth_h, eth_l, btc_c, config):
     last_entry_bar = -10**9
     active_position = None
     trades = []
+    scenario_realized_pnl = 0.0
+    scenario_peak_realized_pnl = 0.0
+    scenario_consecutive_wins = 0
+    scenario_consecutive_losses = 0
 
     for i in range(max(lookback, 15), n):
         current_close = eth_c[i]
@@ -509,6 +594,14 @@ def simulate_single_scenario(eth_c, eth_h, eth_l, btc_c, config):
                 cash += proceeds - exit_fee
 
                 pnl = cash - active_position["cash_before_entry"]
+                scenario_realized_pnl += pnl
+                scenario_peak_realized_pnl = max(scenario_peak_realized_pnl, scenario_realized_pnl)
+                if pnl < 0:
+                    scenario_consecutive_wins = 0
+                    scenario_consecutive_losses += 1
+                else:
+                    scenario_consecutive_wins += 1
+                    scenario_consecutive_losses = 0
                 trades.append({"pnl": pnl, "win": pnl > 0, "reason": exit_reason})
                 active_position = None
 
@@ -520,10 +613,15 @@ def simulate_single_scenario(eth_c, eth_h, eth_l, btc_c, config):
             z = (ratios[i] - mean_window) / std
 
             if z <= -z_entry and atr[i] is not None and atr[i] > 0:
-                risk_usdt = min(MAX_POSITION_USDT * (RISK_PERCENT / 100) * 20, MAX_POSITION_USDT, cash * 0.98)
-                if risk_usdt >= MIN_NOTIONAL_USDT:
-                    qty = risk_usdt / current_close
-                    qty = max(MIN_QTY_ETH, min(qty, MAX_QTY_ETH))
+                risk_multiplier = compute_dynamic_risk_multiplier(
+                    realized_pnl_usdt=scenario_realized_pnl,
+                    session_start_usdt=initial_balance,
+                    peak_realized_pnl_usdt=scenario_peak_realized_pnl,
+                    consecutive_wins=scenario_consecutive_wins,
+                    consecutive_losses=scenario_consecutive_losses,
+                )
+                qty = calc_order_qty(current_close, risk_multiplier=risk_multiplier, cash_cap=cash)
+                if qty is not None:
                     entry_fill = current_close * (1 + slippage_bps / 10000)
                     cost = qty * entry_fill
                     entry_fee = cost * fee_rate
@@ -563,6 +661,7 @@ def simulate_single_scenario(eth_c, eth_h, eth_l, btc_c, config):
         exit_fee = proceeds * fee_rate
         cash += proceeds - exit_fee
         pnl = cash - active_position["cash_before_entry"]
+        scenario_realized_pnl += pnl
         trades.append({"pnl": pnl, "win": pnl > 0, "reason": "forced_close_end"})
 
     total_trades = len(trades)
@@ -581,6 +680,97 @@ def simulate_single_scenario(eth_c, eth_h, eth_l, btc_c, config):
         "win_rate": win_rate,
         "avg_trade_pnl": avg_trade_pnl,
     }
+
+
+def run_sim80():
+    eth_c, eth_h, eth_l = get_ohlc(YAHOO_ETH)
+    btc_c = get_closes(YAHOO_BTC)
+    source = "Yahoo historical"
+    if not eth_c or not eth_h or not eth_l or not btc_c:
+        eth_c, eth_h, eth_l, btc_c = build_synthetic_market_data()
+        source = "Synthetic stress data (Yahoo unavailable)"
+
+    n = min(len(eth_c), len(eth_h), len(eth_l), len(btc_c))
+    if n < LOOKBACK + 30:
+        print("Not enough data for sim80.")
+        return
+
+    eth_c, eth_h, eth_l, btc_c = eth_c[-n:], eth_h[-n:], eth_l[-n:], btc_c[-n:]
+    atr = calc_atr(eth_h, eth_l, eth_c)
+    if atr is None or atr <= 0:
+        print("ATR unavailable for sim80.")
+        return
+
+    current = eth_c[-1]
+    base_qty = calc_order_qty(current, risk_multiplier=1.0, cash_cap=BACKTEST_START_USDT)
+    if base_qty is None:
+        print("Unable to size baseline order for sim80.")
+        return
+
+    runs = max(200, int(SIMULATION["sim_runs"]))
+    horizon_minutes = max(10, int(SIMULATION["short_horizon_minutes"]))
+    trade_interval = max(5, int(SIMULATION["trade_interval_minutes"]))
+    trade_slots = max(1, horizon_minutes // trade_interval)
+
+    tp_move = TP_ATR * atr
+    sl_move = SL_ATR * atr
+    fee_slip = current * ((BACKTEST_FEE_RATE * 2) + (BACKTEST_SLIPPAGE_BPS / 10000))
+
+    outcomes = []
+    for _ in range(runs):
+        cash = BACKTEST_START_USDT
+        realized = 0.0
+        peak_realized = 0.0
+        consecutive_wins = 0
+        consecutive_losses = 0
+        halted = False
+
+        for _slot in range(trade_slots):
+            if halted:
+                break
+
+            risk_multiplier = compute_dynamic_risk_multiplier(
+                realized_pnl_usdt=realized,
+                session_start_usdt=BACKTEST_START_USDT,
+                peak_realized_pnl_usdt=peak_realized,
+                consecutive_wins=consecutive_wins,
+                consecutive_losses=consecutive_losses,
+            )
+            qty = calc_order_qty(current, risk_multiplier=risk_multiplier, cash_cap=cash)
+            if qty is None:
+                break
+
+            win_prob = 0.47
+            pnl = ((tp_move - fee_slip) * qty) if random.random() < win_prob else ((-sl_move - fee_slip) * qty)
+            realized += pnl
+            peak_realized = max(peak_realized, realized)
+            cash = BACKTEST_START_USDT + realized
+
+            if pnl < 0:
+                consecutive_wins = 0
+                consecutive_losses += 1
+            else:
+                consecutive_wins += 1
+                consecutive_losses = 0
+
+            if realized <= -(BACKTEST_START_USDT * (LOCKS["loss_lock_pct"] / 100)):
+                halted = True
+            elif realized >= (BACKTEST_START_USDT * (LOCKS["profit_lock_pct"] / 100)):
+                halted = True
+
+        outcomes.append(cash)
+
+    outcomes.sort()
+    p10 = outcomes[max(0, int(0.10 * (len(outcomes) - 1)))]
+    p50 = outcomes[max(0, int(0.50 * (len(outcomes) - 1)))]
+    p90 = outcomes[max(0, int(0.90 * (len(outcomes) - 1)))]
+    print("\n=== Focused sim80 (paper projection) ===")
+    print(f"Data source: {source}")
+    print(f"Horizon: {horizon_minutes} mins | Runs: {runs} | Trade slots: {trade_slots}")
+    print(f"Projected equity from ${BACKTEST_START_USDT:.2f}:")
+    print(f"  Worst-case band (p10): ${p10:.2f}")
+    print(f"  Base-case  band (p50): ${p50:.2f}")
+    print(f"  Best-case  band (p90): ${p90:.2f}")
 
 
 def build_synthetic_market_data(total_bars=40 * 24):
@@ -755,7 +945,7 @@ def run_backtest(brutal_rounds=1):
 
 def parse_args():
     parser = argparse.ArgumentParser(description="SeaTrader Bybit")
-    parser.add_argument("--mode", choices=["trade", "backtest"], default="trade")
+    parser.add_argument("--mode", choices=["trade", "backtest", "sim80"], default="trade")
     parser.add_argument(
         "--brutal-runs",
         type=int,
@@ -770,6 +960,9 @@ def main():
 
     if args.mode == "backtest":
         run_backtest(brutal_rounds=max(1, args.brutal_runs))
+        return
+    if args.mode == "sim80":
+        run_sim80()
         return
 
     mode = "DRY RUN" if DRY_RUN else ("TESTNET" if TESTNET else "LIVE")
