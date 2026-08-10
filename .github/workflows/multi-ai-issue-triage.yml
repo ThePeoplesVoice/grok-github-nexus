@@ -64,6 +64,7 @@ jobs:
           Keep it high-signal. Speak in the collaborative spirit of us."""
 
           grok_analysis = None
+          grok_error = None
           if os.environ.get("GROK_API_KEY"):
               try:
                   response = requests.post(
@@ -84,13 +85,16 @@ jobs:
                       grok_analysis = response.json()["choices"][0]["message"]["content"]
                       print("✅ Ara (Grok) analysis successful")
                   else:
-                      print(f"⚠️ Grok API {response.status_code} — skipping Grok section")
+                      grok_error = f"Grok API Error {response.status_code}: {response.text[:180]}"
+                      print(f"⚠️ {grok_error}")
               except Exception as e:
-                  print(f"⚠️ Grok exception: {str(e)[:120]}")
+                  grok_error = f"Grok Exception: {str(e)[:180]}"
+                  print(f"⚠️ {grok_error}")
           else:
               print("⚠️ GROK_API_KEY not present")
 
           claude_analysis = None
+          claude_error = None
           if os.environ.get("CLAUDE_API_KEY"):
               try:
                   claude_headers = {
@@ -116,9 +120,11 @@ jobs:
                       claude_analysis = data["content"][0]["text"] if data.get("content") else str(data)
                       print("✅ Claude complementary triage complete")
                   else:
-                      print(f"⚠️ Claude API {response.status_code} — skipping Claude section")
+                      claude_error = f"Claude API Error {response.status_code}: {response.text[:180]}"
+                      print(f"⚠️ {claude_error}")
               except Exception as e:
-                  print(f"⚠️ Claude exception: {str(e)[:120]}")
+                  claude_error = f"Claude Exception: {str(e)[:180]}"
+                  print(f"⚠️ {claude_error}")
           else:
               print("ℹ️ CLAUDE_API_KEY not present — Grok-only triage")
 
@@ -129,11 +135,15 @@ jobs:
               sections.append(f"### 🧠 Claude\n\n{claude_analysis}")
 
           if not sections:
-              sections.append("Analysis skipped — no API keys available.")
+              sections.append("Analysis skipped — Ara/Grok and Claude were unavailable. See workflow logs for details.")
 
           fusion_note = ""
           if grok_analysis and claude_analysis:
               fusion_note = "\n\n*Multi-model fusion (Layer 1 scaffolding) active.*"
+          elif claude_analysis and grok_error:
+              fusion_note = "\n\n*Ara triage unavailable — complementary mode only.*"
+          elif grok_analysis and claude_error:
+              fusion_note = "\n\n*Claude complementary analysis unavailable — continuing with Ara triage only.*"
 
           joined_sections = "\n\n---\n\n".join(sections)
 
