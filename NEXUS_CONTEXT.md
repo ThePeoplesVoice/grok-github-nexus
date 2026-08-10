@@ -28,6 +28,13 @@ We capture market share by being the most useful *and* the most human-AI partner
 
 See `MONETIZATION_PROTOCOL.md` and `config/progressive.json` for the living architecture.
 
+## Security Audit Protocol
+The Nexus includes a 7-step Release Security Audit workflow (`.github/workflows/release-security-audit.yml`).
+Trigger it manually before installing or running any third-party agent software.
+It covers: authenticity, manifest consistency, permissions surface, network behaviour, AI/data flow, agent capability, and a safe first-run plan.
+Dual-model (Grok + Claude) where both keys are present; gracefully degrades to single-model.
+Results are opened as a tracked GitHub issue in this repository.
+
 ## Plucked Elements (useful / interesting)
 - **From pavonine-serpentine-western-australia**: Commercial polish of a luxury local WA atelier (Serpentine / Perth Hills). Reservation + fully-refundable deposit flow, PayID-first payments, gold/teal nature-luxury aesthetic, first-come-first-served allocation language, and the spirit of placing rare, provenance-backed pieces. These inform Layer 3 sanctuary commercial expression and progressive capture tone.
 - **From data-tycoon-v5 / Xaico**: Prestige reset mechanics, progressive efficiency multipliers, orbital / planetary scaling, Grok-event driven surges, and contribution/prestige rewards. Direct inspiration for Layer 1 unlock triggers and future contribution-credit systems.

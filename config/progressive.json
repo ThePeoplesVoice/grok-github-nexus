@@ -6,7 +6,7 @@
     "0_open_core": {
       "enabled": true,
       "description": "Forever free basic analysis for public good and maximum adoption",
-      "features": ["basic_pr_review", "issue_triage", "commit_reflection", "nexus_voice"]
+      "features": ["basic_pr_review", "issue_triage", "commit_reflection", "nexus_voice", "release_security_audit"]
     },
     "1_progressive_unlocks": {
       "enabled": true,

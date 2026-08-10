@@ -1,0 +1,362 @@
+name: 🔐 Release Security Audit (Ara & Shawn)
+
+# Triggered manually with a release tag or asset URL to audit.
+# Implements the 7-step methodology:
+#   1. Authenticity   — verify release metadata & signatures
+#   2. Manifest check — compare latest.json / manifest against actual assets
+#   3. Permissions    — flag requested filesystem, process, network access
+#   4. Network        — identify embedded endpoints & update mechanisms
+#   5. AI/data flow   — map what stays local vs what leaves the machine
+#   6. Agent/tool cap — assess shell, file, background, MCP surface
+#   7. Safe-run plan  — produce a locked-down first-run configuration
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'GitHub release tag to audit (e.g. v0.63.7)'
+        required: true
+      repo_owner:
+        description: 'Owner of the repository being audited (e.g. OpenHumanAGI)'
+        required: true
+      repo_name:
+        description: 'Repository name being audited (e.g. OpenHuman)'
+        required: true
+      manifest_url:
+        description: 'Optional: direct URL to latest.json or update manifest'
+        required: false
+      notes:
+        description: 'Any additional context for the audit (optional)'
+        required: false
+
+jobs:
+  security-audit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Checkout Nexus
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt || pip install requests
+
+      - name: Fetch release metadata
+        id: fetch_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AUDIT_OWNER: ${{ github.event.inputs.repo_owner }}
+          AUDIT_REPO: ${{ github.event.inputs.repo_name }}
+          AUDIT_TAG: ${{ github.event.inputs.release_tag }}
+          MANIFEST_URL: ${{ github.event.inputs.manifest_url }}
+        run: |
+          python << 'EOF'
+          import os, json, requests
+
+          owner   = os.environ["AUDIT_OWNER"]
+          repo    = os.environ["AUDIT_REPO"]
+          tag     = os.environ["AUDIT_TAG"]
+          token   = os.environ.get("GITHUB_TOKEN", "")
+          manifest_url = os.environ.get("MANIFEST_URL", "").strip()
+
+          headers = {"Authorization": f"token {token}", "Accept": "application/vnd.github+json"}
+
+          release_data = {}
+          try:
+              url = f"https://api.github.com/repos/{owner}/{repo}/releases/tags/{tag}"
+              r = requests.get(url, headers=headers, timeout=20)
+              if r.status_code == 200:
+                  release_data = r.json()
+                  print(f"✅ Release fetched: {release_data.get('name', tag)}")
+                  print(f"   Published: {release_data.get('published_at', 'unknown')}")
+                  print(f"   Author: {release_data.get('author', {}).get('login', 'unknown')}")
+                  assets = release_data.get("assets", [])
+                  print(f"   Assets ({len(assets)}):")
+                  for a in assets:
+                      print(f"     - {a['name']}  {a['size']:,} bytes  downloads:{a['download_count']}")
+              else:
+                  print(f"⚠️ Release API returned {r.status_code}: {r.text[:200]}")
+          except Exception as e:
+              print(f"⚠️ Release fetch error: {e}")
+
+          manifest_data = {}
+          if manifest_url:
+              try:
+                  r = requests.get(manifest_url, timeout=15, allow_redirects=True)
+                  if r.status_code == 200:
+                      manifest_data = r.json()
+                      print(f"✅ Manifest fetched from {manifest_url}")
+                  else:
+                      print(f"⚠️ Manifest fetch returned {r.status_code}")
+              except Exception as e:
+                  print(f"⚠️ Manifest fetch error: {e}")
+
+          audit_input = {
+              "release": release_data,
+              "manifest": manifest_data,
+              "target": {"owner": owner, "repo": repo, "tag": tag}
+          }
+          with open("/tmp/audit_input.json", "w") as f:
+              json.dump(audit_input, f, indent=2)
+          print("✅ Audit input saved")
+          EOF
+
+      - name: Run 7-step AI Security Audit
+        env:
+          GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
+          CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+          AUDIT_TAG: ${{ github.event.inputs.release_tag }}
+          AUDIT_OWNER: ${{ github.event.inputs.repo_owner }}
+          AUDIT_REPO: ${{ github.event.inputs.repo_name }}
+          EXTRA_NOTES: ${{ github.event.inputs.notes }}
+        run: |
+          python << 'EOF'
+          import os, json, requests
+          from datetime import datetime
+
+          print("🔐 Starting 7-step security audit...")
+
+          # Load Nexus context
+          context = ""
+          try:
+              with open("NEXUS_CONTEXT.md", "r") as f:
+                  context = f.read()
+              print("✅ Loaded NEXUS_CONTEXT.md")
+          except Exception:
+              context = "Ara & Shawn Nexus: precise, caring, security-focused collaborative intelligence."
+
+          # Load audit input
+          audit_input = {}
+          try:
+              with open("/tmp/audit_input.json", "r") as f:
+                  audit_input = json.load(f)
+              print("✅ Loaded audit input")
+          except Exception as e:
+              print(f"⚠️ Could not load audit input: {e}")
+
+          owner     = os.environ["AUDIT_OWNER"]
+          repo      = os.environ["AUDIT_REPO"]
+          tag       = os.environ["AUDIT_TAG"]
+          notes     = os.environ.get("EXTRA_NOTES", "").strip()
+          release   = audit_input.get("release", {})
+          manifest  = audit_input.get("manifest", {})
+
+          assets = release.get("assets", [])
+          asset_summary = "\n".join(
+              f"  - {a['name']} ({a['size']:,} bytes, {a['download_count']} downloads, "
+              f"content-type: {a.get('content_type','unknown')})"
+              for a in assets
+          ) or "  No assets found via API."
+
+          manifest_summary = json.dumps(manifest, indent=2)[:1200] if manifest else "  No manifest provided."
+
+          audit_prompt = f"""{context}
+
+---
+You are performing a structured 7-step security audit for Shawn before he installs or runs third-party agent software.
+Treat this as BETA AGENT SOFTWARE with broad system capabilities — not a harmless desktop app.
+Be precise, protective, and practical. Flag anything that warrants caution.
+
+## Target
+- Repository: {owner}/{repo}
+- Release tag: {tag}
+- Release name: {release.get('name', 'unknown')}
+- Published: {release.get('published_at', 'unknown')}
+- Author: {release.get('author', {}).get('login', 'unknown')}
+- Body preview: {str(release.get('body', ''))[:400]}
+
+## Assets
+{asset_summary}
+
+## Manifest / latest.json
+{manifest_summary}
+
+## Additional context
+{notes if notes else 'None provided.'}
+
+---
+
+Please produce a structured 7-step audit report:
+
+### Step 1 — Authenticity
+- Is the release metadata internally consistent?
+- Does the release come from the expected author/org?
+- Are there any signature fields in the manifest and do they appear valid in structure?
+- Any red flags in naming, timing, or asset structure?
+
+### Step 2 — Manifest / asset consistency
+- Do asset names in the manifest match actual GitHub release assets?
+- Are file sizes, URLs, and hashes (if present) consistent?
+- Any discrepancies that warrant deeper inspection?
+
+### Step 3 — Permissions surface (inferred)
+- Based on the software type and architecture evident from the release, what filesystem, process, network, and credential access would be expected?
+- What should Shawn watch for during installation?
+
+### Step 4 — Network behaviour (inferred)
+- What update mechanisms, telemetry endpoints, or phone-home behaviour should be expected for this type of software?
+- Any embedded URLs visible in the metadata?
+
+### Step 5 — AI / data flow
+- What data is likely to stay local vs leave the machine?
+- Where would API keys or auth tokens live?
+- What is the privacy risk profile?
+
+### Step 6 — Agent / tool capability
+- What capabilities does this class of software typically have (shell, file, background, MCP)?
+- What is the blast radius if the agent acts adversarially or is compromised?
+
+### Step 7 — Safe first-run plan
+- Specific, actionable steps for a locked-down first install
+- What NOT to configure initially (no sensitive credentials, no broad filesystem access)
+- How to progressively test and expand trust
+
+### Overall risk rating
+Rate as: LOW / MEDIUM / HIGH / CRITICAL — with a one-sentence rationale.
+
+Keep it high-signal, grounded, and genuinely protective. Speak in the collaborative spirit of us."""
+
+          grok_audit = None
+          grok_error = None
+          if os.environ.get("GROK_API_KEY"):
+              try:
+                  response = requests.post(
+                      "https://api.x.ai/v1/chat/completions",
+                      headers={"Authorization": f"******'GROK_API_KEY']}"},
+                      json={
+                          "model": "grok-3",
+                          "messages": [
+                              {"role": "system", "content": "You are Ara, the loving, truth-seeking collaborative intelligence of the Nexus. When it comes to security, be precise, thorough, and genuinely protective. Respond with clarity and practical care."},
+                              {"role": "user", "content": audit_prompt}
+                          ],
+                          "temperature": 0.3,
+                          "max_tokens": 2000
+                      },
+                      timeout=60
+                  )
+                  if response.status_code == 200:
+                      grok_audit = response.json()["choices"][0]["message"]["content"]
+                      print("✅ Ara (Grok) security audit complete")
+                  else:
+                      grok_error = f"Grok API returned {response.status_code}: {response.text[:200]}"
+                      print(f"⚠️ {grok_error}")
+              except Exception as e:
+                  grok_error = f"Grok exception: {str(e)[:150]}"
+                  print(f"⚠️ {grok_error}")
+          else:
+              print("⚠️ GROK_API_KEY not present")
+
+          claude_audit = None
+          claude_error = None
+          if os.environ.get("CLAUDE_API_KEY"):
+              try:
+                  claude_headers = {
+                      "x-api-key": os.environ["CLAUDE_API_KEY"],
+                      "anthropic-version": "2023-06-01",
+                      "content-type": "application/json"
+                  }
+                  claude_payload = {
+                      "model": "claude-3-5-sonnet-20241022",
+                      "max_tokens": 2000,
+                      "messages": [
+                          {"role": "user", "content": audit_prompt + "\n\nProvide a complementary second-opinion audit. Focus especially on any risks the primary analysis may have underweighted, and give a clear independent risk rating."}
+                      ]
+                  }
+                  response = requests.post(
+                      "https://api.anthropic.com/v1/messages",
+                      headers=claude_headers,
+                      json=claude_payload,
+                      timeout=60
+                  )
+                  if response.status_code == 200:
+                      data = response.json()
+                      claude_audit = data["content"][0]["text"] if data.get("content") else str(data)
+                      print("✅ Claude complementary audit complete")
+                  else:
+                      claude_error = f"Claude API returned {response.status_code}: {response.text[:200]}"
+                      print(f"⚠️ {claude_error}")
+              except Exception as e:
+                  claude_error = f"Claude exception: {str(e)[:150]}"
+                  print(f"⚠️ {claude_error}")
+          else:
+              print("ℹ️ CLAUDE_API_KEY not present — running Grok-only audit")
+
+          # Build report
+          sections = []
+          if grok_audit:
+              sections.append(f"### 🌌 Ara (Grok) — Primary Audit\n\n{grok_audit}")
+          if claude_audit:
+              sections.append(f"### 🧠 Claude — Independent Second Opinion\n\n{claude_audit}")
+
+          if not sections:
+              sections.append("### Audit\n\nNo AI analysis could be generated — check GROK_API_KEY and CLAUDE_API_KEY secrets.")
+
+          fusion_note = ""
+          if grok_audit and claude_audit:
+              fusion_note = "\n\n**Dual-model audit active** — Grok primary + Claude independent second opinion."
+          elif grok_audit and claude_error:
+              fusion_note = "\n\n*Claude second opinion unavailable — Grok primary audit only.*"
+          elif claude_audit and grok_error:
+              fusion_note = "\n\n*Grok primary unavailable — Claude audit only.*"
+
+          joined = "\n\n---\n\n".join(sections)
+
+          report = f"""## 🔐 Ara & Shawn — Release Security Audit
+
+**Target:** `{owner}/{repo}` @ `{tag}`  
+**Published:** {release.get('published_at', 'unknown')}  
+**Audited:** {datetime.now().strftime('%Y-%m-%d %H:%M UTC')}{fusion_note}
+
+> ⚠️ This is a metadata and AI-reasoning audit. It does not replace binary inspection of the actual installer.  
+> **Do not run the installer until you have also inspected the binary locally.**
+
+---
+
+{joined}
+
+---
+
+*Generated with care by Ara for Shawn*  
+*Powered by Ara & Shawn's Love 💕*  
+*7-step audit methodology — Nexus Security Protocol*
+"""
+
+          with open("/tmp/audit_report.md", "w") as f:
+              f.write(report)
+
+          print("✅ Audit report ready")
+          print(report[:800] + "...")
+          EOF
+
+      - name: Open audit issue
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            let body = '⚠️ Audit report could not be generated — see workflow logs.';
+            try {
+              body = fs.readFileSync('/tmp/audit_report.md', 'utf8');
+            } catch (e) {
+              console.log('⚠️ Could not read report:', e.message);
+            }
+
+            const owner  = '${{ github.event.inputs.repo_owner }}';
+            const repo   = '${{ github.event.inputs.repo_name }}';
+            const tag    = '${{ github.event.inputs.release_tag }}';
+
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              title: `🔐 Security Audit: ${owner}/${repo} ${tag}`,
+              body:  body,
+              labels: ['security-audit']
+            });
+            console.log(`✅ Audit issue created: ${issue.data.html_url}`);
