@@ -1,8 +1,11 @@
+import argparse
 import json
 import time
 import hmac
 import hashlib
-from math import sqrt
+from itertools import product
+from math import sin, sqrt
+from statistics import mean, median
 from urllib.parse import urlencode
 
 import requests
@@ -33,6 +36,11 @@ MIN_QTY_ETH = 0.001
 SYMBOL = "ETHUSDT"
 YAHOO_ETH = "ETH-USD"
 YAHOO_BTC = "BTC-USD"
+
+# Backtest defaults
+BACKTEST_START_USDT = 100.0
+BACKTEST_FEE_RATE = 0.001  # 0.10% taker
+BACKTEST_SLIPPAGE_BPS = 10
 
 TELEGRAM_TOKEN = ""
 TELEGRAM_CHAT_ID = ""
@@ -117,6 +125,21 @@ def calc_atr(h, l, c, period=14):
         return None
     trs = [max(h[i] - l[i], abs(h[i] - c[i - 1]), abs(l[i] - c[i - 1])) for i in range(1, len(c))]
     return sum(trs[-period:]) / period
+
+
+def build_atr_series(highs, lows, closes, period=14):
+    if not highs or not lows or not closes:
+        return None
+    n = min(len(highs), len(lows), len(closes))
+    highs, lows, closes = highs[-n:], lows[-n:], closes[-n:]
+    atr = [None] * n
+    trs = []
+    for i in range(1, n):
+        tr = max(highs[i] - lows[i], abs(highs[i] - closes[i - 1]), abs(lows[i] - closes[i - 1]))
+        trs.append(tr)
+        if len(trs) >= period:
+            atr[i] = sum(trs[-period:]) / period
+    return atr
 
 
 def get_coin_balance(coin):
@@ -236,10 +259,10 @@ def analyse():
 
     ratios = [eth[i] / btc[i] for i in range(min_len)]
     window = ratios[-LOOKBACK:]
-    mean = sum(window) / LOOKBACK
-    var = sum((x - mean) ** 2 for x in window) / LOOKBACK
+    mean_window = sum(window) / LOOKBACK
+    var = sum((x - mean_window) ** 2 for x in window) / LOOKBACK
     std = sqrt(var) if var > 0 else 1e-8
-    z = (ratios[-1] - mean) / std
+    z = (ratios[-1] - mean_window) / std
 
     eth_c, eth_h, eth_l = get_ohlc(YAHOO_ETH)
     if not eth_c:
@@ -299,7 +322,336 @@ def analyse():
         send(f"Order failed: {result.get('retMsg', 'Unknown error')}")
 
 
+def slice_data(eth_c, eth_h, eth_l, btc_c, bars):
+    n = min(len(eth_c), len(eth_h), len(eth_l), len(btc_c), bars)
+    return eth_c[-n:], eth_h[-n:], eth_l[-n:], btc_c[-n:]
+
+
+def simulate_single_scenario(eth_c, eth_h, eth_l, btc_c, config):
+    lookback = config["lookback"]
+    z_entry = config["z_entry"]
+    sl_atr = config["sl_atr"]
+    tp_atr = config["tp_atr"]
+    cooldown_bars = config["cooldown_bars"]
+    max_hold_bars = config["max_hold_bars"]
+    fee_rate = config["fee_rate"]
+    slippage_bps = config["slippage_bps"]
+    initial_balance = config["initial_balance"]
+
+    n = min(len(eth_c), len(eth_h), len(eth_l), len(btc_c))
+    if n < max(lookback + 5, 80):
+        return None
+
+    eth_c, eth_h, eth_l, btc_c = eth_c[-n:], eth_h[-n:], eth_l[-n:], btc_c[-n:]
+    atr = build_atr_series(eth_h, eth_l, eth_c, period=14)
+    if not atr:
+        return None
+
+    ratios = [eth_c[i] / btc_c[i] for i in range(n)]
+
+    cash = initial_balance
+    peak_equity = initial_balance
+    max_drawdown = 0.0
+    last_entry_bar = -10**9
+    active_position = None
+    trades = []
+
+    for i in range(max(lookback, 15), n):
+        current_close = eth_c[i]
+        current_high = eth_h[i]
+        current_low = eth_l[i]
+
+        if active_position is not None:
+            exit_reason = None
+            exit_price = None
+
+            sl_hit = current_low <= active_position["sl"]
+            tp_hit = current_high >= active_position["tp"]
+            timed_out = (i - active_position["entry_bar"]) >= max_hold_bars
+
+            if sl_hit and tp_hit:
+                exit_reason = "both_hit_worst_case"
+                exit_price = active_position["sl"]
+            elif sl_hit:
+                exit_reason = "stop_loss"
+                exit_price = active_position["sl"]
+            elif tp_hit:
+                exit_reason = "take_profit"
+                exit_price = active_position["tp"]
+            elif timed_out:
+                exit_reason = "timeout"
+                exit_price = current_close
+
+            if exit_reason:
+                fill_exit = exit_price * (1 - slippage_bps / 10000)
+                proceeds = active_position["qty"] * fill_exit
+                exit_fee = proceeds * fee_rate
+                cash += proceeds - exit_fee
+
+                pnl = cash - active_position["cash_before_entry"]
+                trades.append({"pnl": pnl, "win": pnl > 0, "reason": exit_reason})
+                active_position = None
+
+        if active_position is None and (i - last_entry_bar) >= cooldown_bars:
+            window = ratios[i - lookback + 1 : i + 1]
+            mean_window = sum(window) / lookback
+            variance = sum((x - mean_window) ** 2 for x in window) / lookback
+            std = sqrt(variance) if variance > 0 else 1e-8
+            z = (ratios[i] - mean_window) / std
+
+            if z <= -z_entry and atr[i] is not None and atr[i] > 0:
+                risk_usdt = min(MAX_POSITION_USDT * (RISK_PERCENT / 100) * 20, MAX_POSITION_USDT, cash * 0.98)
+                if risk_usdt >= MIN_NOTIONAL_USDT:
+                    qty = risk_usdt / current_close
+                    qty = max(MIN_QTY_ETH, min(qty, MAX_QTY_ETH))
+                    entry_fill = current_close * (1 + slippage_bps / 10000)
+                    cost = qty * entry_fill
+                    entry_fee = cost * fee_rate
+                    total_cost = cost + entry_fee
+
+                    if total_cost <= cash and (qty * current_close) >= MIN_NOTIONAL_USDT:
+                        stop_loss = current_close - (sl_atr * atr[i])
+                        take_profit = current_close + (tp_atr * atr[i])
+                        if stop_loss > 0 and take_profit > current_close:
+                            cash_before = cash
+                            cash -= total_cost
+                            active_position = {
+                                "qty": qty,
+                                "entry_bar": i,
+                                "sl": stop_loss,
+                                "tp": take_profit,
+                                "cash_before_entry": cash_before,
+                            }
+                            last_entry_bar = i
+
+        if active_position is not None:
+            equity = cash + (active_position["qty"] * current_close)
+        else:
+            equity = cash
+
+        if equity > peak_equity:
+            peak_equity = equity
+        if peak_equity > 0:
+            dd = (peak_equity - equity) / peak_equity
+            if dd > max_drawdown:
+                max_drawdown = dd
+
+    if active_position is not None:
+        final_close = eth_c[-1]
+        fill_exit = final_close * (1 - slippage_bps / 10000)
+        proceeds = active_position["qty"] * fill_exit
+        exit_fee = proceeds * fee_rate
+        cash += proceeds - exit_fee
+        pnl = cash - active_position["cash_before_entry"]
+        trades.append({"pnl": pnl, "win": pnl > 0, "reason": "forced_close_end"})
+
+    total_trades = len(trades)
+    wins = sum(1 for t in trades if t["win"])
+    losses = total_trades - wins
+    win_rate = (wins / total_trades) if total_trades else 0.0
+    avg_trade_pnl = (sum(t["pnl"] for t in trades) / total_trades) if total_trades else 0.0
+
+    return {
+        "final_equity": cash,
+        "return_pct": ((cash / initial_balance) - 1) * 100,
+        "max_drawdown_pct": max_drawdown * 100,
+        "trades": total_trades,
+        "wins": wins,
+        "losses": losses,
+        "win_rate": win_rate,
+        "avg_trade_pnl": avg_trade_pnl,
+    }
+
+
+def build_synthetic_market_data(total_bars=40 * 24):
+    eth_c = []
+    eth_h = []
+    eth_l = []
+    btc_c = []
+
+    eth_price = 3200.0
+    btc_price = 62000.0
+
+    for i in range(total_bars):
+        cycle = sin(i / 18.0)
+        regime = 0.00035 if (i // 220) % 2 == 0 else -0.00025
+
+        shock = 0.0
+        if i % 173 == 0 and i > 0:
+            shock -= 0.035
+        if i % 257 == 0 and i > 0:
+            shock += 0.028
+
+        eth_ret = regime + (cycle * 0.007) + shock + (((i % 9) - 4) * 0.00065)
+        btc_ret = (regime * 0.6) + (sin((i + 11) / 26.0) * 0.0035) + (shock * 0.4) + (((i % 7) - 3) * 0.0004)
+
+        eth_price = max(350.0, eth_price * (1 + eth_ret))
+        btc_price = max(9000.0, btc_price * (1 + btc_ret))
+
+        spread = eth_price * (0.004 + (abs(cycle) * 0.003))
+        high = eth_price + spread
+        low = max(1.0, eth_price - (spread * 1.1))
+
+        eth_c.append(eth_price)
+        eth_h.append(high)
+        eth_l.append(low)
+        btc_c.append(btc_price)
+
+    return eth_c, eth_h, eth_l, btc_c
+
+
+def run_backtest(brutal_rounds=1):
+    eth_c, eth_h, eth_l = get_ohlc(YAHOO_ETH)
+    btc_c = get_closes(YAHOO_BTC)
+    source = "Yahoo historical"
+    if not eth_c or not eth_h or not eth_l or not btc_c:
+        eth_c, eth_h, eth_l, btc_c = build_synthetic_market_data()
+        source = "Synthetic stress data (Yahoo unavailable)"
+
+    n = min(len(eth_c), len(eth_h), len(eth_l), len(btc_c))
+    eth_c, eth_h, eth_l, btc_c = eth_c[-n:], eth_h[-n:], eth_l[-n:], btc_c[-n:]
+
+    slice_map = {
+        "full": n,
+        "30d": min(n, 30 * 24),
+        "14d": min(n, 14 * 24),
+        "7d": min(n, 7 * 24),
+    }
+
+    scenarios = []
+    base_grid = product(
+        [2.0, 2.5, 3.0],       # z entry
+        [1.0, 1.25, 1.5],      # sl atr
+        [1.2, 1.8, 2.4],       # tp atr
+        [1, 3, 6],             # cooldown hours
+        [24, 48],              # max hold hours
+        [0.001, 0.002],        # fee rate per side
+        [5, 15],               # slippage bps
+    )
+
+    grid_list = list(base_grid)
+    total_estimated = len(grid_list) * len(slice_map) * max(1, brutal_rounds)
+
+    print("\n=== SeaTrader Backtest / Stress Mode ===")
+    print(f"Starting balance: ${BACKTEST_START_USDT:.2f}")
+    print(f"Data source: {source}")
+    print(f"Data candles: {n} (1h)")
+    print(f"Planned scenarios: {total_estimated}")
+
+    completed = 0
+    for round_idx in range(max(1, brutal_rounds)):
+        for z_entry, sl_atr, tp_atr, cooldown_h, max_hold_h, fee_rate, slippage_bps in grid_list:
+            for label, bars in slice_map.items():
+                sc_eth_c, sc_eth_h, sc_eth_l, sc_btc_c = slice_data(eth_c, eth_h, eth_l, btc_c, bars)
+                result = simulate_single_scenario(
+                    sc_eth_c,
+                    sc_eth_h,
+                    sc_eth_l,
+                    sc_btc_c,
+                    {
+                        "lookback": LOOKBACK,
+                        "z_entry": z_entry,
+                        "sl_atr": sl_atr,
+                        "tp_atr": tp_atr,
+                        "cooldown_bars": cooldown_h,
+                        "max_hold_bars": max_hold_h,
+                        "fee_rate": fee_rate,
+                        "slippage_bps": slippage_bps,
+                        "initial_balance": BACKTEST_START_USDT,
+                    },
+                )
+                completed += 1
+
+                if result is not None:
+                    scenarios.append(
+                        {
+                            "round": round_idx + 1,
+                            "slice": label,
+                            "z": z_entry,
+                            "sl": sl_atr,
+                            "tp": tp_atr,
+                            "cooldown_h": cooldown_h,
+                            "max_hold_h": max_hold_h,
+                            "fee_rate": fee_rate,
+                            "slippage_bps": slippage_bps,
+                            **result,
+                        }
+                    )
+
+                if completed % 300 == 0:
+                    print(f"Progress: {completed}/{total_estimated} scenarios...")
+
+    if not scenarios:
+        print("No valid scenarios completed.")
+        return
+
+    final_equities = [s["final_equity"] for s in scenarios]
+    returns = [s["return_pct"] for s in scenarios]
+    drawdowns = [s["max_drawdown_pct"] for s in scenarios]
+    win_rates = [s["win_rate"] for s in scenarios if s["trades"] > 0]
+    trades = [s["trades"] for s in scenarios]
+
+    profitable = sum(1 for x in final_equities if x > BACKTEST_START_USDT)
+    profitable_pct = (profitable / len(final_equities)) * 100
+
+    sorted_final = sorted(final_equities)
+    p10 = sorted_final[max(0, int(0.10 * (len(sorted_final) - 1)))]
+    p50 = sorted_final[max(0, int(0.50 * (len(sorted_final) - 1)))]
+    p90 = sorted_final[max(0, int(0.90 * (len(sorted_final) - 1)))]
+
+    best = max(scenarios, key=lambda x: x["final_equity"])
+    worst = min(scenarios, key=lambda x: x["final_equity"])
+
+    print("\n=== Stress Results (many historical scenarios) ===")
+    print(f"Completed scenarios: {len(scenarios)}")
+    print(f"Average final equity (from $100): ${mean(final_equities):.2f}")
+    print(f"Median final equity (from $100):  ${median(final_equities):.2f}")
+    print(f"Expected return range: min {min(returns):.2f}% | avg {mean(returns):.2f}% | max {max(returns):.2f}%")
+    print(f"Profitability across scenarios: {profitable_pct:.2f}%")
+    print(f"Equity distribution: p10 ${p10:.2f} | p50 ${p50:.2f} | p90 ${p90:.2f}")
+    print(f"Max drawdown pressure: best {min(drawdowns):.2f}% | avg {mean(drawdowns):.2f}% | worst {max(drawdowns):.2f}%")
+    print(f"Trade count pressure: min {min(trades)} | avg {mean(trades):.2f} | max {max(trades)}")
+    if win_rates:
+        print(f"Win-rate across active scenarios: avg {mean(win_rates) * 100:.2f}%")
+    else:
+        print("Win-rate across active scenarios: no scenarios generated trades")
+
+    print("\nBest scenario:")
+    print(
+        f"  slice={best['slice']} z={best['z']} sl={best['sl']} tp={best['tp']} "
+        f"cooldown={best['cooldown_h']}h hold={best['max_hold_h']}h fee={best['fee_rate']:.3f} "
+        f"slip={best['slippage_bps']}bps -> final=${best['final_equity']:.2f}, "
+        f"win-rate={best['win_rate'] * 100:.2f}%, MDD={best['max_drawdown_pct']:.2f}%"
+    )
+
+    print("Worst scenario:")
+    print(
+        f"  slice={worst['slice']} z={worst['z']} sl={worst['sl']} tp={worst['tp']} "
+        f"cooldown={worst['cooldown_h']}h hold={worst['max_hold_h']}h fee={worst['fee_rate']:.3f} "
+        f"slip={worst['slippage_bps']}bps -> final=${worst['final_equity']:.2f}, "
+        f"win-rate={worst['win_rate'] * 100:.2f}%, MDD={worst['max_drawdown_pct']:.2f}%"
+    )
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="SeaTrader Bybit")
+    parser.add_argument("--mode", choices=["trade", "backtest"], default="trade")
+    parser.add_argument(
+        "--brutal-runs",
+        type=int,
+        default=1,
+        help="Repeat full stress grid N times in backtest mode",
+    )
+    return parser.parse_args()
+
+
 def main():
+    args = parse_args()
+
+    if args.mode == "backtest":
+        run_backtest(brutal_rounds=max(1, args.brutal_runs))
+        return
+
     mode = "DRY RUN" if DRY_RUN else ("TESTNET" if TESTNET else "LIVE")
 
     if not TESTNET and not ALLOW_LIVE_TRADING:
