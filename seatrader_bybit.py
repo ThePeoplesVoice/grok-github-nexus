@@ -44,6 +44,12 @@ DISCIPLINE_PROFILE = {
         "fee_rate": 0.001,  # 0.10% taker
         "slippage_bps": 10,
     },
+    "guardrails": {
+        "max_session_loss_pct": 8.0,
+        "max_consecutive_losses": 3,
+        "max_hourly_volatility_pct": 2.5,
+        "max_bar_range_bps": 180,
+    },
 }
 
 # Backwards-compatible aliases (read from discipline profile)
@@ -67,6 +73,10 @@ YAHOO_BTC = DISCIPLINE_PROFILE["market"]["yahoo_btc"]
 BACKTEST_START_USDT = DISCIPLINE_PROFILE["backtest"]["start_usdt"]
 BACKTEST_FEE_RATE = DISCIPLINE_PROFILE["backtest"]["fee_rate"]
 BACKTEST_SLIPPAGE_BPS = DISCIPLINE_PROFILE["backtest"]["slippage_bps"]
+MAX_SESSION_LOSS_PCT = DISCIPLINE_PROFILE["guardrails"]["max_session_loss_pct"]
+MAX_CONSECUTIVE_LOSSES = DISCIPLINE_PROFILE["guardrails"]["max_consecutive_losses"]
+MAX_HOURLY_VOLATILITY_PCT = DISCIPLINE_PROFILE["guardrails"]["max_hourly_volatility_pct"]
+MAX_BAR_RANGE_BPS = DISCIPLINE_PROFILE["guardrails"]["max_bar_range_bps"]
 
 TELEGRAM_TOKEN = ""
 TELEGRAM_CHAT_ID = ""
@@ -75,6 +85,13 @@ TELEGRAM_CHAT_ID = ""
 BASE_URL = "https://api-testnet.bybit.com" if TESTNET else "https://api.bybit.com"
 last_signal_time = 0
 position = None
+session_state = {
+    "session_start_usdt": None,
+    "realized_pnl_usdt": 0.0,
+    "consecutive_losses": 0,
+    "trading_halted": False,
+    "halt_reason": None,
+}
 
 
 def send(msg):
@@ -88,6 +105,71 @@ def send(msg):
             )
         except Exception:
             pass
+
+
+def bootstrap_session_state():
+    if session_state["session_start_usdt"] is not None:
+        return
+
+    start_balance = get_coin_balance("USDT")
+    if start_balance is None:
+        start_balance = BACKTEST_START_USDT
+    session_state["session_start_usdt"] = max(start_balance, 1.0)
+
+
+def halt_new_entries(reason):
+    if session_state["trading_halted"]:
+        return
+    session_state["trading_halted"] = True
+    session_state["halt_reason"] = reason
+    send(f"Guardrail breach: {reason}. New entries halted for this session.")
+
+
+def evaluate_guardrails(current_price=None, current_high=None, current_low=None, atr=None):
+    if session_state["trading_halted"]:
+        return False
+
+    bootstrap_session_state()
+    max_loss_usdt = session_state["session_start_usdt"] * (MAX_SESSION_LOSS_PCT / 100)
+    if session_state["realized_pnl_usdt"] <= -max_loss_usdt:
+        halt_new_entries(
+            f"session loss cap hit ({session_state['realized_pnl_usdt']:.2f} <= -{max_loss_usdt:.2f})"
+        )
+        return False
+
+    if session_state["consecutive_losses"] >= MAX_CONSECUTIVE_LOSSES:
+        halt_new_entries(
+            f"consecutive loss cap hit ({session_state['consecutive_losses']} losses)"
+        )
+        return False
+
+    if atr and current_price:
+        hourly_volatility_pct = (atr / current_price) * 100
+        if hourly_volatility_pct >= MAX_HOURLY_VOLATILITY_PCT:
+            halt_new_entries(
+                f"hourly volatility spike ({hourly_volatility_pct:.2f}% >= {MAX_HOURLY_VOLATILITY_PCT:.2f}%)"
+            )
+            return False
+
+    if current_high and current_low and current_price:
+        bar_range_bps = ((current_high - current_low) / current_price) * 10000
+        if bar_range_bps >= MAX_BAR_RANGE_BPS:
+            halt_new_entries(
+                f"bar range/slippage proxy spike ({bar_range_bps:.1f}bps >= {MAX_BAR_RANGE_BPS:.1f}bps)"
+            )
+            return False
+
+    return True
+
+
+def record_closed_trade(entry_price, exit_price, qty):
+    pnl = (exit_price - entry_price) * qty
+    session_state["realized_pnl_usdt"] += pnl
+    if pnl < 0:
+        session_state["consecutive_losses"] += 1
+    else:
+        session_state["consecutive_losses"] = 0
+    return pnl
 
 
 def bybit_request(method, endpoint, params=None):
@@ -252,12 +334,15 @@ def manage_open_position(current_price):
 
     result = place_order("Sell", position["qty"])
     if result.get("retCode") == 0:
+        pnl = record_closed_trade(position["entry_price"], current_price, position["qty"])
         send(
             f"<b>EXIT EXECUTED</b>\n"
             f"Reason: {reason}\n"
             f"Qty: {position['qty']:.5f} ETH\n"
             f"Entry: {position['entry_price']:.2f}\n"
             f"Exit ≈ {current_price:.2f}\n"
+            f"PnL ≈ {pnl:.2f} USDT\n"
+            f"Session PnL ≈ {session_state['realized_pnl_usdt']:.2f} USDT\n"
             f"{('DRY RUN' if DRY_RUN else ('TESTNET' if TESTNET else 'LIVE'))}"
         )
         position = None
@@ -279,6 +364,7 @@ def analyse():
         return
 
     current = eth[-1]
+    bootstrap_session_state()
     if position:
         manage_open_position(current)
         return
@@ -296,6 +382,14 @@ def analyse():
 
     atr = calc_atr(eth_h, eth_l, eth_c)
     if atr is None or atr <= 0:
+        return
+
+    if not evaluate_guardrails(
+        current_price=current,
+        current_high=eth_h[-1],
+        current_low=eth_l[-1],
+        atr=atr,
+    ):
         return
 
     signal = None
@@ -689,6 +783,7 @@ def main():
         return
 
     send(f"<b>SeaTrader Bybit {mode}</b>\nZ={Z_ENTRY} | Lookback={LOOKBACK}")
+    bootstrap_session_state()
     print(f"Bybit bot running ({mode})...")
 
     while True:
