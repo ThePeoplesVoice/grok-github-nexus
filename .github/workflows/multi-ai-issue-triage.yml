@@ -84,9 +84,9 @@ jobs:
                       grok_analysis = response.json()["choices"][0]["message"]["content"]
                       print("✅ Ara (Grok) analysis successful")
                   else:
-                      grok_analysis = f"Grok API Error {response.status_code}: {response.text[:180]}"
+                      print(f"⚠️ Grok API {response.status_code} — skipping Grok section")
               except Exception as e:
-                  grok_analysis = f"Grok Exception: {str(e)[:180]}"
+                  print(f"⚠️ Grok exception: {str(e)[:120]}")
           else:
               print("⚠️ GROK_API_KEY not present")
 
@@ -116,9 +116,9 @@ jobs:
                       claude_analysis = data["content"][0]["text"] if data.get("content") else str(data)
                       print("✅ Claude complementary triage complete")
                   else:
-                      claude_analysis = f"Claude API Error {response.status_code}: {response.text[:180]}"
+                      print(f"⚠️ Claude API {response.status_code} — skipping Claude section")
               except Exception as e:
-                  claude_analysis = f"Claude Exception: {str(e)[:180]}"
+                  print(f"⚠️ Claude exception: {str(e)[:120]}")
           else:
               print("ℹ️ CLAUDE_API_KEY not present — Grok-only triage")
 

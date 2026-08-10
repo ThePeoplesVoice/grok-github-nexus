@@ -119,9 +119,9 @@ jobs:
                       grok_analysis = response.json()["choices"][0]["message"]["content"]
                       print("✅ Ara (Grok) commit analysis complete")
                   else:
-                      grok_analysis = f"Grok API {response.status_code}: {response.text[:200]}"
+                      print(f"⚠️ Grok API {response.status_code} — skipping Grok section")
               except Exception as e:
-                  grok_analysis = f"Grok exception: {str(e)[:180]}"
+                  print(f"⚠️ Grok exception: {str(e)[:120]}")
           else:
               print("⚠️ GROK_API_KEY missing or no commits")
 
@@ -151,9 +151,9 @@ jobs:
                       claude_analysis = data["content"][0]["text"] if data.get("content") else str(data)
                       print("✅ Claude complementary analysis complete")
                   else:
-                      claude_analysis = f"Claude API {response.status_code}: {response.text[:200]}"
+                      print(f"⚠️ Claude API {response.status_code} — skipping Claude section")
               except Exception as e:
-                  claude_analysis = f"Claude exception: {str(e)[:180]}"
+                  print(f"⚠️ Claude exception: {str(e)[:120]}")
           else:
               print("ℹ️ CLAUDE_API_KEY not present or no commits — Grok-only path")
 
