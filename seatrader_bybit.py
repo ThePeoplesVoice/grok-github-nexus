@@ -17,30 +17,56 @@ TESTNET = True         # ← Set to False only when ready for real money
 ALLOW_LIVE_TRADING = False  # hard safety gate for real-money mode
 DRY_RUN = True         # set False for actual testnet/live orders
 
-# Strategy
-LOOKBACK = 24
-Z_ENTRY = 2.5
-SL_ATR = 1.25
-TP_ATR = 1.8
-COOLDOWN = 3 * 3600
-MAX_HOLD_SECONDS = 24 * 3600
+# Unified discipline profile (single source of strategy + risk behavior)
+DISCIPLINE_PROFILE = {
+    "strategy": {
+        "lookback": 24,
+        "z_entry": 2.5,
+        "sl_atr": 1.25,
+        "tp_atr": 1.8,
+        "cooldown_seconds": 3 * 3600,
+        "max_hold_seconds": 24 * 3600,
+    },
+    "risk": {
+        "risk_percent": 0.5,
+        "max_position_usdt": 50,
+        "min_notional_usdt": 1.0,
+        "max_qty_eth": 0.05,
+        "min_qty_eth": 0.001,
+    },
+    "market": {
+        "symbol": "ETHUSDT",
+        "yahoo_eth": "ETH-USD",
+        "yahoo_btc": "BTC-USD",
+    },
+    "backtest": {
+        "start_usdt": 100.0,
+        "fee_rate": 0.001,  # 0.10% taker
+        "slippage_bps": 10,
+    },
+}
 
-# Risk
-RISK_PERCENT = 0.5
-MAX_POSITION_USDT = 50
-MIN_NOTIONAL_USDT = 1.0
-MAX_QTY_ETH = 0.05
-MIN_QTY_ETH = 0.001
+# Backwards-compatible aliases (read from discipline profile)
+LOOKBACK = DISCIPLINE_PROFILE["strategy"]["lookback"]
+Z_ENTRY = DISCIPLINE_PROFILE["strategy"]["z_entry"]
+SL_ATR = DISCIPLINE_PROFILE["strategy"]["sl_atr"]
+TP_ATR = DISCIPLINE_PROFILE["strategy"]["tp_atr"]
+COOLDOWN = DISCIPLINE_PROFILE["strategy"]["cooldown_seconds"]
+MAX_HOLD_SECONDS = DISCIPLINE_PROFILE["strategy"]["max_hold_seconds"]
 
-# Market
-SYMBOL = "ETHUSDT"
-YAHOO_ETH = "ETH-USD"
-YAHOO_BTC = "BTC-USD"
+RISK_PERCENT = DISCIPLINE_PROFILE["risk"]["risk_percent"]
+MAX_POSITION_USDT = DISCIPLINE_PROFILE["risk"]["max_position_usdt"]
+MIN_NOTIONAL_USDT = DISCIPLINE_PROFILE["risk"]["min_notional_usdt"]
+MAX_QTY_ETH = DISCIPLINE_PROFILE["risk"]["max_qty_eth"]
+MIN_QTY_ETH = DISCIPLINE_PROFILE["risk"]["min_qty_eth"]
 
-# Backtest defaults
-BACKTEST_START_USDT = 100.0
-BACKTEST_FEE_RATE = 0.001  # 0.10% taker
-BACKTEST_SLIPPAGE_BPS = 10
+SYMBOL = DISCIPLINE_PROFILE["market"]["symbol"]
+YAHOO_ETH = DISCIPLINE_PROFILE["market"]["yahoo_eth"]
+YAHOO_BTC = DISCIPLINE_PROFILE["market"]["yahoo_btc"]
+
+BACKTEST_START_USDT = DISCIPLINE_PROFILE["backtest"]["start_usdt"]
+BACKTEST_FEE_RATE = DISCIPLINE_PROFILE["backtest"]["fee_rate"]
+BACKTEST_SLIPPAGE_BPS = DISCIPLINE_PROFILE["backtest"]["slippage_bps"]
 
 TELEGRAM_TOKEN = ""
 TELEGRAM_CHAT_ID = ""
