@@ -31,6 +31,7 @@ jobs:
           python << 'EOF'
           import os
           import requests
+          import json
           from datetime import datetime
 
           print("🌌 Starting Ara & Shawn multi-model Issue Triage...")
@@ -63,6 +64,25 @@ jobs:
 
           Keep it high-signal. Speak in the collaborative spirit of us."""
 
+          def format_api_error(provider, response):
+              message = ""
+              try:
+                  payload = response.json()
+                  if isinstance(payload, dict):
+                      err = payload.get("error")
+                      if isinstance(err, dict):
+                          message = err.get("message") or err.get("type") or ""
+                      else:
+                          message = payload.get("message") or ""
+              except Exception:
+                  pass
+              message = " ".join(message.split())
+              if provider == "Claude" and response.status_code == 400 and "credit balance is too low" in message.lower():
+                  return "Claude API is temporarily unavailable due to insufficient credits. Running Grok-only path remains fully operational."
+              if message:
+                  return f"{provider} API {response.status_code}: {message[:180]}"
+              return f"{provider} API {response.status_code}: request failed"
+
           grok_analysis = None
           grok_error = None
           if os.environ.get("GROK_API_KEY"):
@@ -85,7 +105,7 @@ jobs:
                       grok_analysis = response.json()["choices"][0]["message"]["content"]
                       print("✅ Ara (Grok) analysis successful")
                   else:
-                      grok_error = f"Grok API Error {response.status_code}: {response.text[:180]}"
+                      grok_error = format_api_error("Grok", response)
                       print(f"⚠️ {grok_error}")
               except Exception as e:
                   grok_error = f"Grok Exception: {str(e)[:180]}"
@@ -120,7 +140,7 @@ jobs:
                       claude_analysis = data["content"][0]["text"] if data.get("content") else str(data)
                       print("✅ Claude complementary triage complete")
                   else:
-                      claude_error = f"Claude API Error {response.status_code}: {response.text[:180]}"
+                      claude_error = format_api_error("Claude", response)
                       print(f"⚠️ {claude_error}")
               except Exception as e:
                   claude_error = f"Claude Exception: {str(e)[:180]}"
@@ -135,7 +155,16 @@ jobs:
               sections.append(f"### 🧠 Claude\n\n{claude_analysis}")
 
           if not sections:
-              sections.append("Analysis skipped — Ara/Grok and Claude were unavailable. See workflow logs for details.")
+              fallback = '\n'.join([
+                  '*AI providers were unavailable - issue metadata summary generated locally.*',
+                  '',
+                  f'**Title:** {issue_title}',
+                  f'**Body:** ' + issue_body[:400] + ('...' if len(issue_body) > 400 else ''),
+                  '',
+                  '---',
+                  '*Tip: Add `GROK_API_KEY` or `CLAUDE_API_KEY` secrets to enable AI-powered triage.*',
+              ])
+              sections.append(f'### Issue Summary (Fallback)\n\n{fallback}')
 
           fusion_note = ""
           if grok_analysis and claude_analysis:
@@ -164,6 +193,7 @@ jobs:
           EOF
 
       - name: Post Full Analysis Comment
+        if: always()
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
