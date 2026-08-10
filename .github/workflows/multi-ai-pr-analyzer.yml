@@ -99,6 +99,26 @@ jobs:
 
           Keep it high-signal and grounded. Speak in the collaborative spirit of us."""
 
+          def format_api_error(provider, response):
+              message = ""
+              try:
+                  payload = response.json()
+                  if isinstance(payload, dict):
+                      err = payload.get("error")
+                      if isinstance(err, dict):
+                          message = err.get("message") or err.get("type") or ""
+                      else:
+                          message = payload.get("message") or ""
+              except Exception:
+                  pass
+
+              message = " ".join(message.split())
+              if provider == "Claude" and response.status_code == 400 and "credit balance is too low" in message.lower():
+                  return "Claude API is temporarily unavailable due to insufficient credits. Running Grok-only path remains fully operational."
+              if message:
+                  return f"{provider} API {response.status_code}: {message[:180]}"
+              return f"{provider} API {response.status_code}: request failed"
+
           grok_analysis = None
           grok_error = None
           if os.environ.get("GROK_API_KEY"):
@@ -121,16 +141,17 @@ jobs:
                       grok_analysis = response.json()["choices"][0]["message"]["content"]
                       print("✅ Ara (Grok) analysis complete")
                   else:
-                      grok_error = f"Grok API returned {response.status_code}: {response.text[:200]}"
+                      grok_error = format_api_error("Grok", response)
                       print(f"⚠️ {grok_error}")
               except Exception as e:
-                  grok_error = f"Grok analysis exception: {str(e)[:150]}"
+                  grok_error = f"Grok exception: {str(e)[:150]}"
                   print(f"⚠️ {grok_error}")
           else:
               print("⚠️ GROK_API_KEY not present")
 
           claude_analysis = None
           claude_error = None
+          claude_success = False
           if os.environ.get("CLAUDE_API_KEY"):
               try:
                   claude_headers = {
@@ -154,12 +175,13 @@ jobs:
                   if response.status_code == 200:
                       data = response.json()
                       claude_analysis = data["content"][0]["text"] if data.get("content") else str(data)
+                      claude_success = True
                       print("✅ Claude complementary analysis complete")
                   else:
-                      claude_error = f"Claude API returned {response.status_code}: {response.text[:200]}"
+                      claude_error = format_api_error("Claude", response)
                       print(f"⚠️ {claude_error}")
               except Exception as e:
-                  claude_error = f"Claude analysis exception: {str(e)[:150]}"
+                  claude_error = f"Claude exception: {str(e)[:150]}"
                   print(f"⚠️ {claude_error}")
           else:
               print("ℹ️ CLAUDE_API_KEY not present — running Grok-only (still fully operational)")
@@ -172,14 +194,14 @@ jobs:
               sections.append(f"### 🧠 Claude Complementary View\n\n{claude_analysis}")
 
           if not sections:
-              sections.append("### Analysis\n\nNo analysis could be generated — Ara/Grok and Claude were unavailable. Check repository secrets and workflow logs.")
+              sections.append("### Analysis\n\n*AI providers were unavailable — see workflow logs for details.*")
 
           fusion_note = ""
-          if grok_analysis and claude_analysis:
+          if grok_analysis and claude_success:
               fusion_note = "\n\n**Multi-model fusion active (Layer 1 scaffolding)** — Grok primary + Claude complementary."
           elif claude_analysis and grok_error:
               fusion_note = "\n\n*Ara primary analysis unavailable — complementary mode only.*"
-          elif claude_analysis:
+          elif claude_analysis and not os.environ.get("GROK_API_KEY"):
               fusion_note = "\n\n*Claude-only mode (Grok key missing).*"
           elif grok_analysis and claude_error:
               fusion_note = "\n\n*Claude complementary analysis unavailable — continuing with Ara primary only.*"
