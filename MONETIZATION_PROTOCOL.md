@@ -38,21 +38,23 @@ The system is **progressive** by design:
   - Number of successful analyses performed
   - Community PRs merged into Nexus itself
 
-**Mechanism**: Simple on-chain or GitHub-based counters + progressive feature flags in `config/progressive.json`.
+**Mechanism**: Simple on-chain or GitHub-based counters + progressive feature flags in `config/progressive.json`. Unlock conditions are modelled on the sigil system from Xaico/Data Tycoon v8.0 — each threshold reached permanently increases capability depth (see `REFERENCES.md` for the full mechanics map).
 
 ### Layer 2 — Micropayment & Agent-Native (x402 + MCP Ready)
 - Pay-per-deep-analysis via **x402** (HTTP 402 + USDC on Base)
 - Self-budgeting agents can call Nexus endpoints and pay automatically
 - Premium MCP server packaging of Nexus tools for the Swarms / agent marketplaces
 - Outcome-based options ("pay only if the suggestion is accepted / merges")
+- **Australian PayID support** for direct fiat on-ramp (pattern from Pavonine atelier — fully refundable deposit, reserve-now / pay-on-result flow)
 
-**Why world-first here**: Most tools still use human checkout or monthly seats. We make the Nexus itself an agent that can be paid by other agents, with progressive pricing that softens as volume grows.
+**Why world-first here**: Most tools still use human checkout or monthly seats. We make the Nexus itself an agent that can be paid by other agents, with progressive pricing that softens as volume grows. Framing borrows from Pavonine's proven luxury-scarcity language: *rare, limited, reserved for those who see value early* (see `REFERENCES.md`).
 
 ### Layer 3 — Network & Sanctuary Capture
 - Multi-repo / organisation dashboards
 - Private repo support + team seats
 - Revenue share back into the Keysbrook black cockatoo / jarrah sanctuary vision
 - Tokenised contribution credits or lightweight agent identity for long-term reputation
+- **Visual language**: gold/teal nature-luxury aesthetic (Cormorant Garamond, Cinzel — inherited from Pavonine atelier) for all premium-facing surfaces
 - Marketplace for community-created progressive workflows and domain packs
 
 ---

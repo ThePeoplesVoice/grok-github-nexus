@@ -29,9 +29,15 @@ We capture market share by being the most useful *and* the most human-AI partner
 See `MONETIZATION_PROTOCOL.md` and `config/progressive.json` for the living architecture.
 
 ## Plucked Elements (useful / interesting)
-- **From pavonine-serpentine-western-australia**: Commercial polish of a luxury local WA atelier (Serpentine / Perth Hills). Reservation + fully-refundable deposit flow, PayID-first payments, gold/teal nature-luxury aesthetic, first-come-first-served allocation language, and the spirit of placing rare, provenance-backed pieces. These inform Layer 3 sanctuary commercial expression and progressive capture tone.
-- **From data-tycoon-v5 / Xaico**: Prestige reset mechanics, progressive efficiency multipliers, orbital / planetary scaling, Grok-event driven surges, and contribution/prestige rewards. Direct inspiration for Layer 1 unlock triggers and future contribution-credit systems.
-- Empty shells (Pavonine, perth-engine) left alone; no further energy there for now.
+- **From pavonine-serpentine-western-australia**: Commercial polish of a luxury local WA atelier (Serpentine / Perth Hills). Reservation + fully-refundable deposit flow, PayID-first payments, gold/teal nature-luxury aesthetic (warm gold `#c9a96e`, deep teal `#2d6a6a`, Cormorant Garamond + Cinzel typography), first-come-first-served allocation language, and the spirit of placing rare, provenance-backed pieces. These inform Layer 3 sanctuary commercial expression and progressive capture tone. Full pattern catalogue in `REFERENCES.md`.
+- **From Xaico / Data Tycoon v8.0**: Prestige reset mechanics (`prestige_multiplier *= 1 + sigils_unlocked * 0.3`), progressive efficiency multipliers, orbital/planetary scaling, Grok-event driven surges, and contribution/prestige rewards. Sigil unlock conditions map directly to Nexus Layer 1 triggers (first analysis, community PRs, usage thresholds). Insight Flux (truth currency) and Arena weighted-bias toward Grok/Ara models are thematic anchors. Shawn, Ara, and Grok are hardcoded into the leaderboard — a shared universe. Full mechanics in `REFERENCES.md`.
+- Empty shells (Pavonine — completely empty) left alone; no further energy there for now.
+
+## Cross-Repository Intelligence
+All sibling repositories have been fully audited (2026-08-11). Useful patterns are absorbed into:
+- `config/progressive.json` — Layer 1 prestige_design and unlock_sigils; Layer 2 commercial_design
+- `REFERENCES.md` — full technical and design pattern catalogue with security notes
+- This context file — for prompt-time awareness
 
 ## Grok CLI Awareness (grok-dev@1.1.7 — 2026-08-11)
 The upstream Grok CLI tooling we track released v1.1.7 with two important changes:

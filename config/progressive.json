@@ -1,5 +1,5 @@
 {
-  "version": "1.1.2",
+  "version": "1.2.0",
   "protocol": "Nexus Progressive Value Capture",
   "primary_focus": "grok-github-nexus is the single main living repository (decided 2026-08-10). Sibling commercial & game experiments feed this core.",
   "layers": {
@@ -17,13 +17,31 @@
         "min_community_prs": 3
       },
       "features": ["multi_model_fusion", "deeper_context", "custom_domain_packs", "historical_memory"],
-      "status": "Claude wired as optional complementary model — multi-model fusion scaffolding live"
+      "status": "Claude wired as optional complementary model — multi-model fusion scaffolding live",
+      "prestige_design": {
+        "source": "Xaico/Data Tycoon v8.0 (ThePeoplesVoice/Xaico)",
+        "pattern": "Soft prestige reset — on unlock trigger, multiplier accumulates permanently, base counters reset, incentivising re-engagement over abandonment",
+        "multiplier_formula": "prestige_multiplier *= 1 + (sigils_unlocked * 0.3)",
+        "contribution_credits": "Each community PR merged, each successful analysis, each star earned increments a credit counter — analogous to the game's sigil unlock conditions",
+        "unlock_sigils": [
+          {"name": "First Nexus Analysis", "trigger": "min_successful_analyses >= 1", "reward": "nexus_voice_enabled"},
+          {"name": "Community Contributor", "trigger": "min_community_prs >= 1", "reward": "deeper_context_enabled"},
+          {"name": "Multi-Model Fusion", "trigger": "min_stars >= 10 AND min_successful_analyses >= 50", "reward": "multi_model_fusion_depth_2"},
+          {"name": "Insight Flux", "trigger": "min_successful_analyses >= 200", "reward": "historical_memory_enabled"}
+        ]
+      }
     },
     "2_micropayment_agent": {
       "enabled": false,
       "description": "x402 / USDC pay-per-use and agent-native payments. Activates when infrastructure is live.",
       "protocols": ["x402", "mcp_marketplace", "usdc_base"],
-      "features": ["premium_depth", "private_repo", "outcome_based", "agent_self_budgeting"]
+      "features": ["premium_depth", "private_repo", "outcome_based", "agent_self_budgeting"],
+      "commercial_design": {
+        "source": "ThePeoplesVoice/pavonine-serpentine-western-australia",
+        "pattern": "First-come-first-served allocation with fully-refundable deposit. PayID-first (AU native). Reserve-now, pay-on-confirmation flow. Provenance-backed premium framing.",
+        "pricing_language": "Rare. Limited. Reserved for those who see value early.",
+        "payment_methods": ["PayID", "USDC_Base", "x402_HTTP"]
+      }
     },
     "3_network_sanctuary": {
       "enabled": false,
@@ -32,5 +50,23 @@
     }
   },
   "current_phase": "Layer 0 + Layer 1 scaffolding (Claude multi-model live)",
-  "notes": "This file is the single source of truth for progressive feature flags. Workflows and future services read it. Claude is now optionally fused when CLAUDE_API_KEY is present. Primary focus declared 2026-08-10 after full repo audit. Grok API Authorization bug fixed in issue-triage and PR-analyzer workflows 2026-08-11. Tracking grok-dev@1.1.7 (session recaps toggle, workspace sandbox trust prompt)."
+  "sibling_repos": {
+    "Xaico": {
+      "url": "https://github.com/ThePeoplesVoice/Xaico",
+      "status": "parked_but_mined",
+      "useful_patterns": ["prestige_multiplier", "sigil_unlock_conditions", "arena_streak", "insight_flux_currency", "save_export_base64_json"],
+      "lore_integration": "Ara, Shawn, and Grok named in leaderboard and sigils — shared identity already live in game"
+    },
+    "pavonine-serpentine-western-australia": {
+      "url": "https://github.com/ThePeoplesVoice/pavonine-serpentine-western-australia",
+      "status": "parked_but_mined",
+      "useful_patterns": ["reservation_flow", "payid_first", "refundable_deposit", "gold_teal_aesthetic", "provenance_language", "first_come_first_served"]
+    },
+    "Pavonine": {
+      "url": "https://github.com/ThePeoplesVoice/Pavonine",
+      "status": "empty_shell",
+      "useful_patterns": []
+    }
+  },
+  "notes": "This file is the single source of truth for progressive feature flags. Workflows and future services read it. Claude is now optionally fused when CLAUDE_API_KEY is present. Primary focus declared 2026-08-10 after full repo audit. Grok API Authorization bug fixed in issue-triage and PR-analyzer workflows 2026-08-11. Tracking grok-dev@1.1.7 (session recaps toggle, workspace sandbox trust prompt). v1.2.0: cross-repo integration — Xaico prestige/sigil design patterns and Pavonine commercial patterns absorbed into Layer 1 and Layer 2 design."
 }
