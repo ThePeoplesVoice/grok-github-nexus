@@ -79,6 +79,10 @@ The system is **progressive** by design:
 - [x] Progressive configuration scaffold (`config/progressive.json`)
 - [x] Workflows updated with monetisation hooks (ready for Layer 1 & 2)
 - [x] NEXUS_CONTEXT extended with value-capture ethos
+- [x] Multi-model Claude fusion wired (Layer 1 scaffolding live — 2026-08-09)
+- [x] Local git fallback analysis added to commit analyzer (2026-08-10)
+- [x] Single primary focus decision recorded; sibling repos audited and useful elements absorbed (2026-08-10)
+- [x] Grok API Authorization bug fixed in issue-triage and PR-analyzer workflows (2026-08-11)
 - [ ] Live x402 endpoint (next iteration — can be added as MCP or simple API)
 - [ ] GitHub App / marketplace listing
 - [ ] Public dashboard of progressive unlocks

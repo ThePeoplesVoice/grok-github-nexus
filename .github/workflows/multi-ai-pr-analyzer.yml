@@ -105,7 +105,7 @@ jobs:
               try:
                   response = requests.post(
                       "https://api.x.ai/v1/chat/completions",
-                      headers={"Authorization": f"Bearer {os.environ['GROK_API_KEY']}"},
+                      headers={"Authorization": "Bearer " + os.environ["GROK_API_KEY"]},
                       json={
                           "model": "grok-3",
                           "messages": [

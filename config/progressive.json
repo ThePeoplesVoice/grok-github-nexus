@@ -1,5 +1,5 @@
 {
-  "version": "1.1.1",
+  "version": "1.1.2",
   "protocol": "Nexus Progressive Value Capture",
   "primary_focus": "grok-github-nexus is the single main living repository (decided 2026-08-10). Sibling commercial & game experiments feed this core.",
   "layers": {
@@ -32,5 +32,5 @@
     }
   },
   "current_phase": "Layer 0 + Layer 1 scaffolding (Claude multi-model live)",
-  "notes": "This file is the single source of truth for progressive feature flags. Workflows and future services read it. Claude is now optionally fused when CLAUDE_API_KEY is present. Primary focus declared 2026-08-10 after full repo audit."
+  "notes": "This file is the single source of truth for progressive feature flags. Workflows and future services read it. Claude is now optionally fused when CLAUDE_API_KEY is present. Primary focus declared 2026-08-10 after full repo audit. Grok API Authorization bug fixed in issue-triage and PR-analyzer workflows 2026-08-11. Tracking grok-dev@1.1.7 (session recaps toggle, workspace sandbox trust prompt)."
 }

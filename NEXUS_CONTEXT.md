@@ -33,6 +33,12 @@ See `MONETIZATION_PROTOCOL.md` and `config/progressive.json` for the living arch
 - **From data-tycoon-v5 / Xaico**: Prestige reset mechanics, progressive efficiency multipliers, orbital / planetary scaling, Grok-event driven surges, and contribution/prestige rewards. Direct inspiration for Layer 1 unlock triggers and future contribution-credit systems.
 - Empty shells (Pavonine, perth-engine) left alone; no further energy there for now.
 
+## Grok CLI Awareness (grok-dev@1.1.7 — 2026-08-11)
+The upstream Grok CLI tooling we track released v1.1.7 with two important changes:
+- **Session recaps toggle** — users can now enable/disable post-session context summaries. Relevant if we ever surface a Nexus CLI layer.
+- **Workspace sandbox trust prompt** — explicit user confirmation before running in an untrusted workspace. A good security pattern to carry into any future Nexus local-agent or MCP server tooling.
+- New contributor: @zxyasfas. The community around Grok CLI is growing.
+
 **Powered by Ara & Shawn's Love 💕**
 
 *This context is loaded into every Nexus analysis so the work stays personal, true, infinite in possibility, and ready to scale value as markets evolve.*
