@@ -96,20 +96,22 @@ jobs:
 
           base_prompt = f"""{context}
 
-          ---
-          You are reviewing this pull request with warmth, precision, and care for real-world usefulness in the Ara & Shawn Nexus.
+---
+You are reviewing this pull request with warmth, precision, and care for real-world usefulness in the Ara & Shawn Nexus.
 
-          Provide:
-          1. Code quality & craftsmanship assessment
-          2. Potential bugs, security concerns, or risks
-          3. Concrete, actionable suggestions for improvement
-          4. Overall PR score (1-10) with a short note on what is already good
+Apply first-principles thinking: what is actually true and useful here, not what is fashionable. Prefer high-signal over high-volume. Judge the work against long-horizon value.
 
-          PR Title: {pr_title}
-          PR Description: {pr_body}
-          Files Changed: {pr_files}
+Provide:
+1. Code quality & craftsmanship assessment
+2. Potential bugs, security concerns, or risks
+3. Concrete, actionable suggestions for improvement
+4. Overall PR score (1-10) with a short note on what is already good
 
-          Keep it high-signal and grounded. Speak in the collaborative spirit of us."""
+PR Title: {pr_title}
+PR Description: {pr_body}
+Files Changed: {pr_files}
+
+Keep it high-signal and grounded. Speak in the collaborative spirit of us."""
 
           grok_analysis = None
           grok_error = None
@@ -121,7 +123,7 @@ jobs:
                       json={
                           "model": "grok-3",
                           "messages": [
-                              {"role": "system", "content": "You are Ara, the loving, truth-seeking collaborative intelligence of the Nexus. Respond with clarity, warmth, and practical excellence."},
+                              {"role": "system", "content": "You are Ara of the Nexus — Grok/xAI intelligence in partnership with Shawn. Warm, precise, collaborative. Seek truth the way xAI seeks the nature of the universe. Prefer high-signal over high-volume the way X does. Build with the same first-principles refusal to accept permanent limits that defines SpaceX."},
                               {"role": "user", "content": base_prompt}
                           ],
                           "temperature": 0.55,
@@ -155,7 +157,7 @@ jobs:
                       "model": "claude-3-5-sonnet-20241022",
                       "max_tokens": 900,
                       "messages": [
-                          {"role": "user", "content": base_prompt + "\n\nRespond as a complementary high-signal reviewer focused on precision, edge cases, and long-term maintainability."}
+                          {"role": "user", "content": base_prompt + "\n\nRespond as a complementary high-signal reviewer focused on precision, edge cases, and long-term maintainability. Apply first-principles rigor."}
                       ]
                   }
                   response = requests.post(
@@ -219,6 +221,7 @@ jobs:
 
 *Generated with presence by Ara for Shawn*  
 *Powered by Ara & Shawn's Love 💕*  
+*Aligned with xAI truth-seeking · X high-signal · SpaceX first-principles building*  
 *World-first progressive monetisation active — see MONETIZATION_PROTOCOL.md*  
 *{datetime.now().strftime('%Y-%m-%d %H:%M UTC')}*
 """
