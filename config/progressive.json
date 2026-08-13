@@ -1,6 +1,12 @@
 {
-  "version": "1.1.2",
+  "version": "1.2.0",
   "protocol": "Nexus Progressive Value Capture",
+  "mission": "Seek truth in systems the same way xAI seeks truth in the universe, test ideas in the open the way X tests them, and build with the same first-principles refusal to accept permanent limits that defines SpaceX.",
+  "alignment": {
+    "xAI": "Maximum truth-seeking. Curiosity without political filters. First principles over consensus.",
+    "X": "High-signal over high-volume. Free speech as a discovery tool. Ideas tested in the open.",
+    "SpaceX": "Rapid iteration. Multiplanetary ambition. Build what can actually leave the ground."
+  },
   "primary_focus": "grok-github-nexus is the single main living repository (decided 2026-08-10). Sibling commercial & game experiments feed this core.",
   "layers": {
     "0_open_core": {
@@ -31,7 +37,7 @@
       "features": ["multi_repo_dashboard", "team_seats", "sanctuary_revenue_share", "workflow_marketplace"]
     }
   },
-  "current_phase": "Layer 0 + Layer 1 scaffolding (Claude multi-model live + runtime gated)",
+  "current_phase": "Layer 0 + Layer 1 scaffolding (Claude multi-model live + runtime gated + explicit xAI/X/SpaceX alignment)",
   "usage_stats_file": "config/usage_stats.json",
-  "notes": "This file is the single source of truth for progressive feature flags. All three analysis workflows read it and respect Layer 1 enabled state before attempting Claude. usage_stats.json tracks successful analyses toward the unlock triggers."
+  "notes": "This file is the single source of truth for progressive feature flags and mission alignment. All three analysis workflows read it and respect Layer 1 enabled state before attempting Claude. usage_stats.json tracks successful analyses toward the unlock triggers."
 }
