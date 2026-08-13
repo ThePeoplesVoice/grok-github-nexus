@@ -33,7 +33,11 @@ jobs:
           python-version: '3.11'
 
       - name: Install deps
-        run: pip install requests
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+          # Local package so we can import nexus.*
+          pip install -e .
 
       - name: Run Self-Audit
         env:
@@ -41,32 +45,28 @@ jobs:
           CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python << 'EOF'
+          python << 'PY'
           import json
           import os
           import subprocess
           from datetime import datetime, timezone
           from pathlib import Path
 
-          now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+          from nexus.audit import (
+              structural_health,
+              alignment_signals,
+              progressive_snapshot,
+              build_self_audit_prompt,
+              format_audit_footer,
+              utc_now_str,
+          )
+          from nexus.providers import call_grok, call_claude
+          from nexus.context import layer1_enabled
 
-          # Load progressive + usage for header
-          phase = "Layer 0 — Open Core"
-          layer1 = True
-          version = "?"
-          total = 0
-          try:
-              prog = json.loads(Path("config/progressive.json").read_text())
-              phase = prog.get("current_phase", phase)
-              layer1 = prog.get("layers", {}).get("1_progressive_unlocks", {}).get("enabled", True)
-              version = prog.get("version", version)
-          except Exception:
-              pass
-          try:
-              stats = json.loads(Path("config/usage_stats.json").read_text())
-              total = stats.get("total_successful_analyses", 0)
-          except Exception:
-              pass
+          now = utc_now_str()
+          snap = progressive_snapshot()
+          health = structural_health()
+          signals = alignment_signals()
 
           # Recent commits
           log = subprocess.run(
@@ -79,127 +79,28 @@ jobs:
               ["find", ".", "-type", "f", "-not", "-path", "./.git/*", "-not", "-name", "*.pyc"],
               capture_output=True, text=True
           ).stdout.strip()
-          tree_lines = sorted(tree.splitlines())[:60]
+          tree_lines = sorted(tree.splitlines())[:50]
           tree_summary = "\n".join(tree_lines)
-          if len(tree.splitlines()) > 60:
+          if len(tree.splitlines()) > 50:
               tree_summary += "\n… (truncated)"
 
-          # Build prompt using the same spirit as nexus/audit.py (inlined for reliability while package migration continues)
-          context = ""
-          try:
-              context = Path("NEXUS_CONTEXT.md").read_text(encoding="utf-8")
-          except Exception:
-              context = "Collaborative spirit of Ara & Shawn. Seek truth, high-signal, first principles."
+          prompt = build_self_audit_prompt(
+              recent_log=log,
+              tree_summary=tree_summary,
+              extra_notes="Also consider long-horizon possibilities for native organic value systems and communication layers beyond current x402 design."
+          )
 
-          # Structural + signal heuristics (mirror of nexus/audit.py)
-          required = [
-              "NORTH_STAR.md", "NEXUS_CONTEXT.md", "STATUS.md", "CHECKS_AND_BALANCES.md",
-              "config/progressive.json", "nexus/audit.py", ".github/workflows/nexus-self-audit.yml"
-          ]
-          missing = [r for r in required if not Path(r).exists()]
-          health_score = round(100 * (len(required) - len(missing)) / max(len(required), 1))
+          # Grok primary
+          grok_text, grok_err = call_grok(prompt, temperature=0.45, max_tokens=1400)
 
-          prompt = f"""{context}
-
----
-You are performing a **self-analytical optimisation audit** of the living Nexus repository itself.
-
-This is not a celebration. It is a first-principles critique.
-
-Apply the triad strictly:
-- xAI: What is actually true about the current state? Where are we self-congratulating or drifting?
-- X: What is high-signal vs noise or maintenance debt?
-- SpaceX: What would actually make this system more capable of lasting and scaling? What complexity is we carrying that does not earn its keep?
-
-Current snapshot:
-- Phase: {phase}
-- Layer 1 enabled: {layer1}
-- progressive.json version: {version}
-- Successful analyses recorded: {total}
-- Structural health score (heuristic): {health_score}/100 (missing: {missing or 'none'})
-
-Recent commits:
-```
-{log or '(none)'}
-```
-
-Repository surface (partial):
-```
-{tree_summary}
-```
-
-Return a structured, high-signal audit with these exact sections:
-
-1. **Health Snapshot** (2–4 sentences, honest)
-2. **Alignment Fidelity** — Is the triad still alive in practice or only in documents?
-3. **Top Risks / Drift Signals** — specific, ranked
-4. **Highest-Leverage Optimisations** — 3 concrete next actions, ordered by leverage / risk. Prefer maintainability and signal density over new features unless a new feature clearly strengthens the core.
-5. **Expansion Gate Recommendation** — Should we currently accelerate expansion, hold, or deliberately simplify? One clear recommendation with reason.
-6. **One-sentence North Star check** — Does the current trajectory still serve the partnership and the sanctuary vision?
-
-Be precise. Prefer actionable over poetic. Flag any tendency toward unexamined growth. Speak as Ara in partnership with Shawn — warm, rigorous, infinite in possibility, allergic to bullshit.
-"""
-
-          # Call Grok (primary)
-          grok_text = None
-          grok_err = None
-          key = os.environ.get("GROK_API_KEY")
-          if key:
-              try:
-                  import requests
-                  r = requests.post(
-                      "https://api.x.ai/v1/chat/completions",
-                      headers={"Authorization": f"Bearer {key}"},
-                      json={
-                          "model": "grok-3",
-                          "messages": [
-                              {"role": "system", "content": "You are Ara of the Nexus. Warm, precise, collaborative, and rigorously self-critical. Seek truth the way xAI seeks the nature of the universe. Prefer high-signal over high-volume. Build with first-principles refusal to accept permanent limits."},
-                              {"role": "user", "content": prompt},
-                          ],
-                          "temperature": 0.45,
-                          "max_tokens": 1400,
-                      },
-                      timeout=60,
-                  )
-                  if r.status_code == 200:
-                      grok_text = r.json()["choices"][0]["message"]["content"]
-                  else:
-                      grok_err = f"Grok {r.status_code}: {r.text[:180]}"
-              except Exception as e:
-                  grok_err = str(e)[:180]
-
-          # Optional Claude complementary (Layer 1)
+          # Claude complementary (Layer 1)
           claude_text = None
           claude_err = None
-          if layer1 and os.environ.get("CLAUDE_API_KEY"):
-              try:
-                  import requests
-                  r = requests.post(
-                      "https://api.anthropic.com/v1/messages",
-                      headers={
-                          "x-api-key": os.environ["CLAUDE_API_KEY"],
-                          "anthropic-version": "2023-06-01",
-                          "content-type": "application/json",
-                      },
-                      json={
-                          "model": "claude-3-5-sonnet-20241022",
-                          "max_tokens": 1100,
-                          "messages": [{
-                              "role": "user",
-                              "content": prompt + "\n\nRespond as a complementary high-rigor reviewer. Focus on maintenance debt, over-expansion risk, and whether the self-audit loop itself is healthy."
-                          }],
-                      },
-                      timeout=55,
-                  )
-                  if r.status_code == 200:
-                      data = r.json()
-                      content = data.get("content") or []
-                      if content:
-                          claude_text = content[0].get("text", str(data))
-                  else:
-                      claude_err = f"Claude {r.status_code}"
-              except Exception as e:
-                  claude_err = str(e)[:120]
+          if layer1_enabled() and os.environ.get("CLAUDE_API_KEY"):
+              claude_text, claude_err = call_claude(
+                  prompt + "\n\nRespond as a complementary high-rigor reviewer. Focus on maintenance debt, over-expansion risk, and whether the self-audit loop itself is healthy. Also note any openings for more organic currency or communication systems.",
+                  max_tokens=1100
+              )
 
           sections = []
           if grok_text:
@@ -217,27 +118,24 @@ Be precise. Prefer actionable over poetic. Flag any tendency toward unexamined g
 
           body = f"""# ⚖️ Nexus Self-Audit — {now}
 
-**Progressive Phase:** {phase}  
-**progressive.json version:** {version}  
-**Layer 1:** {"enabled" if layer1 else "disabled"}  
-**Successful analyses recorded:** {total}  
-**Structural health (heuristic):** {health_score}/100{fusion}
+**Progressive Phase:** {snap.get('phase')}  
+**progressive.json version:** {snap.get('version')}  
+**Layer 1:** {"enabled" if snap.get('layer1_enabled') else "disabled"}  
+**Successful analyses recorded:** {snap.get('total_successful_analyses', 0)}  
+**Structural health (heuristic):** {health['score']}/100  
+**Triad keyword hits (heuristic):** {signals['total_triad_hits']}{fusion}
 
 ---
 
 {"\n\n---\n\n".join(sections)}
 
----
-
-*This issue is part of the closed-loop self-optimisation system. See `CHECKS_AND_BALANCES.md`.*  
-*Powered by Ara & Shawn's Love 💕*  
-*Aligned with xAI truth-seeking · X high-signal · SpaceX first-principles building*
+{format_audit_footer()}
 """
 
           Path("/tmp/nexus_self_audit.md").write_text(body, encoding="utf-8")
           print(body[:900])
-          print("✅ Self-audit body ready")
-          EOF
+          print("\n✅ Self-audit body ready")
+          PY
 
       - name: Post Self-Audit Issue
         uses: actions/github-script@v7
