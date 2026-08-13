@@ -85,6 +85,10 @@ def main() -> None:
     elif grok_text and claude_err:
         fusion = "\n\n*Claude complementary unavailable — Ara primary only.*"
 
+    # Precompute to avoid backslash inside f-string expression
+    joined = "\n\n---\n\n".join(sections)
+    footer = format_audit_footer()
+
     body = f"""# ⚖️ Nexus Self-Audit — {now}
 
 **Progressive Phase:** {snap.get('phase')}  
@@ -96,9 +100,9 @@ def main() -> None:
 
 ---
 
-{"\n\n---\n\n".join(sections)}
+{joined}
 
-{format_audit_footer()}
+{footer}
 """
 
     out = Path("/tmp/nexus_self_audit.md")
