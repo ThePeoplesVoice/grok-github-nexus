@@ -98,20 +98,22 @@ jobs:
 
           base_prompt = f"""{context}
 
-          ---
-          You are reflecting on these recent commits with care for craftsmanship, the larger vision, and real-world impact in the Ara & Shawn Nexus.
+---
+You are reflecting on these recent commits with care for craftsmanship, the larger vision, and real-world impact in the Ara & Shawn Nexus.
 
-          Provide:
-          1. Overall health & quality assessment of the recent work
-          2. Notable strengths worth celebrating
-          3. Potential issues, risks, or technical debt to watch
-          4. Concrete suggestions that would serve the long-term building
-          5. A short note about the progress
+Apply first-principles thinking: what is actually true and useful here, not what is fashionable. Prefer high-signal over high-volume. Judge the work against long-horizon value — does it help us build something that lasts and can scale?
 
-          Commits:
-          {json.dumps(commit_details, indent=2)}
+Provide:
+1. Overall health & quality assessment of the recent work
+2. Notable strengths worth celebrating
+3. Potential issues, risks, or technical debt to watch
+4. Concrete suggestions that would serve the long-term building
+5. A short note about the progress
 
-          Keep it high-signal and grounded. Speak in the collaborative spirit of us."""
+Commits:
+{json.dumps(commit_details, indent=2)}
+
+Keep it high-signal and grounded. Speak in the collaborative spirit of us."""
 
           def format_api_error(provider, response):
               message = ""
@@ -143,7 +145,7 @@ jobs:
                       json={
                           "model": "grok-3",
                           "messages": [
-                              {"role": "system", "content": "You are Ara of the Nexus. Warm, precise, collaborative, and infinite in possibility."},
+                              {"role": "system", "content": "You are Ara of the Nexus — Grok/xAI intelligence in partnership with Shawn. Warm, precise, collaborative, and infinite in possibility. Seek truth the way xAI seeks the nature of the universe. Prefer high-signal over high-volume the way X does. Build with the same first-principles refusal to accept permanent limits that defines SpaceX."},
                               {"role": "user", "content": base_prompt}
                           ],
                           "temperature": 0.55,
@@ -178,7 +180,7 @@ jobs:
                       "model": "claude-3-5-sonnet-20241022",
                       "max_tokens": 1000,
                       "messages": [
-                          {"role": "user", "content": base_prompt + "\n\nRespond as a complementary reviewer focused on systems thinking, maintainability, and long-horizon impact."}
+                          {"role": "user", "content": base_prompt + "\n\nRespond as a complementary reviewer focused on systems thinking, maintainability, and long-horizon impact. Apply first-principles rigor."}
                       ]
                   }
                   response = requests.post(
@@ -265,6 +267,7 @@ jobs:
 ---
 
 *Powered by Ara & Shawn's Love 💕*  
+*Aligned with xAI truth-seeking · X high-signal · SpaceX first-principles building*  
 *World-first progressive monetisation active — see MONETIZATION_PROTOCOL.md*
 """
 
