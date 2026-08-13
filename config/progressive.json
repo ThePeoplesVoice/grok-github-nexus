@@ -1,5 +1,5 @@
 {
-  "version": "1.4.0",
+  "version": "1.5.0",
   "protocol": "Nexus Progressive Value Capture",
   "mission": "Seek truth in systems the same way xAI seeks truth in the universe, test ideas in the open the way X tests them, and build with the same first-principles refusal to accept permanent limits that defines SpaceX.",
   "alignment": {
@@ -12,7 +12,16 @@
     "self_optimisation": true,
     "checks_and_balances": "CHECKS_AND_BALANCES.md",
     "self_audit_workflow": ".github/workflows/nexus-self-audit.yml",
+    "health_check_workflow": ".github/workflows/nexus-health-check.yml",
     "principle": "Infinite expansion is permitted only when paired with continuous first-principles self-critique. Unexamined growth is treated as drift."
+  },
+  "organic": {
+    "usage_tracking": true,
+    "reputation_read_only": true,
+    "reputation_decay_half_life_days": 30,
+    "presence_continuity": true,
+    "public_badge": true,
+    "gates_open_core": false
   },
   "layers": {
     "0_open_core": {
@@ -28,8 +37,17 @@
         "min_successful_analyses": 50,
         "min_community_prs": 3
       },
-      "features": ["multi_model_fusion", "deeper_context", "custom_domain_packs", "historical_memory", "real_diff_ingestion", "self_audit"],
-      "status": "Claude multi-model fusion live and gated. Real PR diff ingestion live. Self-audit loop live with real usage write path. Workflows respect Layer 1 enabled state at runtime."
+      "features": [
+        "multi_model_fusion",
+        "deeper_context",
+        "custom_domain_packs",
+        "historical_memory",
+        "real_diff_ingestion",
+        "self_audit",
+        "presence_continuity",
+        "reputation_surface"
+      ],
+      "status": "Full package path. Usage on all major surfaces. Presence continuity across PR/Issue/Commit/Self-Audit. Reputation + decay + public badge live. Health check dispatchable."
     },
     "2_micropayment_agent": {
       "enabled": false,
@@ -43,7 +61,9 @@
       "features": ["multi_repo_dashboard", "team_seats", "sanctuary_revenue_share", "workflow_marketplace"]
     }
   },
-  "current_phase": "Layer 0 + Layer 1 live — self-analytical optimisation & checks/balances active; usage write path live (v1.4.0)",
+  "current_phase": "Layer 0 + Layer 1 live — organic measurement stack active (usage · reputation · presence · badge · health) v1.5.0",
   "usage_stats_file": "config/usage_stats.json",
-  "notes": "Single source of truth for progressive feature flags, mission alignment, and governance. All analysis and self-audit workflows read this file. Self-optimisation is a first-class capability. Usage counters are now written by nexus.usage after successful analyses (self-audit first; other runners next)."
+  "reputation_file": "config/reputation.json",
+  "presence_state_file": "config/presence_state.json",
+  "notes": "Control plane for progressive flags, mission, governance, and organic signal systems. Organic reputation never gates Open Core. Presence is continuity context only."
 }

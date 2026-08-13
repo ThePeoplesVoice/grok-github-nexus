@@ -2,7 +2,7 @@ name: 📡 Nexus Pulse
 
 on:
   schedule:
-    - cron: '0 8 * * 1'   # Monday 08:00 UTC
+    - cron: '0 8 * * 1'
   workflow_dispatch:
 
 jobs:
@@ -40,11 +40,11 @@ jobs:
         run: |
           git config user.name "nexus-bot"
           git config user.email "nexus-bot@users.noreply.github.com"
-          git add config/usage_stats.json config/reputation.json config/presence_state.json
+          git add config/usage_stats.json config/reputation.json config/presence_state.json badges/reputation.md README.md STATUS.md || true
           if git diff --staged --quiet; then
             echo "No pulse artifact changes to commit"
           else
-            git commit -m "chore: pulse — usage, reputation, presence_state"
+            git commit -m "chore: pulse — usage, reputation, presence_state, badges"
             git push
             echo "✅ pulse artifacts committed"
           fi

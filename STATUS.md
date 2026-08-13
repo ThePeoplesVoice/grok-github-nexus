@@ -1,58 +1,45 @@
 # 📡 Nexus Status
 
-**Last updated:** 2026-08-14 (presence continuity · reputation decay · public badge)
+**Last updated:** 2026-08-14 (extensive: full presence · shared runtime · live badges · health check · progressive v1.5)
 
 ![Reputation](https://img.shields.io/badge/nexus_reputation-0-blue)
 
-This file is the living pulse of the repository. It is intended to be honest, current, and useful to both humans and agents.
+This file is the living pulse of the repository. Honest, current, useful to humans and agents.
 
 ---
 
 ## Current Phase
 
-**Layer 0 (Open Core) + Layer 1 (Progressive Unlocks) — live and gated**
+**Layer 0 + Layer 1 — live** · **progressive.json v1.5.0** · **nexus package v0.6.0**
 
-- Grok primary + Claude complementary across PR / Issue / Commit / Self-Audit
-- Real PR diff ingestion live
-- **Usage tracking live on all major surfaces**
-- **Reputation v0.2** — raw + effective score with **30-day half-life decay**
-- **Presence continuity** — self-audit + commit analysis inherit `presence_state.json`
-- **Public reputation badge** — README + `badges/reputation.md`
-- `nexus/` package at **v0.5.0**
-- Bot-actor guards prevent usage-commit feedback loops
-
----
-
-## System Surface
-
-| Component | Status | Notes |
-|-----------|--------|-------|
-| Usage tracking | **Live** | self_audit · pr · issue · commit · pulse |
-| Reputation + decay | **Live** | effective = raw × 0.5^(days_idle/30) |
-| Presence state | **Live** | written by pulse; consumed by audit + commit |
-| Public badge | **Live** | README + badges/reputation.md |
-| PR / Issue / Commit / Self-Audit / Pulse | **Package path** | YAML heredocs retired for runners |
-| `nexus/` package | **v0.5.0** | + presence module |
-| ORGANIC_SYSTEMS.md | Live | Documents experiments + constraints |
-| x402 / sanctuary layers | Designed | Not activated |
+| System | Status |
+|--------|--------|
+| PR / Issue / Commit / Self-Audit / Pulse | Package path + usage + reputation |
+| Presence continuity | **All major runners** (PR · Issue · Commit · Self-Audit) |
+| Reputation + 30-day half-life decay | Live |
+| Public badge sync (README · STATUS · badges/) | Live on every reputation refresh |
+| Shared `nexus.runtime.after_successful_analysis` | Live |
+| Health check workflow | Live (schedule + dispatch) |
+| Bot-actor guards | Live (self-audit · commit analyzer) |
+| Open Core | Forever free — organic signal does not gate it |
 
 ---
 
 ## Known Gaps (honest)
 
-1. Reputation still usage-derived only (no merged-PR graph yet).
-2. Presence state is consumed by audit/commit prompts but not yet by PR/issue runners.
-3. Badge score in README is static until the next reputation refresh commits an update (or a tiny action rewrites it).
-4. Claude credits can go to zero; degrade path remains clean.
-5. Layer 2 / 3 still inactive by design.
+1. Counters still start near zero until real provider runs accumulate.
+2. Reputation is usage-derived only (no merged-PR graph).
+3. Claude may deplete credits; Grok-only path remains operational.
+4. Layer 2 (x402) and Layer 3 (sanctuary) remain designed, not activated.
+5. Field-notes / sanctuary-tied credits still conceptual.
 
 ---
 
 ## Direction of Travel
 
-1. Optionally sync the README badge on every reputation refresh (already writing `badges/reputation.md`).
-2. Feed presence into PR/issue prompts if continuity proves useful in audit/commit.
-3. Keep reputation privileges **off** until the signal is clearly load-bearing.
+1. Let real analyses move usage → reputation → badge.
+2. Run health check + self-audit on demand when changing core modules.
+3. Keep privileges off reputation until the signal is clearly load-bearing.
 4. Continuous self-critique remains non-negotiable.
 
 ---

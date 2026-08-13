@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """Standalone entrypoint for Multi-AI PR analysis.
 
-Called from the multi-ai-pr-analyzer workflow. Uses the shared nexus package
-for context, providers, prompt building, and usage tracking.
+Presence continuity + usage + reputation on success.
 """
 
 from __future__ import annotations
@@ -15,11 +14,12 @@ import requests
 from nexus.analyze import build_pr_prompt, fusion_note, footer_block, utc_now_str
 from nexus.context import load_context, load_progressive, layer1_enabled, current_phase
 from nexus.providers import call_grok, call_claude
-from nexus.usage import record_successful_analysis, load_usage_stats
+from nexus.usage import load_usage_stats
+from nexus.presence import load_presence, format_presence_for_prompt
+from nexus.runtime import after_successful_analysis, log_success
 
 
 def fetch_pr(repo_name: str, pr_number: str, token: str) -> tuple[dict, str]:
-    """Return (pr_data, diff_excerpt). Diff is truncated for token budget."""
     headers = {
         "Authorization": f"token {token}",
         "Accept": "application/vnd.github+json",
@@ -68,6 +68,7 @@ def main() -> None:
     l1 = layer1_enabled(prog)
     stats = load_usage_stats()
     total_analyses = int(stats.get("total_successful_analyses", 0))
+    presence_block = format_presence_for_prompt(load_presence())
 
     print(f"✅ Progressive phase: {phase} | Layer 1 enabled: {l1}")
     print(f"📊 Current successful analyses: {total_analyses}")
@@ -78,22 +79,26 @@ def main() -> None:
     pr_files = pr_data.get("changed_files", 0)
     print(f"✅ PR: {pr_title} ({pr_files} files)")
 
-    prompt = build_pr_prompt(
+    base = build_pr_prompt(
         context,
         title=pr_title,
         body=pr_body,
         files_changed=pr_files,
         diff_excerpt=diff_excerpt,
     )
+    prompt = (
+        base
+        + "\n\nPrior presence state (compressed continuity from last pulse):\n```\n"
+        + presence_block
+        + "\n```\nUse only as continuity context — judge this PR on its own merits."
+    )
 
-    # Grok primary
     grok_text, grok_err = call_grok(prompt, temperature=0.55, max_tokens=1100)
     if grok_text:
         print("✅ Ara (Grok) analysis complete")
     elif grok_err:
         print(f"⚠️ {grok_err}")
 
-    # Claude complementary (Layer 1)
     claude_text, claude_err = None, None
     if l1 and os.environ.get("CLAUDE_API_KEY"):
         claude_text, claude_err = call_claude(
@@ -117,14 +122,11 @@ def main() -> None:
 
     if success:
         try:
-            new_stats = record_successful_analysis("pr", persist=True)
-            total_analyses = int(new_stats.get("total_successful_analyses", total_analyses + 1))
-            print(
-                f"📊 Usage incremented → total={total_analyses} "
-                f"pr={new_stats.get('by_type', {}).get('pr')}"
-            )
+            result = after_successful_analysis("pr")
+            total_analyses = int(result.get("total", total_analyses + 1))
+            log_success(result, "pr")
         except Exception as e:
-            print(f"⚠️ Could not persist usage stats: {e}")
+            print(f"⚠️ Could not persist usage/reputation: {e}")
 
     sections: list[str] = []
     if grok_text:

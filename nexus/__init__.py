@@ -1,20 +1,13 @@
 """
 Nexus shared analysis core.
 
-This package exists so analysis logic can live in maintainable Python
-instead of only inside YAML heredocs. Workflows can import from here
-as the migration progresses.
-
 Aligned with:
   xAI  — truth-seeking
   X    — high-signal
   SpaceX — first-principles building
-
-Self-analytical optimisation (audit) is a first-class capability so
-expansion remains constrained by continuous critique.
 """
 
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 
 from .context import load_context, load_progressive, load_usage_stats, layer1_enabled, current_phase
 from .providers import call_grok, call_claude, format_api_error
@@ -36,8 +29,10 @@ from .reputation import (
     load_reputation,
     reputation_summary_md,
     reputation_badge_line,
+    sync_public_badges,
 )
 from .presence import load_presence, format_presence_for_prompt
+from .runtime import after_successful_analysis, log_success
 
 __all__ = [
     "load_context",
@@ -61,6 +56,9 @@ __all__ = [
     "load_reputation",
     "reputation_summary_md",
     "reputation_badge_line",
+    "sync_public_badges",
     "load_presence",
     "format_presence_for_prompt",
+    "after_successful_analysis",
+    "log_success",
 ]

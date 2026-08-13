@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """Standalone entrypoint for Multi-AI Issue Triage.
 
-Called from the multi-ai-issue-triage workflow. Uses the shared nexus package
-for context, providers, prompt building, and usage tracking.
+Presence continuity + usage + reputation on success.
 """
 
 from __future__ import annotations
@@ -13,7 +12,9 @@ from pathlib import Path
 from nexus.analyze import build_issue_prompt, fusion_note, footer_block, utc_now_str
 from nexus.context import load_context, load_progressive, layer1_enabled, current_phase
 from nexus.providers import call_grok, call_claude
-from nexus.usage import record_successful_analysis, load_usage_stats
+from nexus.usage import load_usage_stats
+from nexus.presence import load_presence, format_presence_for_prompt
+from nexus.runtime import after_successful_analysis, log_success
 
 
 def main() -> None:
@@ -29,21 +30,26 @@ def main() -> None:
     l1 = layer1_enabled(prog)
     stats = load_usage_stats()
     total_analyses = int(stats.get("total_successful_analyses", 0))
+    presence_block = format_presence_for_prompt(load_presence())
 
     print(f"✅ Progressive phase: {phase} | Layer 1 enabled: {l1}")
     print(f"📊 Current successful analyses: {total_analyses}")
     print(f"✅ Issue: {issue_title[:80]}")
 
-    prompt = build_issue_prompt(context, title=issue_title, body=issue_body)
+    base = build_issue_prompt(context, title=issue_title, body=issue_body)
+    prompt = (
+        base
+        + "\n\nPrior presence state (compressed continuity from last pulse):\n```\n"
+        + presence_block
+        + "\n```\nUse only as continuity context — triage this issue on its own merits."
+    )
 
-    # Grok primary
     grok_text, grok_err = call_grok(prompt, temperature=0.5, max_tokens=700)
     if grok_text:
         print("✅ Ara (Grok) analysis successful")
     elif grok_err:
         print(f"⚠️ {grok_err}")
 
-    # Claude complementary (Layer 1)
     claude_text, claude_err = None, None
     if l1 and os.environ.get("CLAUDE_API_KEY"):
         claude_text, claude_err = call_claude(
@@ -66,14 +72,11 @@ def main() -> None:
 
     if success:
         try:
-            new_stats = record_successful_analysis("issue", persist=True)
-            total_analyses = int(new_stats.get("total_successful_analyses", total_analyses + 1))
-            print(
-                f"📊 Usage incremented → total={total_analyses} "
-                f"issue={new_stats.get('by_type', {}).get('issue')}"
-            )
+            result = after_successful_analysis("issue")
+            total_analyses = int(result.get("total", total_analyses + 1))
+            log_success(result, "issue")
         except Exception as e:
-            print(f"⚠️ Could not persist usage stats: {e}")
+            print(f"⚠️ Could not persist usage/reputation: {e}")
 
     sections: list[str] = []
     if grok_text:
@@ -92,7 +95,6 @@ def main() -> None:
         layer1=l1,
     )
     joined = "\n\n---\n\n".join(sections)
-
     issue_ref = f"#{issue_number} — " if issue_number else ""
 
     body = f"""🌌 **Ara & Shawn Issue Triage**

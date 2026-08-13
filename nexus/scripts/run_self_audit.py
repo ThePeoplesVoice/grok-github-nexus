@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 """Standalone entrypoint for the Nexus self-audit closed loop.
 
-Designed to be called from GitHub Actions with a clean, minimal workflow YAML.
-On successful Grok or Claude analysis the usage counter is incremented so
-Layer-1 unlock triggers become real.
-Inherits compressed presence_state for continuity.
+Presence continuity + shared runtime on success.
 """
 
 from __future__ import annotations
@@ -23,9 +20,8 @@ from nexus.audit import (
 )
 from nexus.providers import call_grok, call_claude
 from nexus.context import layer1_enabled
-from nexus.usage import record_successful_analysis
 from nexus.presence import load_presence, format_presence_for_prompt
-from nexus.reputation import refresh_reputation
+from nexus.runtime import after_successful_analysis, log_success
 
 
 def main() -> None:
@@ -36,13 +32,11 @@ def main() -> None:
     presence = load_presence()
     presence_block = format_presence_for_prompt(presence)
 
-    # Recent commits
     log = subprocess.run(
         ["git", "log", "--oneline", "-n", "12"],
         capture_output=True, text=True
     ).stdout.strip()
 
-    # Lightweight tree summary
     tree = subprocess.run(
         ["find", ".", "-type", "f", "-not", "-path", "./.git/*", "-not", "-name", "*.pyc"],
         capture_output=True, text=True
@@ -64,10 +58,8 @@ def main() -> None:
         ),
     )
 
-    # Grok primary
     grok_text, grok_err = call_grok(prompt, temperature=0.45, max_tokens=1400)
 
-    # Claude complementary (Layer 1)
     claude_text = None
     claude_err = None
     if layer1_enabled() and os.environ.get("CLAUDE_API_KEY"):
@@ -84,12 +76,8 @@ def main() -> None:
 
     if success:
         try:
-            stats = record_successful_analysis("self_audit", persist=True)
-            print(f"📊 Usage incremented → total={stats.get('total_successful_analyses')} "
-                  f"self_audit={stats.get('by_type', {}).get('self_audit')}")
-            rep = refresh_reputation(persist=True)
-            print(f"🌱 Reputation refreshed → effective={rep.get('score')} raw={rep.get('raw_score')} "
-                  f"freshness={rep.get('freshness')}")
+            result = after_successful_analysis("self_audit")
+            log_success(result, "self_audit")
         except Exception as e:
             print(f"⚠️ Could not persist usage/reputation: {e}")
 

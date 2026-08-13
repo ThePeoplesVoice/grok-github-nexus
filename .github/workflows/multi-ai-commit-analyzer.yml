@@ -8,11 +8,10 @@ on:
       - master
   workflow_dispatch:
   schedule:
-    - cron: '0 6 * * 1'   # Light weekly health check (Monday 06:00 UTC)
+    - cron: '0 6 * * 1'
 
 jobs:
   analyze-commits:
-    # Prevent usage-commit feedback loops from github-actions[bot]
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     permissions:
@@ -43,18 +42,18 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python -m nexus.scripts.run_commit_analysis
 
-      - name: Commit usage + reputation (if changed)
+      - name: Commit usage + reputation artifacts (if changed)
         if: success()
         run: |
           git config user.name "nexus-bot"
           git config user.email "nexus-bot@users.noreply.github.com"
-          git add config/usage_stats.json config/reputation.json
+          git add config/usage_stats.json config/reputation.json badges/reputation.md README.md STATUS.md || true
           if git diff --staged --quiet; then
-            echo "No usage/reputation change to commit"
+            echo "No artifact changes to commit"
           else
-            git commit -m "chore: increment usage + reputation after commit analysis"
+            git commit -m "chore: usage + reputation after commit analysis"
             git push
-            echo "✅ usage/reputation committed"
+            echo "✅ artifacts committed"
           fi
 
       - name: 📝 Create Analysis Issue

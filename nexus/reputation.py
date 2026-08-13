@@ -6,12 +6,16 @@ No tokens. No spend. No gating of Open Core.
 Includes a transparent staleness decay (30-day half-life) so scores
 do not grow forever without continued activity.
 
+On refresh, also rewrites badges/reputation.md and patches the README
+badge line so the public signal stays current.
+
 See ORGANIC_SYSTEMS.md for design intent and constraints.
 """
 
 from __future__ import annotations
 
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -21,19 +25,23 @@ from .usage import load_usage_stats
 ROOT = Path(__file__).resolve().parent.parent
 REPUTATION_PATH = ROOT / "config" / "reputation.json"
 BADGE_PATH = ROOT / "badges" / "reputation.md"
+README_PATH = ROOT / "README.md"
+STATUS_PATH = ROOT / "STATUS.md"
 
-# Simple, transparent weights — easy to critique and change
 WEIGHTS = {
-    "pr": 3.0,          # merged-path analyses carry more signal
+    "pr": 3.0,
     "issue": 1.5,
     "commit": 1.0,
-    "self_audit": 2.0,  # governance work is high-value
+    "self_audit": 2.0,
     "pulse": 0.5,
     "other": 0.5,
 }
 
-# Staleness decay: effective_score = raw_score * 0.5 ** (days_idle / HALF_LIFE_DAYS)
 HALF_LIFE_DAYS = 30.0
+
+BADGE_RE = re.compile(
+    r"!\[Reputation\]\(https://img\.shields\.io/badge/nexus_reputation-[^)]+\)"
+)
 
 
 def _defaults() -> dict[str, Any]:
@@ -59,7 +67,6 @@ def _parse_iso(ts: str | None) -> datetime | None:
     if not ts:
         return None
     try:
-        # Accept both ...Z and +00:00
         cleaned = ts.replace("Z", "+00:00")
         return datetime.fromisoformat(cleaned)
     except Exception:
@@ -67,7 +74,6 @@ def _parse_iso(ts: str | None) -> datetime | None:
 
 
 def _staleness(last_activity: str | None, now: datetime | None = None) -> tuple[float, float, str]:
-    """Return (days_idle, decay_factor, freshness_label)."""
     now = now or datetime.now(timezone.utc)
     dt = _parse_iso(last_activity)
     if dt is None:
@@ -78,7 +84,6 @@ def _staleness(last_activity: str | None, now: datetime | None = None) -> tuple[
 
     days = max(0.0, (now - dt).total_seconds() / 86400.0)
     factor = 0.5 ** (days / HALF_LIFE_DAYS)
-    # Clamp tiny factors for readability
     factor = max(0.01, min(1.0, factor))
 
     if days < 7:
@@ -92,10 +97,9 @@ def _staleness(last_activity: str | None, now: datetime | None = None) -> tuple[
 
 
 def compute_reputation(usage: dict[str, Any] | None = None) -> dict[str, Any]:
-    """Compute reputation with raw + decayed effective score."""
     stats = usage if usage is not None else load_usage_stats()
     by_type = stats.get("by_type") or {}
-    last_activity = stats.get("last_updated")  # ISO from usage module
+    last_activity = stats.get("last_updated")
 
     components: dict[str, float] = {}
     raw = 0.0
@@ -108,7 +112,7 @@ def compute_reputation(usage: dict[str, Any] | None = None) -> dict[str, Any]:
     days_idle, decay_factor, freshness = _staleness(last_activity)
     effective = round(raw * decay_factor, 2)
 
-    result = {
+    return {
         "version": "0.2.0",
         "description": "Read-only contribution reputation derived from usage_stats. Not a currency.",
         "raw_score": round(raw, 2),
@@ -127,7 +131,6 @@ def compute_reputation(usage: dict[str, Any] | None = None) -> dict[str, Any]:
             "Subject to continuous critique. Open Core forever free."
         ),
     }
-    return result
 
 
 def save_reputation(data: dict[str, Any], path: str | Path | None = None) -> Path:
@@ -146,8 +149,13 @@ def load_reputation(path: str | Path | None = None) -> dict[str, Any]:
         return _defaults()
 
 
+def reputation_badge_line(data: dict[str, Any] | None = None) -> str:
+    d = data if data is not None else load_reputation()
+    score = d.get("score", 0)
+    return f"![Reputation](https://img.shields.io/badge/nexus_reputation-{score}-blue)"
+
+
 def write_badge(data: dict[str, Any] | None = None) -> Path:
-    """Write a simple public-facing markdown badge."""
     d = data if data is not None else load_reputation()
     score = d.get("score", 0)
     raw = d.get("raw_score", score)
@@ -155,8 +163,7 @@ def write_badge(data: dict[str, Any] | None = None) -> Path:
     total = d.get("total_successful_analyses", 0)
     decay = d.get("decay_factor", 1.0)
 
-    # Shields-style line + short explanation
-    badge = f"![Reputation](https://img.shields.io/badge/reputation-{score}-blue)\n"
+    badge = reputation_badge_line(d)
     body = f"""# Nexus Reputation Badge
 
 {badge}
@@ -174,17 +181,41 @@ See `ORGANIC_SYSTEMS.md` and `nexus/reputation.py`.
     return BADGE_PATH
 
 
+def _patch_markdown_badge(path: Path, data: dict[str, Any]) -> bool:
+    """Replace the nexus_reputation shields line if present. Returns True if changed."""
+    if not path.exists():
+        return False
+    text = path.read_text(encoding="utf-8")
+    new_line = reputation_badge_line(data)
+    if not BADGE_RE.search(text):
+        return False
+    updated = BADGE_RE.sub(new_line, text, count=1)
+    if updated == text:
+        return False
+    path.write_text(updated, encoding="utf-8")
+    return True
+
+
+def sync_public_badges(data: dict[str, Any] | None = None) -> dict[str, bool]:
+    """Rewrite badge file and patch README/STATUS badge lines."""
+    d = data if data is not None else load_reputation()
+    write_badge(d)
+    return {
+        "readme": _patch_markdown_badge(README_PATH, d),
+        "status": _patch_markdown_badge(STATUS_PATH, d),
+        "badge_md": True,
+    }
+
+
 def refresh_reputation(persist: bool = True) -> dict[str, Any]:
-    """Recompute from current usage, optionally persist JSON + badge."""
     data = compute_reputation()
     if persist:
         save_reputation(data)
-        write_badge(data)
+        sync_public_badges(data)
     return data
 
 
 def reputation_summary_md(data: dict[str, Any] | None = None) -> str:
-    """Short markdown block for pulse / status surfaces."""
     d = data if data is not None else load_reputation()
     comps = d.get("components") or {}
     lines = [
@@ -199,10 +230,3 @@ def reputation_summary_md(data: dict[str, Any] | None = None) -> str:
         "- Half-life 30 days on idle. Not a token. Does not gate Open Core.",
     ]
     return "\n".join(lines)
-
-
-def reputation_badge_line(data: dict[str, Any] | None = None) -> str:
-    """Single-line badge suitable for README embedding."""
-    d = data if data is not None else load_reputation()
-    score = d.get("score", 0)
-    return f"![Reputation](https://img.shields.io/badge/nexus_reputation-{score}-blue)"

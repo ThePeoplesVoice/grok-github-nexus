@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "generated_at": null,
+  "phase": null,
+  "layer1_enabled": null,
+  "total_successful_analyses": 0,
+  "by_type": {},
+  "reputation_score": 0,
+  "reputation_raw": 0,
+  "reputation_freshness": "unknown",
+  "recent_commits_preview": [],
+  "notes": "Scaffold only — first real pulse will populate continuity context."
+}

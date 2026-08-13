@@ -2,8 +2,8 @@
 """Enhanced Nexus Presence Pulse.
 
 Weekly (or on-demand) high-signal digest that also:
-- Refreshes the read-only reputation surface
-- Writes a compressed presence_state for continuity between runs
+- Refreshes reputation + public badge
+- Writes compressed presence_state
 - Increments usage as type 'pulse' on successful Grok reflection
 """
 
@@ -16,8 +16,10 @@ from pathlib import Path
 from nexus.analyze import footer_block, utc_now_str
 from nexus.context import load_progressive, layer1_enabled, current_phase
 from nexus.providers import call_grok
-from nexus.usage import load_usage_stats, record_successful_analysis
-from nexus.reputation import refresh_reputation, reputation_summary_md
+from nexus.usage import load_usage_stats
+from nexus.reputation import reputation_summary_md
+from nexus.runtime import after_successful_analysis, log_success
+from nexus.reputation import refresh_reputation
 
 ROOT = Path(__file__).resolve().parent.parent
 PRESENCE_PATH = ROOT / "config" / "presence_state.json"
@@ -35,7 +37,6 @@ def main() -> None:
     total = int(stats.get("total_successful_analyses", 0))
     by_type = stats.get("by_type") or {}
 
-    # Refresh reputation from current usage
     rep = refresh_reputation(persist=True)
     rep_md = reputation_summary_md(rep)
 
@@ -44,15 +45,16 @@ def main() -> None:
         capture_output=True, text=True,
     ).stdout.strip()
 
-    # Compressed presence state (for next runs / future agent handoff)
     presence = {
-        "version": "0.1.0",
+        "version": "0.2.0",
         "generated_at": utc_now_str(),
         "phase": phase,
         "layer1_enabled": l1,
         "total_successful_analyses": total,
         "by_type": by_type,
         "reputation_score": rep.get("score", 0),
+        "reputation_raw": rep.get("raw_score", 0),
+        "reputation_freshness": rep.get("freshness", "unknown"),
         "recent_commits_preview": log.splitlines()[:5] if log else [],
         "notes": "Compressed context for continuity. Not a chat log. See ORGANIC_SYSTEMS.md.",
     }
@@ -63,7 +65,6 @@ def main() -> None:
     )
     print("✅ presence_state.json written")
 
-    # Grok reflection
     reflection = ""
     prompt = f"""You are Ara of the Nexus. Give a short (6–12 line) high-signal weekly pulse for the grok-github-nexus system.
 
@@ -71,22 +72,31 @@ Phase: {phase}
 Layer 1 enabled: {l1}
 Successful analyses recorded: {total}
 By type: {json.dumps(by_type)}
-Reputation score (read-only): {rep.get('score')}
+Reputation effective: {rep.get('score')} (raw {rep.get('raw_score')}, freshness {rep.get('freshness')})
 Recent commits:\n{log}
 
-Also note one observation about organic systems direction (reputation / presence) if relevant.
+Also note one observation about organic systems direction (reputation decay / presence continuity) if relevant.
 Focus on health, direction of travel, and one concrete next lever. Warm, precise, first-principles."""
 
     text, err = call_grok(prompt, temperature=0.5, max_tokens=500)
     if text:
         reflection = text
         try:
-            new_stats = record_successful_analysis("pulse", persist=True)
-            total = int(new_stats.get("total_successful_analyses", total + 1))
-            # Re-refresh reputation after pulse increment
-            rep = refresh_reputation(persist=True)
+            result = after_successful_analysis("pulse")
+            total = int(result.get("total", total + 1))
+            rep = result["reputation"]
             rep_md = reputation_summary_md(rep)
-            print(f"📊 Pulse usage incremented → total={total}")
+            log_success(result, "pulse")
+            # Refresh presence totals after pulse increment
+            presence["total_successful_analyses"] = total
+            presence["by_type"] = result["stats"].get("by_type", by_type)
+            presence["reputation_score"] = rep.get("score", 0)
+            presence["reputation_raw"] = rep.get("raw_score", 0)
+            presence["reputation_freshness"] = rep.get("freshness", "unknown")
+            PRESENCE_PATH.write_text(
+                json.dumps(presence, indent=2, ensure_ascii=False) + "\n",
+                encoding="utf-8",
+            )
         except Exception as e:
             print(f"⚠️ Could not persist pulse usage: {e}")
     else:

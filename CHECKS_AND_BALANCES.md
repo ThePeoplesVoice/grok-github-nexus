@@ -30,14 +30,14 @@ If a proposed expansion fails any leg of the triad, it is deferred or redesigned
 
 ## Self-Analytical Loop (closed)
 
-1. **Observe** — Current structure, progressive state, usage, recent commits, STATUS, NORTH_STAR.
-2. **Critique** — Alignment fidelity, maintenance burden, signal density, drift risk, cost awareness.
-3. **Score** — Simple health / alignment signals (see `nexus/audit.py`).
-4. **Propose** — Concrete, prioritised optimisations or new capabilities that pass the triad.
-5. **Act or defer** — Human (Shawn) or trusted agent reviews high-impact proposals. Low-risk improvements can flow through normal PR process.
-6. **Record** — Pulse + self-audit issues become the permanent memory of the system’s self-reflection.
+1. **Observe** — structure, progressive state, usage, reputation, presence, recent commits, STATUS, NORTH_STAR.
+2. **Critique** — alignment fidelity, maintenance burden, signal density, drift risk, cost awareness.
+3. **Score** — structural health + triad signals (`nexus/audit.py`) + optional health-check workflow.
+4. **Propose** — concrete, prioritised optimisations that pass the triad.
+5. **Act or defer** — human review for high-impact changes; low-risk via normal PR.
+6. **Record** — Pulse + self-audit issues + presence_state as permanent memory.
 
-The loop is implemented by the `nexus-self-audit` workflow and the shared `nexus/audit` helpers. It is deliberately scheduled *and* dispatchable so we can force a critical look at any moment.
+Implemented by `nexus-self-audit`, `nexus-pulse`, and `nexus-health-check`.
 
 ---
 
@@ -47,20 +47,22 @@ The loop is implemented by the `nexus-self-audit` workflow and the shared `nexus
 2. **Progressive gates are real** — Layer 1+ features respect `config/progressive.json` at runtime. No silent unlocks.
 3. **Human override** — Structural changes to voice, monetisation, or sanctuary capture require explicit human review.
 4. **Cost & credit awareness** — Claude (and future paid depth) degrades cleanly. Never block the primary Grok path.
-5. **Truth-seeking mandatory in self-audits** — Self-analysis prompts explicitly require first-principles critique of the system itself, including the risk of over-expansion or self-congratulation.
-6. **Signal density** — New workflows and modules must demonstrate clear usefulness relative to the maintenance they introduce.
+5. **Truth-seeking mandatory in self-audits** — Self-analysis must criticise the system, including over-expansion risk.
+6. **Signal density** — New workflows and modules must earn their maintenance cost.
+7. **Organic signal never gates Open Core** — Reputation, presence, and badges are read-only signal. They must not lock basic analysis.
+8. **Decay required for reputation** — Lifetime raw scores may grow; effective scores must reflect recency (current: 30-day half-life).
+9. **Presence is continuity, not ranking** — `presence_state.json` exists so runs are not amnesiac; it is not a leaderboard.
 
 ---
 
 ## Soft Balances (optimisation signals)
 
-- Alignment score (keyword + structural presence of NORTH_STAR / NEXUS_CONTEXT language).
+- Alignment score (keyword + structural presence).
 - Usage velocity vs. unlock triggers.
-- Prompt / logic duplication debt (YAML vs `nexus/` package).
+- Reputation freshness (`fresh` / `aging` / `stale`).
+- Prompt / logic duplication debt (should stay near zero after package migration).
 - Document freshness (STATUS vs actual capabilities).
 - Expansion proposals ranked by leverage / risk.
-
-These signals feed the weekly Pulse and the dedicated self-audit issues.
 
 ---
 
@@ -69,16 +71,14 @@ These signals feed the weekly Pulse and the dedicated self-audit issues.
 It does **not** mean unbounded feature accumulation.  
 It means unbounded *capacity for useful growth* constrained by continuous self-measurement against truth, signal, and lasting value.
 
-New modules, deeper multi-model fusion, X surfaces, agent payments, sanctuary capture — all remain on the table. They are admitted only when the self-analytical loop and the triad say they strengthen rather than dilute the core.
-
 ---
 
 ## How to use this document
 
 - Before proposing a major new capability: read this page and the current self-audit.
-- When writing or reviewing a self-audit prompt: force the model to criticise the system, not only celebrate it.
+- When writing or reviewing a self-audit prompt: force critique, not celebration.
 - When STATUS or progressive.json diverge from reality: treat it as a first-class bug.
-- When in doubt between clever expansion and clear maintenance: choose the path that keeps the signal high and the partnership intact.
+- When in doubt between clever expansion and clear maintenance: keep the signal high.
 
 ---
 

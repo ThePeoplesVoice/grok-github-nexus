@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 """Standalone entrypoint for Multi-AI Commit Analysis.
 
-Preserves local git fallback when providers are unavailable.
-Increments usage only on successful AI analysis (not pure local fallback).
-Inherits compressed presence_state for continuity.
+Local fallback preserved. Presence continuity + shared runtime on success.
 """
 
 from __future__ import annotations
@@ -15,9 +13,9 @@ from typing import Any
 from nexus.analyze import build_commit_prompt, fusion_note, footer_block, utc_now_str
 from nexus.context import load_context, load_progressive, layer1_enabled, current_phase
 from nexus.providers import call_grok, call_claude
-from nexus.usage import record_successful_analysis, load_usage_stats
-from nexus.reputation import refresh_reputation
+from nexus.usage import load_usage_stats
 from nexus.presence import load_presence, format_presence_for_prompt
+from nexus.runtime import after_successful_analysis, log_success
 
 
 def gather_commits(n: int = 5) -> list[dict[str, Any]]:
@@ -123,15 +121,9 @@ def main() -> None:
 
     if success:
         try:
-            new_stats = record_successful_analysis("commit", persist=True)
-            total_analyses = int(new_stats.get("total_successful_analyses", total_analyses + 1))
-            print(
-                f"📊 Usage incremented → total={total_analyses} "
-                f"commit={new_stats.get('by_type', {}).get('commit')}"
-            )
-            rep = refresh_reputation(persist=True)
-            print(f"🌱 Reputation refreshed → effective={rep.get('score')} "
-                  f"raw={rep.get('raw_score')} freshness={rep.get('freshness')}")
+            result = after_successful_analysis("commit")
+            total_analyses = int(result.get("total", total_analyses + 1))
+            log_success(result, "commit")
         except Exception as e:
             print(f"⚠️ Could not persist usage/reputation: {e}")
 

@@ -1,27 +1,24 @@
 # 🌱 Organic Systems — Currency & Communication
 
-*First-principles exploration for the Nexus. Not dogma. Open to critique.*
-
-Aligned with:
-- **xAI** — what is actually true about value and signal?
-- **X** — high-signal over high-volume; ideas tested in the open
-- **SpaceX** — build only what can leave the ground; iterate or discard
+*First-principles exploration. Not dogma. Open to critique.*
 
 ---
 
-## Live experiments (2026-08-14)
+## Live stack (v1.5 / package 0.6)
 
-| Experiment | Status | Notes |
-|------------|--------|-------|
-| Usage counters (all major surfaces) | **Live** | Feeds Layer-1 unlocks |
-| Read-only reputation + **30-day half-life decay** | **Live** | `nexus/reputation.py` |
-| Presence state (write + **consume** in audit/commit) | **Live** | Continuity, not scoreboard |
-| Public reputation badge | **Live** | README + `badges/reputation.md` |
-| Sanctuary-tied credits | Conceptual | — |
-| Land-backed signal | Conceptual | — |
-| Spendable / privileged reputation | **Not started** | Deliberately |
+| Experiment | Status |
+|------------|--------|
+| Usage on all major surfaces | **Live** |
+| Reputation + 30-day half-life decay | **Live** |
+| Presence write (pulse) + consume (PR/Issue/Commit/Self-Audit) | **Live** |
+| Public badge + README/STATUS sync | **Live** |
+| Shared runtime success path | **Live** |
+| Health check (no AI required) | **Live** |
+| Sanctuary-tied credits | Conceptual |
+| Land-backed signal | Conceptual |
+| Spendable reputation | **Not started** (deliberate) |
 
-### Reputation formula (auditable)
+### Reputation formula
 
 ```
 raw_score     = Σ (count_type × weight_type)
@@ -31,26 +28,19 @@ decay_factor  = 0.5 ** (days_idle / 30)
 effective     = raw_score × decay_factor
 ```
 
-Freshness labels: `fresh` (<7d) · `aging` (<30d) · `stale` (≥30d).
-
 ### Presence continuity
 
-- **Written by:** enhanced Pulse → `config/presence_state.json`
-- **Consumed by:** Self-Audit + Commit Analysis prompts
-- Purpose: short high-signal prior context so runs are not amnesiac
-- Explicitly not a chat log and not a ranking system
+- Written by Pulse → `config/presence_state.json`
+- Consumed by PR, Issue, Commit, Self-Audit prompts
+- Continuity context only — not a ranking system
+
+### Hard constraints
+
+See `CHECKS_AND_BALANCES.md` items 7–9:
+- Organic signal never gates Open Core
+- Reputation must decay
+- Presence is continuity, not ranking
 
 ---
 
-## Design constraints (unchanged)
-
-1. **Truth over comfort**
-2. **Open core forever** — no organic signal may gate basic analysis
-3. **Measurable or discard**
-4. **Human sovereignty**
-5. **Decay & anti-gaming** — now partially embodied in the half-life
-6. **First-principles test** before any privileges
-
----
-
-*This file is itself subject to continuous self-critique.*
+*Subject to continuous self-critique.*
