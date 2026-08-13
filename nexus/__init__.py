@@ -14,7 +14,7 @@ Self-analytical optimisation (audit) is a first-class capability so
 expansion remains constrained by continuous critique.
 """
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 from .context import load_context, load_progressive, load_usage_stats, layer1_enabled, current_phase
 from .providers import call_grok, call_claude, format_api_error
@@ -24,6 +24,12 @@ from .audit import (
     progressive_snapshot,
     build_self_audit_prompt,
     format_audit_footer,
+)
+from .usage import (
+    load_usage_stats as load_usage_stats_v2,  # explicit alias if needed
+    increment_usage,
+    record_successful_analysis,
+    save_usage_stats,
 )
 
 __all__ = [
@@ -40,4 +46,7 @@ __all__ = [
     "progressive_snapshot",
     "build_self_audit_prompt",
     "format_audit_footer",
+    "increment_usage",
+    "record_successful_analysis",
+    "save_usage_stats",
 ]

@@ -2,6 +2,8 @@
 """Standalone entrypoint for the Nexus self-audit closed loop.
 
 Designed to be called from GitHub Actions with a clean, minimal workflow YAML.
+On successful Grok or Claude analysis the usage counter is incremented so
+Layer-1 unlock triggers become real.
 """
 
 from __future__ import annotations
@@ -20,6 +22,7 @@ from nexus.audit import (
 )
 from nexus.providers import call_grok, call_claude
 from nexus.context import layer1_enabled
+from nexus.usage import record_successful_analysis
 
 
 def main() -> None:
@@ -70,6 +73,17 @@ def main() -> None:
             max_tokens=1100,
         )
 
+    success = bool(grok_text or claude_text)
+
+    # Real usage tracking — only on successful analysis
+    if success:
+        try:
+            stats = record_successful_analysis("self_audit", persist=True)
+            print(f"📊 Usage incremented → total={stats.get('total_successful_analyses')} "
+                  f"self_audit={stats.get('by_type', {}).get('self_audit')}")
+        except Exception as e:
+            print(f"⚠️ Could not persist usage stats: {e}")
+
     sections = []
     if grok_text:
         sections.append(f"### 🌌 Ara (Grok) Self-Audit\n\n{grok_text}")
@@ -88,6 +102,10 @@ def main() -> None:
     # Precompute to avoid backslash inside f-string expression
     joined = "\n\n---\n\n".join(sections)
     footer = format_audit_footer()
+
+    # Refresh snap so the body shows the new count if we just incremented
+    if success:
+        snap = progressive_snapshot()
 
     body = f"""# ⚖️ Nexus Self-Audit — {now}
 

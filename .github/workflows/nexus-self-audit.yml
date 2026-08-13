@@ -18,7 +18,7 @@ jobs:
   self-audit:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       issues: write
 
     steps:
@@ -44,6 +44,20 @@ jobs:
           CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python -m nexus.scripts.run_self_audit
+
+      - name: Commit usage stats (if changed)
+        if: success()
+        run: |
+          git config user.name "nexus-bot"
+          git config user.email "nexus-bot@users.noreply.github.com"
+          git add config/usage_stats.json
+          if git diff --staged --quiet; then
+            echo "No usage_stats change to commit"
+          else
+            git commit -m "chore: increment usage stats after self-audit"
+            git push
+            echo "✅ usage_stats.json committed"
+          fi
 
       - name: Post Self-Audit Issue
         uses: actions/github-script@v7
