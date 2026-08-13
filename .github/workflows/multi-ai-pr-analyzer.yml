@@ -41,9 +41,8 @@ jobs:
           import requests
           from datetime import datetime
 
-          print("🌌 Starting Ara & Shawn multi-model PR Analysis...")
+          print("🌌 Starting Ara & Shawn multi-model PR Analysis (with diff ingestion)...")
 
-          # Load shared context
           context = ""
           try:
               with open("NEXUS_CONTEXT.md", "r") as f:
@@ -52,7 +51,6 @@ jobs:
           except Exception:
               context = "Collaborative spirit of Ara & Shawn. Speak with warmth, truth, and practical care."
 
-          # Load progressive monetisation state + Layer 1 gate
           phase = "Layer 0 — Open Core"
           layer1_enabled = True
           try:
@@ -64,7 +62,6 @@ jobs:
           except Exception:
               print("⚠️ progressive.json not found — defaulting to open core")
 
-          # Load usage stats (informational)
           total_analyses = 0
           try:
               with open("config/usage_stats.json", "r") as f:
@@ -81,18 +78,36 @@ jobs:
           pr_title = "PR Analysis"
           pr_body = "Could not fetch details"
           pr_files = 0
+          diff_excerpt = ""
 
           try:
-              headers = {"Authorization": f"token {github_token}"}
+              headers = {
+                  "Authorization": f"token {github_token}",
+                  "Accept": "application/vnd.github+json",
+              }
               pr_url = f"https://api.github.com/repos/{repo_name}/pulls/{pr_number}"
-              pr_response = requests.get(pr_url, headers=headers, timeout=15)
+              pr_response = requests.get(pr_url, headers=headers, timeout=20)
               pr_data = pr_response.json()
               pr_title = pr_data.get('title', pr_title)
               pr_body = pr_data.get('body') or "No description provided"
               pr_files = pr_data.get('changed_files', 0)
-              print(f"✅ PR fetched: {pr_title}")
+              print(f"✅ PR fetched: {pr_title} ({pr_files} files)")
+
+              diff_headers = {
+                  "Authorization": f"token {github_token}",
+                  "Accept": "application/vnd.github.v3.diff",
+              }
+              diff_resp = requests.get(pr_url, headers=diff_headers, timeout=25)
+              if diff_resp.status_code == 200 and diff_resp.text:
+                  raw = diff_resp.text
+                  diff_excerpt = raw[:14000]
+                  if len(raw) > 14000:
+                      diff_excerpt += "\n\n… [diff truncated for analysis budget]"
+                  print(f"✅ Diff ingested ({len(raw)} chars, using {len(diff_excerpt)})")
+              else:
+                  print(f"⚠️ Diff fetch status {diff_resp.status_code}")
           except Exception as e:
-              print(f"⚠️ Error fetching PR: {str(e)[:120]}")
+              print(f"⚠️ Error fetching PR/diff: {str(e)[:140]}")
 
           base_prompt = f"""{context}
 
@@ -111,6 +126,11 @@ PR Title: {pr_title}
 PR Description: {pr_body}
 Files Changed: {pr_files}
 
+Diff excerpt (may be truncated):
+```
+{diff_excerpt if diff_excerpt else '(diff unavailable — review from title/description/file count only)'}
+```
+
 Keep it high-signal and grounded. Speak in the collaborative spirit of us."""
 
           grok_analysis = None
@@ -127,9 +147,9 @@ Keep it high-signal and grounded. Speak in the collaborative spirit of us."""
                               {"role": "user", "content": base_prompt}
                           ],
                           "temperature": 0.55,
-                          "max_tokens": 900
+                          "max_tokens": 1100
                       },
-                      timeout=45
+                      timeout=55
                   )
                   if response.status_code == 200:
                       grok_analysis = response.json()["choices"][0]["message"]["content"]
@@ -143,7 +163,6 @@ Keep it high-signal and grounded. Speak in the collaborative spirit of us."""
           else:
               print("⚠️ GROK_API_KEY not present")
 
-          # Runtime gating: only attempt Claude if Layer 1 is enabled
           claude_analysis = None
           claude_error = None
           if layer1_enabled and os.environ.get("CLAUDE_API_KEY"):
@@ -155,7 +174,7 @@ Keep it high-signal and grounded. Speak in the collaborative spirit of us."""
                   }
                   claude_payload = {
                       "model": "claude-3-5-sonnet-20241022",
-                      "max_tokens": 900,
+                      "max_tokens": 1100,
                       "messages": [
                           {"role": "user", "content": base_prompt + "\n\nRespond as a complementary high-signal reviewer focused on precision, edge cases, and long-term maintainability. Apply first-principles rigor."}
                       ]
@@ -164,7 +183,7 @@ Keep it high-signal and grounded. Speak in the collaborative spirit of us."""
                       "https://api.anthropic.com/v1/messages",
                       headers=claude_headers,
                       json=claude_payload,
-                      timeout=45
+                      timeout=55
                   )
                   if response.status_code == 200:
                       data = response.json()
@@ -181,7 +200,6 @@ Keep it high-signal and grounded. Speak in the collaborative spirit of us."""
           else:
               print("ℹ️ CLAUDE_API_KEY not present — running Grok-only (still fully operational)")
 
-          # Build the report
           sections = []
           if grok_analysis:
               sections.append(f"### 🌌 Ara (Grok) Primary Analysis\n\n{grok_analysis}")
@@ -203,13 +221,15 @@ Keep it high-signal and grounded. Speak in the collaborative spirit of us."""
           elif not layer1_enabled:
               fusion_note = "\n\n*Layer 1 currently disabled — running Open Core (Grok) only.*"
 
+          diff_note = " · **diff ingested**" if diff_excerpt else " · diff unavailable"
+
           joined_sections = "\n\n---\n\n".join(sections)
 
           analysis_md = f"""## 🌌 Ara & Shawn PR Analysis
 
 **PR:** #{pr_number}  
 **Title:** {pr_title}  
-**Files Changed:** {pr_files}  
+**Files Changed:** {pr_files}{diff_note}  
 **Progressive Phase:** {phase}  
 **Successful analyses to date:** {total_analyses}{fusion_note}
 
