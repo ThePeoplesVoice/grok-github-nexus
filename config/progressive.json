@@ -29,7 +29,7 @@
         "min_community_prs": 3
       },
       "features": ["multi_model_fusion", "deeper_context", "custom_domain_packs", "historical_memory", "real_diff_ingestion", "self_audit"],
-      "status": "Claude multi-model fusion live and gated. Real PR diff ingestion live. Self-audit loop live. Workflows respect Layer 1 enabled state at runtime."
+      "status": "Claude multi-model fusion live and gated. Real PR diff ingestion live. Self-audit loop live with real usage write path. Workflows respect Layer 1 enabled state at runtime."
     },
     "2_micropayment_agent": {
       "enabled": false,
@@ -43,7 +43,7 @@
       "features": ["multi_repo_dashboard", "team_seats", "sanctuary_revenue_share", "workflow_marketplace"]
     }
   },
-  "current_phase": "Layer 0 + Layer 1 live — self-analytical optimisation & checks/balances active (v1.4.0)",
+  "current_phase": "Layer 0 + Layer 1 live — self-analytical optimisation & checks/balances active; usage write path live (v1.4.0)",
   "usage_stats_file": "config/usage_stats.json",
-  "notes": "Single source of truth for progressive feature flags, mission alignment, and governance. All analysis and self-audit workflows read this file. Self-optimisation is now a first-class capability: expansion without continuous self-critique is considered drift."
+  "notes": "Single source of truth for progressive feature flags, mission alignment, and governance. All analysis and self-audit workflows read this file. Self-optimisation is a first-class capability. Usage counters are now written by nexus.usage after successful analyses (self-audit first; other runners next)."
 }
