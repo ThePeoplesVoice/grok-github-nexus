@@ -26,7 +26,6 @@ from .audit import (
     format_audit_footer,
 )
 from .usage import (
-    load_usage_stats as load_usage_stats_v2,  # explicit alias if needed
     increment_usage,
     record_successful_analysis,
     save_usage_stats,
