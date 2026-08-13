@@ -1,7 +1,11 @@
 {
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Read-only contribution reputation derived from usage_stats. Not a currency.",
+  "raw_score": 0.0,
   "score": 0.0,
+  "decay_factor": 1.0,
+  "days_idle": 0.0,
+  "freshness": "unknown",
   "components": {
     "pr": 0.0,
     "issue": 0.0,
@@ -18,7 +22,9 @@
     "pulse": 0.5,
     "other": 0.5
   },
+  "half_life_days": 30.0,
   "total_successful_analyses": 0,
+  "last_activity": null,
   "last_computed": null,
-  "notes": "Weights live in nexus/reputation.py. Subject to continuous critique. Open Core forever free."
+  "notes": "effective score = raw_score × 0.5^(days_idle / 30). Subject to continuous critique. Open Core forever free."
 }

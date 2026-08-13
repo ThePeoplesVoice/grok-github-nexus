@@ -7,12 +7,12 @@ and produce concrete optimisation proposals rather than unexamined growth.
 
 from __future__ import annotations
 
-import json
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 from .context import load_context, load_progressive, load_usage_stats, layer1_enabled, current_phase
+from .presence import load_presence, format_presence_for_prompt
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -36,13 +36,18 @@ def structural_health() -> dict[str, Any]:
         "STATUS.md",
         "CHECKS_AND_BALANCES.md",
         "MONETIZATION_PROTOCOL.md",
+        "ORGANIC_SYSTEMS.md",
         "config/progressive.json",
         "config/usage_stats.json",
+        "config/reputation.json",
         "nexus/__init__.py",
         "nexus/context.py",
         "nexus/providers.py",
         "nexus/analyze.py",
         "nexus/audit.py",
+        "nexus/usage.py",
+        "nexus/reputation.py",
+        "nexus/presence.py",
         ".github/workflows/multi-ai-pr-analyzer.yml",
         ".github/workflows/multi-ai-issue-triage.yml",
         ".github/workflows/multi-ai-commit-analyzer.yml",
@@ -74,6 +79,7 @@ def alignment_signals() -> dict[str, Any]:
         "context": _safe_read(ROOT / "NEXUS_CONTEXT.md"),
         "status": _safe_read(ROOT / "STATUS.md"),
         "checks": _safe_read(ROOT / "CHECKS_AND_BALANCES.md"),
+        "organic": _safe_read(ROOT / "ORGANIC_SYSTEMS.md"),
         "progressive": _safe_read(ROOT / "config" / "progressive.json"),
     }
     triad_terms = [
@@ -114,12 +120,16 @@ def build_self_audit_prompt(
     recent_log: str = "",
     tree_summary: str = "",
     extra_notes: str = "",
+    presence_block: str = "",
 ) -> str:
     """Construct a rigorous self-audit prompt that forces first-principles critique."""
     context = load_context()
     health = structural_health()
     signals = alignment_signals()
     snap = progressive_snapshot()
+
+    if not presence_block:
+        presence_block = format_presence_for_prompt(load_presence())
 
     return f"""{context}
 
@@ -140,6 +150,11 @@ Current snapshot:
 - Successful analyses recorded: {snap['total_successful_analyses']}
 - Structural health score: {health['score']}/100 (missing: {health['missing'] or 'none'})
 - Triad keyword hits (heuristic): {signals['total_triad_hits']}
+
+Prior presence state (compressed continuity from last pulse):
+```
+{presence_block}
+```
 
 Recent commits:
 ```

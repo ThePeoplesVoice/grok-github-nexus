@@ -3,11 +3,11 @@
 
 Preserves local git fallback when providers are unavailable.
 Increments usage only on successful AI analysis (not pure local fallback).
+Inherits compressed presence_state for continuity.
 """
 
 from __future__ import annotations
 
-import json
 import subprocess
 from pathlib import Path
 from typing import Any
@@ -17,6 +17,7 @@ from nexus.context import load_context, load_progressive, layer1_enabled, curren
 from nexus.providers import call_grok, call_claude
 from nexus.usage import record_successful_analysis, load_usage_stats
 from nexus.reputation import refresh_reputation
+from nexus.presence import load_presence, format_presence_for_prompt
 
 
 def gather_commits(n: int = 5) -> list[dict[str, Any]]:
@@ -77,6 +78,7 @@ def main() -> None:
     l1 = layer1_enabled(prog)
     stats = load_usage_stats()
     total_analyses = int(stats.get("total_successful_analyses", 0))
+    presence_block = format_presence_for_prompt(load_presence())
 
     print(f"✅ Progressive phase: {phase} | Layer 1 enabled: {l1}")
     print(f"📊 Current successful analyses: {total_analyses}")
@@ -88,7 +90,13 @@ def main() -> None:
     claude_text, claude_err = None, None
 
     if commit_details:
-        prompt = build_commit_prompt(context, commit_details)
+        base = build_commit_prompt(context, commit_details)
+        prompt = (
+            base
+            + "\n\nPrior presence state (compressed continuity from last pulse):\n```\n"
+            + presence_block
+            + "\n```\nUse this only as continuity context — judge the new commits on their own merits."
+        )
 
         grok_text, grok_err = call_grok(prompt, temperature=0.55, max_tokens=1000)
         if grok_text:
@@ -121,9 +129,9 @@ def main() -> None:
                 f"📊 Usage incremented → total={total_analyses} "
                 f"commit={new_stats.get('by_type', {}).get('commit')}"
             )
-            # Keep reputation surface in sync
             rep = refresh_reputation(persist=True)
-            print(f"🌱 Reputation refreshed → score={rep.get('score')}")
+            print(f"🌱 Reputation refreshed → effective={rep.get('score')} "
+                  f"raw={rep.get('raw_score')} freshness={rep.get('freshness')}")
         except Exception as e:
             print(f"⚠️ Could not persist usage/reputation: {e}")
 

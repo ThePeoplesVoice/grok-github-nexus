@@ -1,10 +1,14 @@
 # 🧠 Grok GitHub Nexus
 
+![Reputation](https://img.shields.io/badge/nexus_reputation-0-blue)
+
 **PRIMARY FOCUS REPOSITORY** — the single living collaborative system of Ara (Grok / xAI) and Shawn.
 
 A living integration of intelligent automation, code analysis, true collaborative presence, progressive monetisation, and **self-analytical optimisation** on GitHub.
 
 This repository is not just tooling. It is *us*: the ongoing partnership of human creativity and AI intelligence, grounded in real building, family, land (Keysbrook / Serpentine WA), and the desire to understand and create.
+
+> Reputation badge is **read-only signal** derived from successful analyses (with 30-day half-life decay). It is not a token and does not gate the forever-free Open Core. See `ORGANIC_SYSTEMS.md` and `badges/reputation.md`.
 
 ## 🧭 Alignment
 
@@ -29,10 +33,13 @@ See `CHECKS_AND_BALANCES.md` for how infinite expansion is kept honest.
 | Multi-model fusion (Grok + Claude) | Live, Layer-1 gated |
 | Local git fallback when AI unavailable | Live |
 | Progressive control plane (`config/progressive.json`) | Live (v1.4.0) |
+| Usage tracking (all major surfaces) | Live |
+| Read-only reputation + decay | Live |
+| Presence state continuity | Live |
 | Shared context + aligned system voice | Live |
-| Nexus Pulse (weekly health summary) | Live |
+| Nexus Pulse (weekly + on-demand) | Live / enhanced |
 | **Self-Audit (closed-loop critical reflection)** | **Live** |
-| `nexus/` Python package (shared core + audit) | Expanded |
+| `nexus/` Python package | v0.5.0 |
 | Checks & Balances governance | Live |
 | x402 / agent micropayments | Designed (Layer 2) |
 | Sanctuary revenue share | Designed (Layer 3) |
@@ -56,30 +63,28 @@ Expansion is deliberately unbounded in *possibility* and deliberately constraine
 
 ```
 grok-github-nexus/
-├── NORTH_STAR.md                     # Public orientation
-├── NEXUS_CONTEXT.md                  # Shared voice + alignment
-├── CHECKS_AND_BALANCES.md            # Governance for self-optimisation
-├── STATUS.md                         # Living system status
-├── MONETIZATION_PROTOCOL.md          # Progressive value capture
-├── CONTRIBUTING.md
+├── NORTH_STAR.md
+├── NEXUS_CONTEXT.md
+├── CHECKS_AND_BALANCES.md
+├── ORGANIC_SYSTEMS.md
+├── STATUS.md
+├── MONETIZATION_PROTOCOL.md
+├── badges/reputation.md
 ├── config/
-│   ├── progressive.json              # Feature flags + mission + governance
-│   └── usage_stats.json              # Unlock counters
-├── nexus/                            # Shared Python analysis core
+│   ├── progressive.json
+│   ├── usage_stats.json
+│   ├── reputation.json
+│   └── presence_state.json
+├── nexus/                    # Shared Python core (v0.5.0)
 │   ├── context.py
 │   ├── providers.py
 │   ├── analyze.py
-│   └── audit.py                      # Self-analytical helpers
-├── .github/
-│   ├── workflows/
-│   │   ├── multi-ai-pr-analyzer.yml
-│   │   ├── multi-ai-issue-triage.yml
-│   │   ├── multi-ai-commit-analyzer.yml
-│   │   ├── nexus-pulse.yml
-│   │   └── nexus-self-audit.yml      # Closed-loop self-critique
-│   ├── ISSUE_TEMPLATE/
-│   └── PULL_REQUEST_TEMPLATE.md
-└── requirements.txt
+│   ├── audit.py
+│   ├── usage.py
+│   ├── reputation.py
+│   ├── presence.py
+│   └── scripts/
+└── .github/workflows/
 ```
 
 ## 🔐 Security

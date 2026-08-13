@@ -14,7 +14,7 @@ Self-analytical optimisation (audit) is a first-class capability so
 expansion remains constrained by continuous critique.
 """
 
-__version__ = "0.4.0"
+__version__ = "0.5.0"
 
 from .context import load_context, load_progressive, load_usage_stats, layer1_enabled, current_phase
 from .providers import call_grok, call_claude, format_api_error
@@ -35,7 +35,9 @@ from .reputation import (
     refresh_reputation,
     load_reputation,
     reputation_summary_md,
+    reputation_badge_line,
 )
+from .presence import load_presence, format_presence_for_prompt
 
 __all__ = [
     "load_context",
@@ -58,4 +60,7 @@ __all__ = [
     "refresh_reputation",
     "load_reputation",
     "reputation_summary_md",
+    "reputation_badge_line",
+    "load_presence",
+    "format_presence_for_prompt",
 ]

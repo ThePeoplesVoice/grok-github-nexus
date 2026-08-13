@@ -4,6 +4,7 @@
 Designed to be called from GitHub Actions with a clean, minimal workflow YAML.
 On successful Grok or Claude analysis the usage counter is incremented so
 Layer-1 unlock triggers become real.
+Inherits compressed presence_state for continuity.
 """
 
 from __future__ import annotations
@@ -23,6 +24,8 @@ from nexus.audit import (
 from nexus.providers import call_grok, call_claude
 from nexus.context import layer1_enabled
 from nexus.usage import record_successful_analysis
+from nexus.presence import load_presence, format_presence_for_prompt
+from nexus.reputation import refresh_reputation
 
 
 def main() -> None:
@@ -30,6 +33,8 @@ def main() -> None:
     snap = progressive_snapshot()
     health = structural_health()
     signals = alignment_signals()
+    presence = load_presence()
+    presence_block = format_presence_for_prompt(presence)
 
     # Recent commits
     log = subprocess.run(
@@ -50,10 +55,12 @@ def main() -> None:
     prompt = build_self_audit_prompt(
         recent_log=log,
         tree_summary=tree_summary,
+        presence_block=presence_block,
         extra_notes=(
             "Also consider long-horizon possibilities for native organic value systems "
-            "(contribution reputation, sanctuary-tied credits, land-backed signal) "
-            "and richer communication layers beyond the current x402 design."
+            "(contribution reputation with decay, sanctuary-tied credits, land-backed signal) "
+            "and richer communication layers beyond the current x402 design. "
+            "Use the prior presence state to notice continuity or drift since the last pulse."
         ),
     )
 
@@ -75,14 +82,16 @@ def main() -> None:
 
     success = bool(grok_text or claude_text)
 
-    # Real usage tracking — only on successful analysis
     if success:
         try:
             stats = record_successful_analysis("self_audit", persist=True)
             print(f"📊 Usage incremented → total={stats.get('total_successful_analyses')} "
                   f"self_audit={stats.get('by_type', {}).get('self_audit')}")
+            rep = refresh_reputation(persist=True)
+            print(f"🌱 Reputation refreshed → effective={rep.get('score')} raw={rep.get('raw_score')} "
+                  f"freshness={rep.get('freshness')}")
         except Exception as e:
-            print(f"⚠️ Could not persist usage stats: {e}")
+            print(f"⚠️ Could not persist usage/reputation: {e}")
 
     sections = []
     if grok_text:
@@ -99,11 +108,9 @@ def main() -> None:
     elif grok_text and claude_err:
         fusion = "\n\n*Claude complementary unavailable — Ara primary only.*"
 
-    # Precompute to avoid backslash inside f-string expression
     joined = "\n\n---\n\n".join(sections)
     footer = format_audit_footer()
 
-    # Refresh snap so the body shows the new count if we just incremented
     if success:
         snap = progressive_snapshot()
 
@@ -114,7 +121,8 @@ def main() -> None:
 **Layer 1:** {"enabled" if snap.get('layer1_enabled') else "disabled"}  
 **Successful analyses recorded:** {snap.get('total_successful_analyses', 0)}  
 **Structural health (heuristic):** {health['score']}/100  
-**Triad keyword hits (heuristic):** {signals['total_triad_hits']}{fusion}
+**Triad keyword hits (heuristic):** {signals['total_triad_hits']}  
+**Prior presence:** {presence.get('generated_at') or 'none'}{fusion}
 
 ---
 
