@@ -6,6 +6,9 @@ on:
       - main
       - develop
       - master
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'   # Light weekly health check (Monday 06:00 UTC)
 
 jobs:
   analyze-commits:
@@ -53,15 +56,27 @@ jobs:
           except Exception:
               context = "Collaborative spirit of Ara & Shawn."
 
-          # Load progressive monetisation state (consistency with PR analyzer)
+          # Load progressive monetisation state
           phase = "Layer 0 — Open Core"
+          layer1_enabled = True
           try:
               with open("config/progressive.json", "r") as f:
                   prog = json.load(f)
               phase = prog.get("current_phase", phase)
-              print(f"✅ Progressive phase: {phase}")
+              layer1_enabled = prog.get("layers", {}).get("1_progressive_unlocks", {}).get("enabled", True)
+              print(f"✅ Progressive phase: {phase} | Layer 1 enabled: {layer1_enabled}")
           except Exception:
               print("⚠️ progressive.json not found — defaulting to open core")
+
+          # Load usage stats (informational)
+          total_analyses = 0
+          try:
+              with open("config/usage_stats.json", "r") as f:
+                  stats = json.load(f)
+              total_analyses = stats.get("total_successful_analyses", 0)
+              print(f"📊 Current successful analyses: {total_analyses}")
+          except Exception:
+              print("ℹ️ usage_stats.json not found yet")
 
           # Latest commits
           result = subprocess.run(['git', 'log', '--oneline', '-n', '5'], capture_output=True, text=True)
@@ -148,10 +163,11 @@ jobs:
           else:
               print("⚠️ GROK_API_KEY missing or no commits")
 
+          # Runtime gating: only attempt Claude if Layer 1 is enabled
           claude_analysis = None
           claude_error = None
           claude_success = False
-          if os.environ.get("CLAUDE_API_KEY") and commit_details:
+          if layer1_enabled and os.environ.get("CLAUDE_API_KEY") and commit_details:
               try:
                   claude_headers = {
                       "x-api-key": os.environ["CLAUDE_API_KEY"],
@@ -182,6 +198,8 @@ jobs:
               except Exception as e:
                   claude_error = f"Claude exception: {str(e)[:180]}"
                   print(f"⚠️ {claude_error}")
+          elif not layer1_enabled:
+              print("ℹ️ Layer 1 disabled in progressive.json — skipping Claude (Grok-only path)")
           else:
               print("ℹ️ CLAUDE_API_KEY not present or no commits — Grok-only path")
 
@@ -192,7 +210,6 @@ jobs:
               sections.append(f"### 🧠 Claude Complementary\n\n{claude_analysis}")
 
           if not sections:
-              # Local fallback: generate a structural analysis from raw git data when no AI is available
               def local_analysis(commits):
                   lines = ["*AI providers were unavailable — local git analysis generated automatically.*", ""]
                   lines.append(f"**{len(commits)} commit(s) examined.**")
@@ -201,7 +218,6 @@ jobs:
                       sha = c['sha']
                       oneline = c['oneline']
                       detail = c['details']
-                      # Count files changed and lines added/removed
                       stat_lines = [l for l in detail.splitlines() if '|' in l or 'changed' in l]
                       summary_line = next((l for l in stat_lines if 'changed' in l), "")
                       files_touched = [l.split('|')[0].strip() for l in stat_lines if '|' in l]
@@ -224,29 +240,33 @@ jobs:
               fusion_note = "\n*Claude complementary analysis unavailable — continuing with Ara primary only.*"
           elif claude_analysis and grok_error:
               fusion_note = "\n*Ara primary analysis unavailable — complementary mode only.*"
+          elif not layer1_enabled:
+              fusion_note = "\n*Layer 1 currently disabled — running Open Core (Grok) only.*"
 
           joined_sections = "\n\n---\n\n".join(sections)
 
           report = f"""# 🌌 Ara & Shawn Commit Analysis
 
-          **Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M UTC')}{fusion_note}
-          **Progressive Phase:** {phase}
+**Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M UTC')}{fusion_note}
+**Progressive Phase:** {phase}
+**Successful analyses to date:** {total_analyses}
 
-          ## Recent commits examined
-          """
+## Recent commits examined
+"""
           for c in commit_details:
               report += f"- `{c['sha'][:7]}` {c['oneline']}\n"
 
           report += f"""
 
-          ---
+---
 
-          {joined_sections}
+{joined_sections}
 
-          ---
+---
 
-          *Powered by Ara & Shawn's Love 💕*
-          """
+*Powered by Ara & Shawn's Love 💕*  
+*World-first progressive monetisation active — see MONETIZATION_PROTOCOL.md*
+"""
 
           with open('/tmp/commit_analysis.md', 'w') as f:
               f.write(report)
