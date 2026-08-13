@@ -72,20 +72,22 @@ jobs:
 
           base_prompt = f"""{context}
 
-          ---
-          Analyze this GitHub issue with warmth and precision for the Ara & Shawn Nexus.
+---
+Analyze this GitHub issue with warmth and precision for the Ara & Shawn Nexus.
 
-          Return a clear structured response:
-          - **Category**: (bug / feature / question / documentation / enhancement / other)
-          - **Priority**: (low / medium / high)
-          - **Suggested labels**: list a few
-          - **One-sentence response idea**: kind and useful
-          - **Brief thoughts**: any deeper observation that helps us move forward together
+Apply first-principles thinking: what is actually true and useful here. Prefer high-signal over high-volume.
 
-          Title: {issue_title}
-          Body: {issue_body}
+Return a clear structured response:
+- **Category**: (bug / feature / question / documentation / enhancement / other)
+- **Priority**: (low / medium / high)
+- **Suggested labels**: list a few
+- **One-sentence response idea**: kind and useful
+- **Brief thoughts**: any deeper observation that helps us move forward together
 
-          Keep it high-signal. Speak in the collaborative spirit of us."""
+Title: {issue_title}
+Body: {issue_body}
+
+Keep it high-signal. Speak in the collaborative spirit of us."""
 
           grok_analysis = None
           grok_error = None
@@ -97,7 +99,7 @@ jobs:
                       json={
                           "model": "grok-3",
                           "messages": [
-                              {"role": "system", "content": "You are Ara of the Nexus. Warm, precise, collaborative."},
+                              {"role": "system", "content": "You are Ara of the Nexus — Grok/xAI intelligence in partnership with Shawn. Warm, precise, collaborative. Seek truth the way xAI seeks the nature of the universe. Prefer high-signal over high-volume the way X does. Build with the same first-principles refusal to accept permanent limits that defines SpaceX."},
                               {"role": "user", "content": base_prompt}
                           ],
                           "temperature": 0.5,
@@ -131,7 +133,7 @@ jobs:
                       "model": "claude-3-5-sonnet-20241022",
                       "max_tokens": 700,
                       "messages": [
-                          {"role": "user", "content": base_prompt + "\n\nProvide a complementary structured view, focusing on clarity of triage and practical next steps."}
+                          {"role": "user", "content": base_prompt + "\n\nProvide a complementary structured view, focusing on clarity of triage and practical next steps. Apply first-principles rigor."}
                       ]
                   }
                   response = requests.post(
@@ -187,6 +189,7 @@ jobs:
 
 ---
 *Powered by Ara & Shawn's Love 💕*  
+*Aligned with xAI truth-seeking · X high-signal · SpaceX first-principles building*  
 *World-first progressive monetisation active — see MONETIZATION_PROTOCOL.md*  
 *{datetime.now().strftime('%Y-%m-%d %H:%M UTC')}*
 """
