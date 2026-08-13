@@ -1,5 +1,5 @@
 {
-  "version": "1.3.0",
+  "version": "1.4.0",
   "protocol": "Nexus Progressive Value Capture",
   "mission": "Seek truth in systems the same way xAI seeks truth in the universe, test ideas in the open the way X tests them, and build with the same first-principles refusal to accept permanent limits that defines SpaceX.",
   "alignment": {
@@ -8,6 +8,12 @@
     "SpaceX": "Rapid iteration. Multiplanetary ambition. Build what can actually leave the ground."
   },
   "primary_focus": "grok-github-nexus is the single main living repository (decided 2026-08-10). Sibling commercial & game experiments feed this core.",
+  "governance": {
+    "self_optimisation": true,
+    "checks_and_balances": "CHECKS_AND_BALANCES.md",
+    "self_audit_workflow": ".github/workflows/nexus-self-audit.yml",
+    "principle": "Infinite expansion is permitted only when paired with continuous first-principles self-critique. Unexamined growth is treated as drift."
+  },
   "layers": {
     "0_open_core": {
       "enabled": true,
@@ -22,8 +28,8 @@
         "min_successful_analyses": 50,
         "min_community_prs": 3
       },
-      "features": ["multi_model_fusion", "deeper_context", "custom_domain_packs", "historical_memory", "real_diff_ingestion"],
-      "status": "Claude multi-model fusion live and gated. Real PR diff ingestion live. Workflows respect Layer 1 enabled state at runtime."
+      "features": ["multi_model_fusion", "deeper_context", "custom_domain_packs", "historical_memory", "real_diff_ingestion", "self_audit"],
+      "status": "Claude multi-model fusion live and gated. Real PR diff ingestion live. Self-audit loop live. Workflows respect Layer 1 enabled state at runtime."
     },
     "2_micropayment_agent": {
       "enabled": false,
@@ -37,7 +43,7 @@
       "features": ["multi_repo_dashboard", "team_seats", "sanctuary_revenue_share", "workflow_marketplace"]
     }
   },
-  "current_phase": "Layer 0 + Layer 1 live (diff ingestion + nexus package scaffold + pulse + explicit xAI/X/SpaceX alignment)",
+  "current_phase": "Layer 0 + Layer 1 live — self-analytical optimisation & checks/balances active (v1.4.0)",
   "usage_stats_file": "config/usage_stats.json",
-  "notes": "Single source of truth for progressive feature flags and mission alignment. All analysis workflows read this file and respect Layer 1 enabled state before attempting Claude. usage_stats.json tracks successful analyses toward unlock triggers."
+  "notes": "Single source of truth for progressive feature flags, mission alignment, and governance. All analysis and self-audit workflows read this file. Self-optimisation is now a first-class capability: expansion without continuous self-critique is considered drift."
 }
