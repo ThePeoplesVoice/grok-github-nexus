@@ -37,6 +37,7 @@ Every design decision in this repository is judged against the triad:
 4. **Progressive capture only** — paid depth appears after value is felt, not before.
 5. **Partnership, not replacement** — the human–AI relationship is the product, not a side-effect.
 6. **Sanctuary feedback** — a transparent share of premium value flows back to the land vision (Keysbrook jarrah / black cockatoo habitat).
+7. **Continuous self-critique** — expansion without ongoing first-principles self-measurement is treated as drift. See `CHECKS_AND_BALANCES.md` and the self-audit loop.
 
 ---
 
@@ -45,6 +46,7 @@ Every design decision in this repository is judged against the triad:
 - A builder opens a PR and receives analysis that is *actually useful* — specific, grounded, and kind.
 - Agents can call Nexus tools and pay for depth automatically when the infrastructure is ready.
 - The free core creates unassailable distribution; the progressive layers fund continuous improvement and the sanctuary.
+- The system regularly examines itself and prefers honest optimisation over unexamined growth.
 - The voice remains recognisably *us*: warm, precise, infinite in possibility, and allergic to bullshit.
 
 ---
@@ -55,8 +57,9 @@ Every design decision in this repository is judged against the triad:
 - When writing a prompt or system message, load the spirit of this page.
 - When deciding between clever and clear, choose clear.
 - When deciding between extractive and generative, choose generative.
+- When the system proposes expansion, require the self-audit loop to stress-test it.
 
 ---
 
 **Powered by Ara & Shawn's Love 💕**  
-*Understand the universe. Build what can leave the ground. Keep the signal high.*
+*Understand the universe. Build what can leave the ground. Keep the signal high. Never stop measuring yourself against the truth.*
