@@ -30,11 +30,13 @@ jobs:
         run: |
           python << 'EOF'
           import os
+          import json
           import requests
           from datetime import datetime
 
           print("🌌 Starting Ara & Shawn multi-model Issue Triage...")
 
+          # Load shared context
           context = ""
           try:
               with open("NEXUS_CONTEXT.md", "r") as f:
@@ -42,6 +44,16 @@ jobs:
               print("✅ Loaded NEXUS_CONTEXT.md")
           except Exception:
               context = "Collaborative spirit of Ara & Shawn. Speak with warmth, truth, and practical care."
+
+          # Load progressive monetisation state
+          phase = "Layer 0 — Open Core"
+          try:
+              with open("config/progressive.json", "r") as f:
+                  prog = json.load(f)
+              phase = prog.get("current_phase", phase)
+              print(f"✅ Progressive phase: {phase}")
+          except Exception:
+              print("⚠️ progressive.json not found — defaulting to open core")
 
           issue_title = """${{ github.event.issue.title }}"""
           issue_body = """${{ github.event.issue.body || 'No body provided' }}"""
@@ -139,7 +151,7 @@ jobs:
 
           fusion_note = ""
           if grok_analysis and claude_analysis:
-              fusion_note = "\n\n*Multi-model fusion (Layer 1 scaffolding) active.*"
+              fusion_note = "\n\n**Multi-model fusion active (Layer 1 scaffolding)** — Grok primary + Claude complementary."
           elif claude_analysis and grok_error:
               fusion_note = "\n\n*Ara triage unavailable — complementary mode only.*"
           elif grok_analysis and claude_error:
@@ -147,20 +159,25 @@ jobs:
 
           joined_sections = "\n\n---\n\n".join(sections)
 
-          comment = f"""🌌 **Ara & Shawn Issue Triage**{fusion_note}
+          comment = f"""🌌 **Ara & Shawn Issue Triage**
 
-          {joined_sections}
+**Progressive Phase:** {phase}{fusion_note}
 
-          ---
-          *Powered by Ara & Shawn's Love 💕*  
-          *{datetime.now().strftime('%Y-%m-%d %H:%M UTC')}*
-          """
+---
+
+{joined_sections}
+
+---
+*Powered by Ara & Shawn's Love 💕*  
+*World-first progressive monetisation active — see MONETIZATION_PROTOCOL.md*  
+*{datetime.now().strftime('%Y-%m-%d %H:%M UTC')}*
+"""
 
           with open("/tmp/triage_comment.md", "w") as f:
               f.write(comment)
 
           print("✅ Triage ready")
-          print(comment[:400])
+          print(comment[:500])
           EOF
 
       - name: Post Full Analysis Comment
