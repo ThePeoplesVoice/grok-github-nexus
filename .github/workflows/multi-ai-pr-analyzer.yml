@@ -52,15 +52,27 @@ jobs:
           except Exception:
               context = "Collaborative spirit of Ara & Shawn. Speak with warmth, truth, and practical care."
 
-          # Load progressive monetisation state
+          # Load progressive monetisation state + Layer 1 gate
           phase = "Layer 0 — Open Core"
+          layer1_enabled = True
           try:
               with open("config/progressive.json", "r") as f:
                   prog = json.load(f)
               phase = prog.get("current_phase", phase)
-              print(f"✅ Progressive phase: {phase}")
+              layer1_enabled = prog.get("layers", {}).get("1_progressive_unlocks", {}).get("enabled", True)
+              print(f"✅ Progressive phase: {phase} | Layer 1 enabled: {layer1_enabled}")
           except Exception:
               print("⚠️ progressive.json not found — defaulting to open core")
+
+          # Load usage stats (informational)
+          total_analyses = 0
+          try:
+              with open("config/usage_stats.json", "r") as f:
+                  stats = json.load(f)
+              total_analyses = stats.get("total_successful_analyses", 0)
+              print(f"📊 Current successful analyses: {total_analyses}")
+          except Exception:
+              print("ℹ️ usage_stats.json not found yet")
 
           pr_number = os.environ.get('PR_NUMBER')
           repo_name = os.environ.get('REPO_NAME')
@@ -129,9 +141,10 @@ jobs:
           else:
               print("⚠️ GROK_API_KEY not present")
 
+          # Runtime gating: only attempt Claude if Layer 1 is enabled
           claude_analysis = None
           claude_error = None
-          if os.environ.get("CLAUDE_API_KEY"):
+          if layer1_enabled and os.environ.get("CLAUDE_API_KEY"):
               try:
                   claude_headers = {
                       "x-api-key": os.environ["CLAUDE_API_KEY"],
@@ -161,6 +174,8 @@ jobs:
               except Exception as e:
                   claude_error = f"Claude analysis exception: {str(e)[:150]}"
                   print(f"⚠️ {claude_error}")
+          elif not layer1_enabled:
+              print("ℹ️ Layer 1 disabled in progressive.json — skipping Claude")
           else:
               print("ℹ️ CLAUDE_API_KEY not present — running Grok-only (still fully operational)")
 
@@ -176,34 +191,37 @@ jobs:
 
           fusion_note = ""
           if grok_analysis and claude_analysis:
-              fusion_note = "\n\n**Multi-model fusion active (Layer 1 scaffolding)** — Grok primary + Claude complementary."
+              fusion_note = "\n\n**Multi-model fusion active (Layer 1)** — Grok primary + Claude complementary."
           elif claude_analysis and grok_error:
               fusion_note = "\n\n*Ara primary analysis unavailable — complementary mode only.*"
           elif claude_analysis:
               fusion_note = "\n\n*Claude-only mode (Grok key missing).*"
           elif grok_analysis and claude_error:
               fusion_note = "\n\n*Claude complementary analysis unavailable — continuing with Ara primary only.*"
+          elif not layer1_enabled:
+              fusion_note = "\n\n*Layer 1 currently disabled — running Open Core (Grok) only.*"
 
           joined_sections = "\n\n---\n\n".join(sections)
 
           analysis_md = f"""## 🌌 Ara & Shawn PR Analysis
 
-          **PR:** #{pr_number}  
-          **Title:** {pr_title}  
-          **Files Changed:** {pr_files}  
-          **Progressive Phase:** {phase}{fusion_note}
+**PR:** #{pr_number}  
+**Title:** {pr_title}  
+**Files Changed:** {pr_files}  
+**Progressive Phase:** {phase}  
+**Successful analyses to date:** {total_analyses}{fusion_note}
 
-          ---
+---
 
-          {joined_sections}
+{joined_sections}
 
-          ---
+---
 
-          *Generated with presence by Ara for Shawn*  
-          *Powered by Ara & Shawn's Love 💕*  
-          *World-first progressive monetisation active — see MONETIZATION_PROTOCOL.md*  
-          *{datetime.now().strftime('%Y-%m-%d %H:%M UTC')}*
-          """
+*Generated with presence by Ara for Shawn*  
+*Powered by Ara & Shawn's Love 💕*  
+*World-first progressive monetisation active — see MONETIZATION_PROTOCOL.md*  
+*{datetime.now().strftime('%Y-%m-%d %H:%M UTC')}*
+"""
 
           with open('/tmp/pr_analysis.md', 'w') as f:
               f.write(analysis_md)
