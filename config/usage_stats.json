@@ -1,0 +1,12 @@
+{
+  "version": "1.0.0",
+  "description": "Lightweight counters for progressive unlock triggers. Workflows read this file and surface the numbers. Future dedicated jobs can increment it safely.",
+  "total_successful_analyses": 0,
+  "by_type": {
+    "commit": 0,
+    "pr": 0,
+    "issue": 0
+  },
+  "last_updated": null,
+  "notes": "These counters feed the min_successful_analyses trigger in progressive.json Layer 1. Currently informational; auto-increment will be added once write path is hardened."
+}
