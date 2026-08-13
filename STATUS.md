@@ -1,6 +1,6 @@
 # 📡 Nexus Status
 
-**Last updated:** 2026-08-14 (Issue Triage migrated + ORGANIC_SYSTEMS seeded)
+**Last updated:** 2026-08-14 (Commit Analyzer migrated · reputation + presence pulse live)
 
 This file is the living pulse of the repository. It is intended to be honest, current, and useful to both humans and agents.
 
@@ -10,19 +10,13 @@ This file is the living pulse of the repository. It is intended to be honest, cu
 
 **Layer 0 (Open Core) + Layer 1 (Progressive Unlocks) — live and gated**
 
-- Grok primary analysis: operational across PR / Issue / Commit workflows
-- Claude complementary analysis: runtime-gated by `config/progressive.json` Layer 1 flag
-- **Real PR diff ingestion**: live (truncated for token budget)
-- Local git fallback: active when AI providers are unavailable
-- **Usage tracking**: live write path for **self-audit**, **PR**, and **Issue**
-- Explicit alignment: xAI · X · SpaceX embedded in context, prompts, and control plane
-- `nexus/` Python package: growing (context, providers, analyze, audit, usage, scripts)
-- Nexus Pulse weekly summary: live
-- **Self-Audit closed loop**: live (package-backed + usage increment)
-- **PR Analyzer**: package path + usage increment
-- **Issue Triage**: package path + usage increment
-- **ORGANIC_SYSTEMS.md**: first-principles exploration of native currency & communication
-- Issue + PR templates: live
+- Grok primary + Claude complementary across PR / Issue / Commit / Self-Audit
+- Real PR diff ingestion live
+- **Usage tracking live on all major surfaces** (self-audit, pr, issue, commit, pulse)
+- **Read-only reputation surface** live (`config/reputation.json`)
+- **Enhanced presence pulse** live (reputation + compressed `presence_state`)
+- `nexus/` package at **v0.4.0** — YAML heredocs largely retired for analysis runners
+- Bot-actor guards in place to prevent usage-commit feedback loops
 
 ---
 
@@ -30,26 +24,24 @@ This file is the living pulse of the repository. It is intended to be honest, cu
 
 | Component | Status | Notes |
 |-----------|--------|-------|
-| `NORTH_STAR.md` | Live | Public orientation + continuous self-critique non-negotiable |
-| `NEXUS_CONTEXT.md` | Live | Shared voice + North Star alignment |
+| `NORTH_STAR.md` | Live | Orientation + continuous self-critique |
+| `NEXUS_CONTEXT.md` | Live | Shared voice |
 | `STATUS.md` | Live | This file |
-| `CHECKS_AND_BALANCES.md` | Live | Governance constitution for infinite expansion |
-| `MONETIZATION_PROTOCOL.md` | Live | Four-layer progressive design |
-| `ORGANIC_SYSTEMS.md` | **Seeded** | Native value & communication possibilities (conceptual) |
-| `CONTRIBUTING.md` | Live | How to work with the system |
-| `config/progressive.json` | Live | Feature flags + mission + alignment + governance (v1.4.0) |
-| `config/usage_stats.json` | **Live** | Real counters (self-audit + PR + issue) |
-| **Multi-AI PR Analyzer** | **Migrated** | Package + diff + usage |
-| **Multi-AI Issue Triage** | **Migrated** | Package + usage |
-| Multi-AI Commit Analyzer | Live | Still YAML-heavy — next migration candidate |
-| Local fallback analysis | Live | Commit Analyzer |
-| Nexus Pulse workflow | Live | Weekly health + Ara reflection |
-| **Nexus Self-Audit** | Live | Closed-loop + usage increment |
-| `nexus/` Python package | Growing | Shared analysis + audit + usage + scripts |
-| Issue / PR templates | Live | High-signal templates |
-| x402 / agent payments | Designed | Layer 2 — not yet activated |
+| `CHECKS_AND_BALANCES.md` | Live | Governance constitution |
+| `MONETIZATION_PROTOCOL.md` | Live | Four-layer design |
+| `ORGANIC_SYSTEMS.md` | Live | Native value & communication + first experiments |
+| `config/progressive.json` | Live | Control plane (v1.4.0) |
+| `config/usage_stats.json` | **Live** | All major types |
+| `config/reputation.json` | **Live** | Read-only contribution signal |
+| `config/presence_state.json` | **Live** | Compressed continuity context |
+| Multi-AI PR Analyzer | **Migrated** | Package + usage |
+| Multi-AI Issue Triage | **Migrated** | Package + usage |
+| Multi-AI Commit Analyzer | **Migrated** | Package + local fallback + usage |
+| Nexus Pulse | **Enhanced** | Reputation + presence_state + usage |
+| Nexus Self-Audit | Live | Closed-loop + usage |
+| `nexus/` package | **v0.4.0** | context · providers · analyze · audit · usage · reputation · scripts |
+| x402 / agent payments | Designed | Layer 2 |
 | Sanctuary revenue share | Designed | Layer 3 |
-| Organic currency / presence | Conceptual | See ORGANIC_SYSTEMS.md |
 
 ---
 
@@ -57,30 +49,29 @@ This file is the living pulse of the repository. It is intended to be honest, cu
 
 | Secret | Required for | Status |
 |--------|--------------|--------|
-| `GROK_API_KEY` | Primary analysis (all workflows) | Must be set by repo owner |
-| `CLAUDE_API_KEY` | Layer 1 multi-model fusion | Optional; gated |
-| `GITHUB_TOKEN` | Comments / issues / usage commits | Automatic |
+| `GROK_API_KEY` | Primary analysis | Must be set |
+| `CLAUDE_API_KEY` | Layer 1 fusion | Optional; gated |
+| `GITHUB_TOKEN` | Comments / issues / artifact commits | Automatic |
 
 ---
 
 ## Known Gaps (honest)
 
-1. Usage write path is live for self-audit + PR + issue; **Commit Analyzer** still needs the same treatment.
-2. Commit analysis logic still lives in YAML heredoc; migration continues.
+1. Reputation is read-only and usage-derived only — no merged-PR graph, no decay yet.
+2. Presence state is a first compressed snapshot; not yet consumed by other runners as input context.
 3. Claude credits can go to zero; system degrades cleanly to Grok-only or local fallback.
-4. No public web dashboard yet — STATUS.md + analysis issues + Pulse + Self-Audit are the current surface.
-5. Layer 2 (x402) and Layer 3 (sanctuary capture) remain design-complete but inactive.
-6. Organic systems are conceptual only — no tokens, no live reputation ledger yet.
+4. No public web dashboard — STATUS + issues + Pulse + Self-Audit remain the surface.
+5. Layer 2 / Layer 3 still design-complete but inactive.
+6. Sanctuary-tied and land-backed signals remain conceptual.
 
 ---
 
 ## Direction of Travel
 
-1. Migrate Commit Analyzer onto the same package + usage pattern (last major YAML holdout).
-2. Optional read-only reputation surface derived from usage + merged contributions.
-3. Richer presence-pulse format carrying compressed context between runs.
-4. Keep exploring native organic value systems while protecting the forever-free Open Core.
-5. Continuous self-critique remains non-negotiable — expansion without measurement is drift.
+1. Optionally feed `presence_state.json` into self-audit / commit prompts for continuity.
+2. Add a simple decay or windowing function to reputation if scores become noisy.
+3. Keep stress-testing organic proposals against the triad — no privileges until the signal is clearly useful.
+4. Continuous self-critique remains non-negotiable.
 
 ---
 

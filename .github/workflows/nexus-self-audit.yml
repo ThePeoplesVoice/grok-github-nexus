@@ -12,10 +12,13 @@ on:
       - 'NEXUS_CONTEXT.md'
       - 'STATUS.md'
       - 'CHECKS_AND_BALANCES.md'
+      - 'ORGANIC_SYSTEMS.md'
       - '.github/workflows/**'
 
 jobs:
   self-audit:
+    # Prevent usage-commit feedback loops
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -50,9 +53,9 @@ jobs:
         run: |
           git config user.name "nexus-bot"
           git config user.email "nexus-bot@users.noreply.github.com"
-          git add config/usage_stats.json
+          git add config/usage_stats.json config/reputation.json
           if git diff --staged --quiet; then
-            echo "No usage_stats change to commit"
+            echo "No usage/reputation change to commit"
           else
             git commit -m "chore: increment usage stats after self-audit"
             git push

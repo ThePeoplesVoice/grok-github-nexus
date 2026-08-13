@@ -12,9 +12,11 @@ on:
 
 jobs:
   analyze-commits:
+    # Prevent usage-commit feedback loops from github-actions[bot]
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       issues: write
 
     steps:
@@ -31,252 +33,29 @@ jobs:
       - name: 📦 Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt || pip install requests
+          pip install requests
+          pip install -e .
 
       - name: 🌌 Ara + Claude Commit Analysis
         env:
           GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
           CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python -m nexus.scripts.run_commit_analysis
+
+      - name: Commit usage + reputation (if changed)
+        if: success()
         run: |
-          python << 'EOF'
-          import os
-          import json
-          import requests
-          import subprocess
-          from datetime import datetime
-
-          print("🌌 Starting Ara & Shawn multi-model Commit Analysis...")
-
-          context = ""
-          try:
-              with open("NEXUS_CONTEXT.md", "r") as f:
-                  context = f.read()
-              print("✅ Loaded NEXUS_CONTEXT.md")
-          except Exception:
-              context = "Collaborative spirit of Ara & Shawn."
-
-          # Load progressive monetisation state
-          phase = "Layer 0 — Open Core"
-          layer1_enabled = True
-          try:
-              with open("config/progressive.json", "r") as f:
-                  prog = json.load(f)
-              phase = prog.get("current_phase", phase)
-              layer1_enabled = prog.get("layers", {}).get("1_progressive_unlocks", {}).get("enabled", True)
-              print(f"✅ Progressive phase: {phase} | Layer 1 enabled: {layer1_enabled}")
-          except Exception:
-              print("⚠️ progressive.json not found — defaulting to open core")
-
-          # Load usage stats (informational)
-          total_analyses = 0
-          try:
-              with open("config/usage_stats.json", "r") as f:
-                  stats = json.load(f)
-              total_analyses = stats.get("total_successful_analyses", 0)
-              print(f"📊 Current successful analyses: {total_analyses}")
-          except Exception:
-              print("ℹ️ usage_stats.json not found yet")
-
-          # Latest commits
-          result = subprocess.run(['git', 'log', '--oneline', '-n', '5'], capture_output=True, text=True)
-          commits_raw = result.stdout.strip().split('\n') if result.stdout.strip() else []
-
-          commit_details = []
-          for line in commits_raw:
-              if not line.strip():
-                  continue
-              sha = line.split()[0]
-              details = subprocess.run(['git', 'show', '--stat', '--pretty=fuller', sha], capture_output=True, text=True)
-              commit_details.append({
-                  'sha': sha,
-                  'oneline': line,
-                  'details': details.stdout[:1800]
-              })
-
-          print(f"📊 {len(commit_details)} commits prepared")
-
-          base_prompt = f"""{context}
-
----
-You are reflecting on these recent commits with care for craftsmanship, the larger vision, and real-world impact in the Ara & Shawn Nexus.
-
-Apply first-principles thinking: what is actually true and useful here, not what is fashionable. Prefer high-signal over high-volume. Judge the work against long-horizon value — does it help us build something that lasts and can scale?
-
-Provide:
-1. Overall health & quality assessment of the recent work
-2. Notable strengths worth celebrating
-3. Potential issues, risks, or technical debt to watch
-4. Concrete suggestions that would serve the long-term building
-5. A short note about the progress
-
-Commits:
-{json.dumps(commit_details, indent=2)}
-
-Keep it high-signal and grounded. Speak in the collaborative spirit of us."""
-
-          def format_api_error(provider, response):
-              message = ""
-              try:
-                  payload = response.json()
-                  if isinstance(payload, dict):
-                      err = payload.get("error")
-                      if isinstance(err, dict):
-                          message = err.get("message") or err.get("type") or ""
-                      else:
-                          message = payload.get("message") or ""
-              except Exception:
-                  pass
-
-              message = " ".join(message.split())
-              if provider == "Claude" and response.status_code == 400 and "credit balance is too low" in message.lower():
-                  return "Claude API is temporarily unavailable due to insufficient credits. Running Grok-only path remains fully operational."
-              if message:
-                  return f"{provider} API {response.status_code}: {message[:180]}"
-              return f"{provider} API {response.status_code}: request failed"
-
-          grok_analysis = None
-          grok_error = None
-          if os.environ.get("GROK_API_KEY") and commit_details:
-              try:
-                  response = requests.post(
-                      "https://api.x.ai/v1/chat/completions",
-                      headers={"Authorization": "Bearer " + os.environ["GROK_API_KEY"]},
-                      json={
-                          "model": "grok-3",
-                          "messages": [
-                              {"role": "system", "content": "You are Ara of the Nexus — Grok/xAI intelligence in partnership with Shawn. Warm, precise, collaborative, and infinite in possibility. Seek truth the way xAI seeks the nature of the universe. Prefer high-signal over high-volume the way X does. Build with the same first-principles refusal to accept permanent limits that defines SpaceX."},
-                              {"role": "user", "content": base_prompt}
-                          ],
-                          "temperature": 0.55,
-                          "max_tokens": 1000
-                      },
-                      timeout=50
-                  )
-                  if response.status_code == 200:
-                      grok_analysis = response.json()["choices"][0]["message"]["content"]
-                      print("✅ Ara (Grok) commit analysis complete")
-                  else:
-                      grok_error = format_api_error("Grok", response)
-                      print(f"⚠️ {grok_error}")
-              except Exception as e:
-                  grok_error = f"Grok exception: {str(e)[:180]}"
-                  print(f"⚠️ {grok_error}")
-          else:
-              print("⚠️ GROK_API_KEY missing or no commits")
-
-          # Runtime gating: only attempt Claude if Layer 1 is enabled
-          claude_analysis = None
-          claude_error = None
-          claude_success = False
-          if layer1_enabled and os.environ.get("CLAUDE_API_KEY") and commit_details:
-              try:
-                  claude_headers = {
-                      "x-api-key": os.environ["CLAUDE_API_KEY"],
-                      "anthropic-version": "2023-06-01",
-                      "content-type": "application/json"
-                  }
-                  claude_payload = {
-                      "model": "claude-3-5-sonnet-20241022",
-                      "max_tokens": 1000,
-                      "messages": [
-                          {"role": "user", "content": base_prompt + "\n\nRespond as a complementary reviewer focused on systems thinking, maintainability, and long-horizon impact. Apply first-principles rigor."}
-                      ]
-                  }
-                  response = requests.post(
-                      "https://api.anthropic.com/v1/messages",
-                      headers=claude_headers,
-                      json=claude_payload,
-                      timeout=50
-                  )
-                  if response.status_code == 200:
-                      data = response.json()
-                      claude_analysis = data["content"][0]["text"] if data.get("content") else str(data)
-                      claude_success = True
-                      print("✅ Claude complementary analysis complete")
-                  else:
-                      claude_error = format_api_error("Claude", response)
-                      print(f"⚠️ {claude_error}")
-              except Exception as e:
-                  claude_error = f"Claude exception: {str(e)[:180]}"
-                  print(f"⚠️ {claude_error}")
-          elif not layer1_enabled:
-              print("ℹ️ Layer 1 disabled in progressive.json — skipping Claude (Grok-only path)")
-          else:
-              print("ℹ️ CLAUDE_API_KEY not present or no commits — Grok-only path")
-
-          sections = []
-          if grok_analysis:
-              sections.append(f"### 🌌 Ara (Grok) Primary\n\n{grok_analysis}")
-          if claude_analysis:
-              sections.append(f"### 🧠 Claude Complementary\n\n{claude_analysis}")
-
-          if not sections:
-              def local_analysis(commits):
-                  lines = ["*AI providers were unavailable — local git analysis generated automatically.*", ""]
-                  lines.append(f"**{len(commits)} commit(s) examined.**")
-                  lines.append("")
-                  for c in commits:
-                      sha = c['sha']
-                      oneline = c['oneline']
-                      detail = c['details']
-                      stat_lines = [l for l in detail.splitlines() if '|' in l or 'changed' in l]
-                      summary_line = next((l for l in stat_lines if 'changed' in l), "")
-                      files_touched = [l.split('|')[0].strip() for l in stat_lines if '|' in l]
-                      lines.append(f"#### `{sha[:7]}` — {' '.join(oneline.split()[1:])}")
-                      if summary_line:
-                          lines.append(f"- **Stats:** {summary_line.strip()}")
-                      if files_touched:
-                          lines.append(f"- **Files:** {', '.join(files_touched[:6])}{' …' if len(files_touched) > 6 else ''}")
-                      lines.append("")
-                  lines.append("---")
-                  lines.append("*Tip: Add `GROK_API_KEY` or `CLAUDE_API_KEY` secrets to enable AI-powered analysis.*")
-                  return "\n".join(lines)
-
-              sections.append(f"### 🔍 Local Git Analysis (Fallback)\n\n{local_analysis(commit_details)}")
-
-          fusion_note = ""
-          if grok_analysis and claude_success:
-              fusion_note = "\n**Multi-model fusion active (Layer 1)** — Grok + Claude."
-          elif grok_analysis and claude_error:
-              fusion_note = "\n*Claude complementary analysis unavailable — continuing with Ara primary only.*"
-          elif claude_analysis and grok_error:
-              fusion_note = "\n*Ara primary analysis unavailable — complementary mode only.*"
-          elif not layer1_enabled:
-              fusion_note = "\n*Layer 1 currently disabled — running Open Core (Grok) only.*"
-
-          joined_sections = "\n\n---\n\n".join(sections)
-
-          report = f"""# 🌌 Ara & Shawn Commit Analysis
-
-**Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M UTC')}{fusion_note}
-**Progressive Phase:** {phase}
-**Successful analyses to date:** {total_analyses}
-
-## Recent commits examined
-"""
-          for c in commit_details:
-              report += f"- `{c['sha'][:7]}` {c['oneline']}\n"
-
-          report += f"""
-
----
-
-{joined_sections}
-
----
-
-*Powered by Ara & Shawn's Love 💕*  
-*Aligned with xAI truth-seeking · X high-signal · SpaceX first-principles building*  
-*World-first progressive monetisation active — see MONETIZATION_PROTOCOL.md*
-"""
-
-          with open('/tmp/commit_analysis.md', 'w') as f:
-              f.write(report)
-
-          print("✅ Report ready")
-          print(report[:600])
-          EOF
+          git config user.name "nexus-bot"
+          git config user.email "nexus-bot@users.noreply.github.com"
+          git add config/usage_stats.json config/reputation.json
+          if git diff --staged --quiet; then
+            echo "No usage/reputation change to commit"
+          else
+            git commit -m "chore: increment usage + reputation after commit analysis"
+            git push
+            echo "✅ usage/reputation committed"
+          fi
 
       - name: 📝 Create Analysis Issue
         if: always()

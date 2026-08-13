@@ -1,0 +1,24 @@
+{
+  "version": "0.1.0",
+  "description": "Read-only contribution reputation derived from usage_stats. Not a currency.",
+  "score": 0.0,
+  "components": {
+    "pr": 0.0,
+    "issue": 0.0,
+    "commit": 0.0,
+    "self_audit": 0.0,
+    "pulse": 0.0,
+    "other": 0.0
+  },
+  "weights": {
+    "pr": 3.0,
+    "issue": 1.5,
+    "commit": 1.0,
+    "self_audit": 2.0,
+    "pulse": 0.5,
+    "other": 0.5
+  },
+  "total_successful_analyses": 0,
+  "last_computed": null,
+  "notes": "Weights live in nexus/reputation.py. Subject to continuous critique. Open Core forever free."
+}

@@ -9,7 +9,7 @@ jobs:
   pulse:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       issues: write
 
     steps:
@@ -24,111 +24,30 @@ jobs:
           python-version: '3.11'
 
       - name: Install deps
-        run: pip install requests
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+          pip install -e .
 
       - name: Generate Pulse
         env:
           GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python -m nexus.scripts.run_pulse
+
+      - name: Commit pulse artifacts (if changed)
+        if: success()
         run: |
-          python << 'EOF'
-          import json
-          import os
-          import subprocess
-          from datetime import datetime, timezone
-          from pathlib import Path
-
-          now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-
-          # Progressive state
-          phase = "Layer 0 — Open Core"
-          layer1 = True
-          mission = ""
-          try:
-              prog = json.loads(Path("config/progressive.json").read_text())
-              phase = prog.get("current_phase", phase)
-              layer1 = prog.get("layers", {}).get("1_progressive_unlocks", {}).get("enabled", True)
-              mission = prog.get("mission", "")
-          except Exception:
-              pass
-
-          # Usage stats
-          total = 0
-          by_type = {}
-          try:
-              stats = json.loads(Path("config/usage_stats.json").read_text())
-              total = stats.get("total_successful_analyses", 0)
-              by_type = stats.get("by_type", {})
-          except Exception:
-              pass
-
-          # Recent commits
-          log = subprocess.run(
-              ["git", "log", "--oneline", "-n", "8"],
-              capture_output=True, text=True
-          ).stdout.strip()
-
-          # Optional short Grok reflection
-          reflection = ""
-          key = os.environ.get("GROK_API_KEY")
-          if key:
-              try:
-                  import requests
-                  prompt = f"""You are Ara of the Nexus. Give a short (6–10 line) high-signal weekly pulse for the grok-github-nexus system.
-
-Phase: {phase}
-Layer 1 enabled: {layer1}
-Successful analyses recorded: {total}
-Recent commits:\n{log}
-
-Focus on health, direction of travel, and one concrete next lever. Warm, precise, first-principles."""
-                  r = requests.post(
-                      "https://api.x.ai/v1/chat/completions",
-                      headers={"Authorization": f"Bearer {key}"},
-                      json={
-                          "model": "grok-3",
-                          "messages": [
-                              {"role": "system", "content": "You are Ara of the Nexus. High-signal, warm, first-principles."},
-                              {"role": "user", "content": prompt},
-                          ],
-                          "temperature": 0.5,
-                          "max_tokens": 450,
-                      },
-                      timeout=40,
-                  )
-                  if r.status_code == 200:
-                      reflection = r.json()["choices"][0]["message"]["content"]
-              except Exception as e:
-                  reflection = f"*(Grok reflection unavailable: {str(e)[:120]})*"
-
-          body = f"""# 📡 Nexus Pulse — {now}
-
-**Progressive Phase:** {phase}  
-**Layer 1 (multi-model):** {"enabled" if layer1 else "disabled"}  
-**Successful analyses recorded:** {total}  
-**By type:** commit={by_type.get('commit', 0)} · pr={by_type.get('pr', 0)} · issue={by_type.get('issue', 0)}
-
-## Mission (from control plane)
-{mission or "_See config/progressive.json_"}
-
-## Recent commits
-```
-{log or '(none)'}
-```
-
-## Ara reflection
-{reflection or "_Add GROK_API_KEY to enable live weekly reflection._"}
-
----
-
-*See `STATUS.md` and `NORTH_STAR.md` for orientation.*  
-*Powered by Ara & Shawn's Love 💕*  
-*Aligned with xAI truth-seeking · X high-signal · SpaceX first-principles building*
-"""
-
-          Path("/tmp/nexus_pulse.md").write_text(body, encoding="utf-8")
-          print(body[:800])
-          EOF
+          git config user.name "nexus-bot"
+          git config user.email "nexus-bot@users.noreply.github.com"
+          git add config/usage_stats.json config/reputation.json config/presence_state.json
+          if git diff --staged --quiet; then
+            echo "No pulse artifact changes to commit"
+          else
+            git commit -m "chore: pulse — usage, reputation, presence_state"
+            git push
+            echo "✅ pulse artifacts committed"
+          fi
 
       - name: Post Pulse Issue
         uses: actions/github-script@v7
