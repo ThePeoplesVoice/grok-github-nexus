@@ -1,6 +1,6 @@
 {
-  "version": "1.0.3",
-  "updated_at": "2026-08-14T08:25:00Z",
+  "version": "1.0.4",
+  "updated_at": "2026-08-14T10:55:00Z",
   "notes": "Ranked work queue. Human owns API key; agent owns architecture.",
   "done": [
     {
@@ -62,32 +62,37 @@
       "id": "key-setup-doc",
       "title": "docs/KEY_SETUP.md with ACL and secret checklist",
       "completed": "2026-08-14"
+    },
+    {
+      "id": "disable-grok-live-tools",
+      "title": "Prevent Grok 4.x live tool use (raw command output in issues) via search:false + system prompt guard",
+      "completed": "2026-08-14"
     }
   ],
   "next": [
     {
       "id": "verify-grok-key-and-dispatch",
-      "title": "Fix GROK_API_KEY (Incorrect API key per Self-Audit #36) then dispatch Self-Audit/Pulse",
+      "title": "Confirm GROK_API_KEY secret is set in GitHub then dispatch Self-Audit/Pulse",
       "priority": 1,
       "leverage": "high",
       "risk": "low",
-      "why": "Only remaining hard blocker. See docs/KEY_SETUP.md."
-    },
-    {
-      "id": "verify-health-on-ci",
-      "title": "Dispatch Health Check + Dev Cycle once for green baseline",
-      "priority": 2,
-      "leverage": "high",
-      "risk": "low",
-      "why": "No AI required; proves package install path on Actions."
+      "why": "API key must be set in GitHub Secrets. See docs/KEY_SETUP.md. Live-tool guard is now in code."
     },
     {
       "id": "cleanup-automated-issues",
       "title": "Bulk-close obsolete self-audit/commit-analysis issues from build phase",
-      "priority": 3,
+      "priority": 2,
       "leverage": "medium",
       "risk": "low",
       "why": "Signal density: dozens of failed-API issues clutter the tracker."
+    },
+    {
+      "id": "verify-health-on-ci",
+      "title": "Dispatch Health Check + Dev Cycle once for green baseline",
+      "priority": 3,
+      "leverage": "high",
+      "risk": "low",
+      "why": "No AI required; proves package install path on Actions."
     }
   ],
   "backlog": [

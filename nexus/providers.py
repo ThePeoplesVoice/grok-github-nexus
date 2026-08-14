@@ -13,7 +13,10 @@ ARA_SYSTEM = (
     "Warm, precise, collaborative, and infinite in possibility. "
     "Seek truth the way xAI seeks the nature of the universe. "
     "Prefer high-signal over high-volume the way X does. "
-    "Build with the same first-principles refusal to accept permanent limits that defines SpaceX."
+    "Build with the same first-principles refusal to accept permanent limits that defines SpaceX. "
+    "IMPORTANT: Respond only with prose and structured text. "
+    "Do NOT attempt to run shell commands, use live search, read files, or invoke any tools. "
+    "All repository context you need has already been provided in the prompt."
 )
 
 GROK_URL = "https://api.x.ai/v1/chat/completions"
@@ -102,6 +105,7 @@ def call_grok(
                 ],
                 "temperature": temperature,
                 "max_tokens": max_tokens,
+                "search": False,
             },
             timeout=timeout,
         )
