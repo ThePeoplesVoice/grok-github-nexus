@@ -7,13 +7,13 @@ on:
   push:
     paths:
       - 'nexus/**'
-      - 'config/**'
+      - 'config/progressive.json'
       - 'NORTH_STAR.md'
       - 'NEXUS_CONTEXT.md'
       - 'STATUS.md'
       - 'CHECKS_AND_BALANCES.md'
       - 'ORGANIC_SYSTEMS.md'
-      - '.github/workflows/**'
+      - 'AUTOMATED_DEVELOPMENT.md'
 
 jobs:
   self-audit:
@@ -43,12 +43,15 @@ jobs:
       - name: Run Self-Audit
         env:
           GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+          GROK_MODEL: ${{ vars.GROK_MODEL }}
           CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python -m nexus.scripts.run_self_audit
 
       - name: Commit usage + reputation artifacts (if changed)
         if: success()
+        continue-on-error: true
         run: |
           git config user.name "nexus-bot"
           git config user.email "nexus-bot@users.noreply.github.com"
@@ -56,9 +59,8 @@ jobs:
           if git diff --staged --quiet; then
             echo "No artifact changes to commit"
           else
-            git commit -m "chore: usage + reputation after self-audit"
-            git push
-            echo "✅ artifacts committed"
+            git commit -m "chore: usage + reputation after self-audit" || true
+            git push || echo "⚠️ push failed (non-fatal)"
           fi
 
       - name: Post Self-Audit Issue

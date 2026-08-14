@@ -18,23 +18,40 @@ ARA_SYSTEM = (
 
 GROK_URL = "https://api.x.ai/v1/chat/completions"
 CLAUDE_URL = "https://api.anthropic.com/v1/messages"
-GROK_MODEL = "grok-3"
-CLAUDE_MODEL = "claude-3-5-sonnet-20241022"
+
+# grok-3 was retired 2026-05-15. Default to current frontier; override with GROK_MODEL.
+DEFAULT_GROK_MODEL = "grok-4.6"
+DEFAULT_CLAUDE_MODEL = "claude-sonnet-4-20250514"
+
+
+def _grok_model() -> str:
+    return (os.environ.get("GROK_MODEL") or DEFAULT_GROK_MODEL).strip()
+
+
+def _claude_model() -> str:
+    return (os.environ.get("CLAUDE_MODEL") or DEFAULT_CLAUDE_MODEL).strip()
 
 
 def format_api_error(provider: str, response: requests.Response) -> str:
     """Turn provider error payloads into short, human-readable messages."""
     message = ""
+    raw_snippet = ""
     try:
         payload = response.json()
         if isinstance(payload, dict):
             err = payload.get("error")
             if isinstance(err, dict):
-                message = err.get("message") or err.get("type") or ""
+                message = err.get("message") or err.get("type") or err.get("code") or ""
+            elif isinstance(err, str):
+                message = err
             else:
                 message = payload.get("message") or ""
+            if not message:
+                raw_snippet = str(payload)[:200]
+        else:
+            raw_snippet = str(payload)[:200]
     except Exception:
-        pass
+        raw_snippet = (response.text or "")[:200]
 
     message = " ".join(str(message).split())
     if (
@@ -47,8 +64,10 @@ def format_api_error(provider: str, response: requests.Response) -> str:
             "Running Grok-only path remains fully operational."
         )
     if message:
-        return f"{provider} API {response.status_code}: {message[:180]}"
-    return f"{provider} API {response.status_code}: request failed"
+        return f"{provider} API {response.status_code}: {message[:220]}"
+    if raw_snippet:
+        return f"{provider} API {response.status_code}: {raw_snippet}"
+    return f"{provider} API {response.status_code}: request failed (empty body)"
 
 
 def call_grok(
@@ -57,20 +76,26 @@ def call_grok(
     system: str = ARA_SYSTEM,
     temperature: float = 0.55,
     max_tokens: int = 1000,
-    timeout: int = 50,
+    timeout: int = 90,
     api_key: str | None = None,
+    model: str | None = None,
 ) -> tuple[str | None, str | None]:
     """Call Grok. Returns (analysis_text, error_message)."""
-    key = api_key or os.environ.get("GROK_API_KEY")
+    key = api_key or os.environ.get("GROK_API_KEY") or os.environ.get("XAI_API_KEY")
     if not key:
-        return None, "GROK_API_KEY missing"
+        return None, "GROK_API_KEY (or XAI_API_KEY) missing"
+
+    model_name = (model or _grok_model()).strip()
 
     try:
         response = requests.post(
             GROK_URL,
-            headers={"Authorization": f"Bearer {key}"},
+            headers={
+                "Authorization": f"Bearer {key}",
+                "Content-Type": "application/json",
+            },
             json={
-                "model": GROK_MODEL,
+                "model": model_name,
                 "messages": [
                     {"role": "system", "content": system},
                     {"role": "user", "content": user_content},
@@ -84,7 +109,7 @@ def call_grok(
             data = response.json()
             text = data["choices"][0]["message"]["content"]
             return text, None
-        return None, format_api_error("Grok", response)
+        return None, format_api_error("Grok", response) + f" [model={model_name}]"
     except Exception as e:
         return None, f"Grok exception: {str(e)[:180]}"
 
@@ -92,15 +117,18 @@ def call_grok(
 def call_claude(
     user_content: str,
     *,
-    temperature: float | None = None,  # Claude Messages API uses top-level max_tokens mainly
+    temperature: float | None = None,
     max_tokens: int = 1000,
-    timeout: int = 50,
+    timeout: int = 90,
     api_key: str | None = None,
+    model: str | None = None,
 ) -> tuple[str | None, str | None]:
     """Call Claude. Returns (analysis_text, error_message)."""
     key = api_key or os.environ.get("CLAUDE_API_KEY")
     if not key:
         return None, "CLAUDE_API_KEY missing"
+
+    model_name = (model or _claude_model()).strip()
 
     try:
         headers = {
@@ -109,7 +137,7 @@ def call_claude(
             "content-type": "application/json",
         }
         payload: dict[str, Any] = {
-            "model": CLAUDE_MODEL,
+            "model": model_name,
             "max_tokens": max_tokens,
             "messages": [{"role": "user", "content": user_content}],
         }
@@ -122,6 +150,6 @@ def call_claude(
             if content and isinstance(content, list):
                 return content[0].get("text", str(data)), None
             return str(data), None
-        return None, format_api_error("Claude", response)
+        return None, format_api_error("Claude", response) + f" [model={model_name}]"
     except Exception as e:
         return None, f"Claude exception: {str(e)[:180]}"

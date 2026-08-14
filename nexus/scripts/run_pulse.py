@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 """Enhanced Nexus Presence Pulse.
 
-Weekly (or on-demand) high-signal digest that also:
-- Refreshes reputation + public badge
-- Writes compressed presence_state
-- Increments usage as type 'pulse' on successful Grok reflection
+Always produces a pulse report + presence_state, even when Grok is unavailable.
+Increments usage only on successful Grok reflection.
 """
 
 from __future__ import annotations
@@ -17,9 +15,8 @@ from nexus.analyze import footer_block, utc_now_str
 from nexus.context import load_progressive, layer1_enabled, current_phase
 from nexus.providers import call_grok
 from nexus.usage import load_usage_stats
-from nexus.reputation import reputation_summary_md
+from nexus.reputation import reputation_summary_md, refresh_reputation
 from nexus.runtime import after_successful_analysis, log_success
-from nexus.reputation import refresh_reputation
 
 ROOT = Path(__file__).resolve().parent.parent
 PRESENCE_PATH = ROOT / "config" / "presence_state.json"
@@ -35,9 +32,13 @@ def main() -> None:
 
     stats = load_usage_stats()
     total = int(stats.get("total_successful_analyses", 0))
-    by_type = stats.get("by_type") or {}
+    by_type = dict(stats.get("by_type") or {})
 
-    rep = refresh_reputation(persist=True)
+    try:
+        rep = refresh_reputation(persist=True)
+    except Exception as e:
+        print(f"⚠️ reputation refresh failed: {e}")
+        rep = {"score": 0, "raw_score": 0, "freshness": "unknown"}
     rep_md = reputation_summary_md(rep)
 
     log = subprocess.run(
@@ -86,10 +87,10 @@ Focus on health, direction of travel, and one concrete next lever. Warm, precise
             total = int(result.get("total", total + 1))
             rep = result["reputation"]
             rep_md = reputation_summary_md(rep)
+            by_type = dict(result["stats"].get("by_type") or by_type)
             log_success(result, "pulse")
-            # Refresh presence totals after pulse increment
             presence["total_successful_analyses"] = total
-            presence["by_type"] = result["stats"].get("by_type", by_type)
+            presence["by_type"] = by_type
             presence["reputation_score"] = rep.get("score", 0)
             presence["reputation_raw"] = rep.get("raw_score", 0)
             presence["reputation_freshness"] = rep.get("freshness", "unknown")
@@ -100,7 +101,11 @@ Focus on health, direction of travel, and one concrete next lever. Warm, precise
         except Exception as e:
             print(f"⚠️ Could not persist pulse usage: {e}")
     else:
-        reflection = f"_Grok reflection unavailable: {err or 'no response'}_"
+        reflection = (
+            f"_Grok reflection unavailable: {err or 'no response'}_\n\n"
+            "_Pulse still recorded structural state + presence_state for continuity._"
+        )
+        print(f"⚠️ Grok unavailable: {err}")
 
     now = utc_now_str()
     body = f"""# 📡 Nexus Pulse — {now}

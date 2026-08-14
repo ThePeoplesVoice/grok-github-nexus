@@ -1,6 +1,6 @@
 # 📡 Nexus Status
 
-**Last updated:** 2026-08-14 (automated development process live)
+**Last updated:** 2026-08-14 (Grok model migration grok-3 → grok-4.6)
 
 ![Reputation](https://img.shields.io/badge/nexus_reputation-0-blue)
 
@@ -8,47 +8,30 @@
 
 ## Current Phase
 
-**Layer 0 + Layer 1** · progressive **v1.5.0** · package **v0.7.0**
+**Layer 0 + Layer 1** · progressive **v1.5.1** · package **v0.7.0** (+ provider fix)
 
 | System | Status |
 |--------|--------|
-| Analysis runners (PR/Issue/Commit/Audit/Pulse) | Package path + usage + reputation + presence |
-| Automated development process | **Live** (`AUTOMATED_DEVELOPMENT.md` + dev cycle) |
-| Dev queue | `config/dev_queue.json` |
-| Field notes | `config/field_notes.jsonl` |
-| Health check | Live |
-| Reputation + decay + badge sync | Live |
+| Analysis runners | Package path + usage + reputation + presence |
+| Grok model | **`grok-4.6`** (was retired `grok-3` — caused API 400) |
+| Automated development process | Live |
+| Health / Dev cycle / Pulse / Self-audit | Live workflows |
 | Open Core | Forever free |
 
----
+### Diagnosis (2026-08-14)
 
-## Cadence
+Live runs showed **Grok API 400** on every self-audit and commit analyzer falling back to local git. Root cause: **`grok-3` retired 15 May 2026**. Provider now defaults to **`grok-4.6`**, accepts `GROK_MODEL` / `XAI_API_KEY` overrides, and surfaces richer error bodies.
 
-| Workflow | Schedule (UTC) |
-|----------|----------------|
-| Health check | Mon 05:00 + dispatch |
-| Dev cycle | Mon 07:00 + dispatch |
-| Pulse | Mon 08:00 + dispatch |
-| Self-audit | Wed 09:00 + dispatch |
-| Commit analyzer | on push (non-bot) + Mon 06:00 |
+Usage counters remain **0** until a successful provider call lands after this fix.
 
 ---
 
-## Top of queue (see `config/dev_queue.json`)
+## What still needs a human
 
-1. Accumulate real provider usage so organic scores leave zero  
-2. Keep feeding dev_queue into self-audit (now wired)  
-3. Field notes on every dev cycle (now wired)  
-4. Presence/reputation freshness in health check (now wired)
-
----
-
-## Known Gaps
-
-1. Live analysis counts still near zero until secrets-backed runs succeed  
-2. Reputation still usage-only (no merged-PR graph)  
-3. Layer 2 / 3 designed, not activated  
-4. Actions trigger tools may be unavailable from some agent sessions — use GitHub UI dispatch
+1. Confirm repo secret **`GROK_API_KEY`** (or **`XAI_API_KEY`**) is a valid xAI key  
+2. Dispatch **Nexus Pulse** or **Self-Audit** once and confirm the issue body is real analysis (not API 400)  
+3. Dispatch **Health Check** + **Dev Cycle** once for a green baseline  
+4. Optional: set repo variable `GROK_MODEL` if you prefer `grok-4.3` (cheaper) over `grok-4.6`
 
 ---
 

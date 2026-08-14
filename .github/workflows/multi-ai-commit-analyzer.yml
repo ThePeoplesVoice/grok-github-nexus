@@ -38,12 +38,15 @@ jobs:
       - name: 🌌 Ara + Claude Commit Analysis
         env:
           GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+          GROK_MODEL: ${{ vars.GROK_MODEL }}
           CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python -m nexus.scripts.run_commit_analysis
 
       - name: Commit usage + reputation artifacts (if changed)
         if: success()
+        continue-on-error: true
         run: |
           git config user.name "nexus-bot"
           git config user.email "nexus-bot@users.noreply.github.com"
@@ -51,9 +54,8 @@ jobs:
           if git diff --staged --quiet; then
             echo "No artifact changes to commit"
           else
-            git commit -m "chore: usage + reputation after commit analysis"
-            git push
-            echo "✅ artifacts committed"
+            git commit -m "chore: usage + reputation after commit analysis" || true
+            git push || echo "⚠️ push failed (non-fatal)"
           fi
 
       - name: 📝 Create Analysis Issue

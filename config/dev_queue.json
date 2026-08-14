@@ -1,7 +1,7 @@
 {
-  "version": "1.0.1",
-  "updated_at": "2026-08-14T00:20:00Z",
-  "notes": "Ranked work queue for the automated development process. Agents and humans pull from top of next[].",
+  "version": "1.0.2",
+  "updated_at": "2026-08-14T04:10:00Z",
+  "notes": "Ranked work queue for the automated development process.",
   "done": [
     {
       "id": "usage-write-path",
@@ -35,36 +35,41 @@
     },
     {
       "id": "consume-dev-queue-in-audit",
-      "title": "Feed dev_queue into self-audit prompt for continuity of work",
+      "title": "Feed dev_queue into self-audit prompt",
       "completed": "2026-08-14"
     },
     {
       "id": "field-notes-from-cycles",
-      "title": "Append a field note on every successful dev cycle",
+      "title": "Append field note on every successful dev cycle",
       "completed": "2026-08-14"
     },
     {
       "id": "presence-in-health-report",
-      "title": "Surface presence age and reputation freshness in health check",
+      "title": "Surface presence + reputation freshness in health check",
+      "completed": "2026-08-14"
+    },
+    {
+      "id": "fix-retired-grok-3",
+      "title": "Migrate default Grok model from retired grok-3 to grok-4.6",
       "completed": "2026-08-14"
     }
   ],
   "next": [
     {
-      "id": "accumulate-real-usage",
-      "title": "Run live provider analyses so usage/reputation leave zero",
+      "id": "verify-grok-key-and-dispatch",
+      "title": "Confirm GROK_API_KEY/XAI_API_KEY and dispatch Pulse + Self-Audit",
       "priority": 1,
       "leverage": "high",
       "risk": "low",
-      "why": "Organic scores and Layer-1 unlock triggers are inert until real runs succeed. Dispatch Pulse, Self-Audit, or Commit Analyzer from GitHub Actions UI with GROK_API_KEY set."
+      "why": "Model fixed; need one successful provider call to prove the stack and move usage off zero."
     },
     {
       "id": "verify-health-on-ci",
-      "title": "Confirm health-check + dev-cycle workflows succeed on GitHub Actions",
+      "title": "Dispatch Health Check + Dev Cycle once for green baseline",
       "priority": 2,
       "leverage": "high",
       "risk": "low",
-      "why": "Code is in-repo; first green runs prove the automated cadence."
+      "why": "No runs yet on these workflows."
     }
   ],
   "backlog": [
@@ -75,12 +80,12 @@
     },
     {
       "id": "x402-readiness-spike",
-      "title": "Spike Layer-2 x402 integration when infra is real",
+      "title": "Spike Layer-2 x402 when infra is real",
       "why": "Do not activate theatre payments."
     },
     {
       "id": "sanctuary-credit-design",
-      "title": "Deepen sanctuary-tied credit design only after measurement demand",
+      "title": "Deepen sanctuary-tied credit design after measurement demand",
       "why": "Conceptual until land/work linkage is concrete."
     }
   ]

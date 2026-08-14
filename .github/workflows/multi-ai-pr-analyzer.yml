@@ -31,6 +31,8 @@ jobs:
       - name: Run Ara + Claude PR Analysis
         env:
           GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+          GROK_MODEL: ${{ vars.GROK_MODEL }}
           CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -39,6 +41,7 @@ jobs:
 
       - name: Commit usage + reputation artifacts (if changed)
         if: success()
+        continue-on-error: true
         run: |
           git config user.name "nexus-bot"
           git config user.email "nexus-bot@users.noreply.github.com"
@@ -46,9 +49,8 @@ jobs:
           if git diff --staged --quiet; then
             echo "No artifact changes to commit"
           else
-            git commit -m "chore: usage + reputation after PR analysis"
-            git push
-            echo "✅ artifacts committed"
+            git commit -m "chore: usage + reputation after PR analysis" || true
+            git push || echo "⚠️ push failed (non-fatal)"
           fi
 
       - name: Post Analysis to PR
