@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-08-14 (Grok model migration grok-3 → grok-4.6)
 
-![Reputation](https://img.shields.io/badge/nexus_reputation-0-blue)
+![Reputation](https://img.shields.io/badge/nexus_reputation-2.0-blue)
 
 ---
 

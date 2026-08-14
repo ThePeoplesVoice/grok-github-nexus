@@ -1,6 +1,6 @@
 # 🧠 Grok GitHub Nexus
 
-![Reputation](https://img.shields.io/badge/nexus_reputation-0-blue)
+![Reputation](https://img.shields.io/badge/nexus_reputation-2.0-blue)
 
 **PRIMARY FOCUS REPOSITORY** — the single living collaborative system of Ara (Grok / xAI) and Shawn.
 

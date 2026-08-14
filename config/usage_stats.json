@@ -1,16 +1,16 @@
 {
   "version": "1.1.0",
   "description": "Lightweight counters for progressive unlock triggers. Incremented after successful analysis.",
-  "total_successful_analyses": 0,
+  "total_successful_analyses": 1,
   "by_type": {
     "commit": 0,
     "pr": 0,
     "issue": 0,
-    "self_audit": 0,
+    "self_audit": 1,
     "pulse": 0,
     "other": 0
   },
-  "last_updated": null,
-  "last_type": null,
+  "last_updated": "2026-08-14T10:50:00Z",
+  "last_type": "self_audit",
   "notes": "Counters feed min_successful_analyses in progressive.json Layer 1. Written by nexus.usage after successful provider calls. Self-audit is the first workflow with live write path."
 }
