@@ -1,0 +1,63 @@
+name: 🔄 Nexus Dev Cycle
+
+on:
+  schedule:
+    - cron: '0 7 * * 1'   # Monday 07:00 UTC — between health and pulse
+  workflow_dispatch:
+
+jobs:
+  dev-cycle:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 15
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+          pip install -e .
+
+      - name: Run automated development cycle
+        run: python -m nexus.scripts.run_dev_cycle
+
+      - name: Commit queue + field notes (if changed)
+        if: success()
+        run: |
+          git config user.name "nexus-bot"
+          git config user.email "nexus-bot@users.noreply.github.com"
+          git add config/dev_queue.json config/field_notes.jsonl || true
+          if git diff --staged --quiet; then
+            echo "No dev-cycle artifacts to commit"
+          else
+            git commit -m "chore: automated dev cycle — queue + field notes"
+            git push
+            echo "✅ dev cycle artifacts committed"
+          fi
+
+      - name: Post Dev Cycle Issue
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('/tmp/nexus_dev_cycle.md', 'utf8');
+            const title = `🔄 Dev Cycle — ${new Date().toISOString().slice(0, 10)}`;
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['nexus-dev-cycle', 'automated']
+            });
+            console.log('✅ Dev cycle issue created');

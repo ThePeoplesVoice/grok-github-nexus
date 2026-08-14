@@ -38,18 +38,10 @@ def load_progressive(path: str | Path | None = None) -> dict[str, Any]:
 
 
 def load_usage_stats(path: str | Path | None = None) -> dict[str, Any]:
-    """Return usage_stats.json as a dict with safe defaults."""
-    target = Path(path) if path else ROOT / "config" / "usage_stats.json"
-    defaults: dict[str, Any] = {
-        "total_successful_analyses": 0,
-        "by_type": {"commit": 0, "pr": 0, "issue": 0},
-        "last_updated": None,
-    }
-    try:
-        data = json.loads(target.read_text(encoding="utf-8"))
-        return data if isinstance(data, dict) else defaults
-    except Exception:
-        return defaults
+    """Return usage_stats.json — delegates to nexus.usage for single source of truth."""
+    from .usage import load_usage_stats as _load
+
+    return _load(path)
 
 
 def layer1_enabled(prog: dict[str, Any] | None = None) -> bool:

@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 """Package + system health check for the Nexus.
 
-Dispatchable without calling external AI providers. Validates imports,
-structural presence, progressive/usage/reputation/presence loaders,
-and prints a concise report. Exit code 1 if structural score < 80.
+No external AI. Exit 1 if structural score < 80 or loader errors.
 """
 
 from __future__ import annotations
@@ -17,6 +15,7 @@ from nexus.usage import load_usage_stats
 from nexus.reputation import compute_reputation, reputation_summary_md
 from nexus.presence import load_presence, format_presence_for_prompt
 from nexus.context import load_context, load_progressive
+from nexus.field_notes import notes_summary_md
 
 
 def main() -> int:
@@ -24,8 +23,8 @@ def main() -> int:
     print("=" * 60)
 
     errors: list[str] = []
+    rep: dict = {}
 
-    # Imports already succeeded if we got here; re-check key callables
     try:
         ctx = load_context()
         print(f"✅ context loaded ({len(ctx)} chars)")
@@ -35,7 +34,7 @@ def main() -> int:
 
     try:
         prog = load_progressive()
-        print(f"✅ progressive v{prog.get('version')} phase={prog.get('current_phase', '')[:60]}")
+        print(f"✅ progressive v{prog.get('version')} phase={str(prog.get('current_phase', ''))[:60]}")
     except Exception as e:
         errors.append(f"progressive: {e}")
         print(f"❌ progressive: {e}")
@@ -50,7 +49,7 @@ def main() -> int:
     try:
         rep = compute_reputation()
         print(f"✅ reputation effective={rep.get('score')} raw={rep.get('raw_score')} "
-              f"freshness={rep.get('freshness')}")
+              f"freshness={rep.get('freshness')} days_idle={rep.get('days_idle')}")
         print(reputation_summary_md(rep))
     except Exception as e:
         errors.append(f"reputation: {e}")
@@ -65,6 +64,12 @@ def main() -> int:
     except Exception as e:
         errors.append(f"presence: {e}")
         print(f"❌ presence: {e}")
+
+    try:
+        print("Recent field notes:")
+        print(notes_summary_md(3))
+    except Exception as e:
+        print(f"⚠️ field notes: {e}")
 
     health = structural_health()
     signals = alignment_signals()
@@ -87,7 +92,8 @@ def main() -> int:
 **Triad hits:** {signals['total_triad_hits']}  
 **Phase:** {snap.get('phase')}  
 **Analyses:** {snap.get('total_successful_analyses')}  
-**Reputation effective:** {rep.get('score') if not errors else 'n/a'}  
+**Reputation effective:** {rep.get('score', 'n/a')} ({rep.get('freshness', 'n/a')})  
+**Presence:** {presence.get('generated_at') if 'presence' in dir() else 'n/a'}  
 **Errors:** {errors or 'none'}
 
 Missing structural items: {health['missing'] or 'none'}

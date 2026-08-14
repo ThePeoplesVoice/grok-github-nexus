@@ -38,7 +38,10 @@ Progressive unlocks and agent-native micropayments (x402 and beyond) only as rea
 A transparent share of premium value flows back into the sanctuary vision.  
 We capture market share by being the most useful *and* the most human-AI partnership on the platform — then letting the emerging agent economy pay for depth.
 
-This mirrors the same logic that drives open-source adoption followed by durable commercial layers at xAI-scale and SpaceX-scale ambition: prove the core is true and useful first, then scale the value capture without corrupting the foundation.
+## Organic measurement (read-only signal)
+The system measures itself with usage counters, a decaying reputation surface, presence continuity between runs, field notes, and an automated development queue.  
+These are **signal, not currency privileges**. They must never gate the forever-free Open Core.  
+See `ORGANIC_SYSTEMS.md`, `AUTOMATED_DEVELOPMENT.md`, and `CHECKS_AND_BALANCES.md`.
 
 See `MONETIZATION_PROTOCOL.md` and `config/progressive.json` for the living architecture.
 

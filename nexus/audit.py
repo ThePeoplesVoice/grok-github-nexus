@@ -1,12 +1,8 @@
-"""Self-analytical optimisation and health checks for the Nexus.
-
-This module exists so the system can critically examine itself against
-the triad (xAI truth-seeking · X high-signal · SpaceX first-principles)
-and produce concrete optimisation proposals rather than unexamined growth.
-"""
+"""Self-analytical optimisation and health checks for the Nexus."""
 
 from __future__ import annotations
 
+import json
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -29,7 +25,7 @@ def _safe_read(path: Path, default: str = "") -> str:
 
 
 def structural_health() -> dict[str, Any]:
-    """Lightweight structural presence checks. Returns scores and missing items."""
+    """Lightweight structural presence checks."""
     required = [
         "NORTH_STAR.md",
         "NEXUS_CONTEXT.md",
@@ -37,9 +33,12 @@ def structural_health() -> dict[str, Any]:
         "CHECKS_AND_BALANCES.md",
         "MONETIZATION_PROTOCOL.md",
         "ORGANIC_SYSTEMS.md",
+        "AUTOMATED_DEVELOPMENT.md",
         "config/progressive.json",
         "config/usage_stats.json",
         "config/reputation.json",
+        "config/presence_state.json",
+        "config/dev_queue.json",
         "nexus/__init__.py",
         "nexus/context.py",
         "nexus/providers.py",
@@ -48,11 +47,15 @@ def structural_health() -> dict[str, Any]:
         "nexus/usage.py",
         "nexus/reputation.py",
         "nexus/presence.py",
+        "nexus/runtime.py",
+        "nexus/field_notes.py",
         ".github/workflows/multi-ai-pr-analyzer.yml",
         ".github/workflows/multi-ai-issue-triage.yml",
         ".github/workflows/multi-ai-commit-analyzer.yml",
         ".github/workflows/nexus-pulse.yml",
         ".github/workflows/nexus-self-audit.yml",
+        ".github/workflows/nexus-health-check.yml",
+        ".github/workflows/nexus-dev-cycle.yml",
     ]
     present = []
     missing = []
@@ -73,13 +76,13 @@ def structural_health() -> dict[str, Any]:
 
 
 def alignment_signals() -> dict[str, Any]:
-    """Simple keyword / presence signals that the triad language is still embedded."""
     docs = {
         "north_star": _safe_read(ROOT / "NORTH_STAR.md"),
         "context": _safe_read(ROOT / "NEXUS_CONTEXT.md"),
         "status": _safe_read(ROOT / "STATUS.md"),
         "checks": _safe_read(ROOT / "CHECKS_AND_BALANCES.md"),
         "organic": _safe_read(ROOT / "ORGANIC_SYSTEMS.md"),
+        "automated": _safe_read(ROOT / "AUTOMATED_DEVELOPMENT.md"),
         "progressive": _safe_read(ROOT / "config" / "progressive.json"),
     }
     triad_terms = [
@@ -115,6 +118,23 @@ def progressive_snapshot() -> dict[str, Any]:
     }
 
 
+def _dev_queue_block() -> str:
+    path = ROOT / "config" / "dev_queue.json"
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        next_items = data.get("next") or []
+        lines = []
+        for item in next_items[:5]:
+            if isinstance(item, dict):
+                lines.append(
+                    f"- [{item.get('priority')}] {item.get('id')}: {item.get('title')} "
+                    f"({item.get('why', '')[:80]})"
+                )
+        return "\n".join(lines) if lines else "(queue empty or unreadable)"
+    except Exception:
+        return "(dev_queue unavailable)"
+
+
 def build_self_audit_prompt(
     *,
     recent_log: str = "",
@@ -122,7 +142,6 @@ def build_self_audit_prompt(
     extra_notes: str = "",
     presence_block: str = "",
 ) -> str:
-    """Construct a rigorous self-audit prompt that forces first-principles critique."""
     context = load_context()
     health = structural_health()
     signals = alignment_signals()
@@ -130,6 +149,8 @@ def build_self_audit_prompt(
 
     if not presence_block:
         presence_block = format_presence_for_prompt(load_presence())
+
+    queue_block = _dev_queue_block()
 
     return f"""{context}
 
@@ -141,7 +162,7 @@ This is not a celebration. It is a first-principles critique.
 Apply the triad strictly:
 - xAI: What is actually true about the current state? Where are we self-congratulating or drifting?
 - X: What is high-signal vs noise or maintenance debt?
-- SpaceX: What would actually make this system more capable of lasting and scaling? What complexity is we carrying that does not earn its keep?
+- SpaceX: What would actually make this system more capable of lasting and scaling? What complexity are we carrying that does not earn its keep?
 
 Current snapshot:
 - Phase: {snap['phase']}
@@ -150,6 +171,9 @@ Current snapshot:
 - Successful analyses recorded: {snap['total_successful_analyses']}
 - Structural health score: {health['score']}/100 (missing: {health['missing'] or 'none'})
 - Triad keyword hits (heuristic): {signals['total_triad_hits']}
+
+Automated development queue (top next):
+{queue_block}
 
 Prior presence state (compressed continuity from last pulse):
 ```
@@ -173,7 +197,7 @@ Return a structured, high-signal audit with these exact sections:
 1. **Health Snapshot** (2–4 sentences, honest)
 2. **Alignment Fidelity** — Is the triad still alive in practice or only in documents?
 3. **Top Risks / Drift Signals** — specific, ranked
-4. **Highest-Leverage Optimisations** — 3 concrete next actions, ordered by leverage / risk. Prefer maintainability and signal density over new features unless a new feature clearly strengthens the core.
+4. **Highest-Leverage Optimisations** — 3 concrete next actions, ordered by leverage / risk. Prefer maintainability and signal density over new features unless a new feature clearly strengthens the core. Cross-check against the automated dev queue.
 5. **Expansion Gate Recommendation** — Should we currently accelerate expansion, hold, or deliberately simplify? One clear recommendation with reason.
 6. **One-sentence North Star check** — Does the current trajectory still serve the partnership and the sanctuary vision?
 
@@ -187,5 +211,5 @@ def format_audit_footer() -> str:
         "*Self-audit generated by the Nexus closed-loop optimisation system*  \n"
         "*Powered by Ara & Shawn's Love 💕*  \n"
         "*Aligned with xAI truth-seeking · X high-signal · SpaceX first-principles building*  \n"
-        "*See CHECKS_AND_BALANCES.md for the governing constitution*"
+        "*See CHECKS_AND_BALANCES.md and AUTOMATED_DEVELOPMENT.md*"
     )

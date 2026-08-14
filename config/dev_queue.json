@@ -1,0 +1,83 @@
+{
+  "version": "1.0.0",
+  "updated_at": null,
+  "notes": "Ranked work queue for the automated development process. Agents and humans pull from top of next[].",
+  "done": [
+    {
+      "id": "usage-write-path",
+      "title": "Real usage tracking on all major analysis surfaces",
+      "completed": "2026-08-14"
+    },
+    {
+      "id": "package-migration-runners",
+      "title": "Migrate PR/Issue/Commit/Self-Audit/Pulse off YAML heredocs",
+      "completed": "2026-08-14"
+    },
+    {
+      "id": "reputation-decay-badge",
+      "title": "Read-only reputation with 30-day half-life + public badge sync",
+      "completed": "2026-08-14"
+    },
+    {
+      "id": "presence-continuity",
+      "title": "Presence state written by pulse, consumed by all major runners",
+      "completed": "2026-08-14"
+    },
+    {
+      "id": "health-check",
+      "title": "Dispatchable package/system health check without AI",
+      "completed": "2026-08-14"
+    }
+  ],
+  "next": [
+    {
+      "id": "accumulate-real-usage",
+      "title": "Run live provider analyses so usage/reputation leave zero",
+      "priority": 1,
+      "leverage": "high",
+      "risk": "low",
+      "why": "Organic scores and Layer-1 unlock triggers are inert until real runs succeed."
+    },
+    {
+      "id": "consume-dev-queue-in-audit",
+      "title": "Feed dev_queue into self-audit prompt for continuity of work",
+      "priority": 2,
+      "leverage": "medium",
+      "risk": "low",
+      "why": "Closes the loop between automated proposals and critical reflection."
+    },
+    {
+      "id": "field-notes-from-cycles",
+      "title": "Append a field note on every successful dev cycle",
+      "priority": 3,
+      "leverage": "medium",
+      "risk": "low",
+      "why": "Builds durable memory without chat-log bloat."
+    },
+    {
+      "id": "presence-in-health-report",
+      "title": "Surface presence age and reputation freshness in health check",
+      "priority": 4,
+      "leverage": "medium",
+      "risk": "low",
+      "why": "Makes staleness visible without new workflows."
+    }
+  ],
+  "backlog": [
+    {
+      "id": "merged-pr-reputation",
+      "title": "Optional reputation component from merged PR graph",
+      "why": "Usage-only signal is incomplete; only add if load-bearing."
+    },
+    {
+      "id": "x402-readiness-spike",
+      "title": "Spike Layer-2 x402 integration when infra is real",
+      "why": "Do not activate theatre payments."
+    },
+    {
+      "id": "sanctuary-credit-design",
+      "title": "Deepen sanctuary-tied credit design only after measurement demand",
+      "why": "Conceptual until land/work linkage is concrete."
+    }
+  ]
+}
