@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "generated_at": "2026-08-14 12:25 UTC",
+  "phase": "Layer 0 + Layer 1 live — automated development process + organic measurement stack (v1.5.1)",
+  "layer1_enabled": true,
+  "total_successful_analyses": 3,
+  "by_type": {
+    "commit": 2,
+    "pr": 0,
+    "issue": 0,
+    "self_audit": 1,
+    "pulse": 0,
+    "other": 0
+  },
+  "reputation_score": 4.0,
+  "reputation_raw": 4.0,
+  "reputation_freshness": "fresh",
+  "recent_commits_preview": [
+    "277f2e8 Apply remaining changes",
+    "437491d chore: usage + reputation after commit analysis"
+  ],
+  "notes": "Compressed context for continuity. Not a chat log. See ORGANIC_SYSTEMS.md."
+}
