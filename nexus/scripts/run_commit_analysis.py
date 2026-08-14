@@ -18,6 +18,11 @@ from nexus.presence import load_presence, format_presence_for_prompt
 from nexus.runtime import after_successful_analysis, log_success
 
 
+def commit_subject(oneline: str) -> str:
+    parts = oneline.split(maxsplit=1)
+    return parts[1] if len(parts) == 2 else oneline
+
+
 def gather_commits(n: int = 5) -> list[dict[str, Any]]:
     result = subprocess.run(
         ["git", "log", "--oneline", "-n", str(n)],
@@ -53,7 +58,7 @@ def local_analysis(commits: list[dict[str, Any]]) -> str:
         stat_lines = [l for l in detail.splitlines() if "|" in l or "changed" in l]
         summary_line = next((l for l in stat_lines if "changed" in l), "")
         files_touched = [l.split("|")[0].strip() for l in stat_lines if "|" in l]
-        lines.append(f"#### `{sha[:7]}` — {' '.join(oneline.split()[1:])}")
+        lines.append(f"#### `{sha[:7]}` — {commit_subject(oneline)}")
         if summary_line:
             lines.append(f"- **Stats:** {summary_line.strip()}")
         if files_touched:
@@ -144,7 +149,7 @@ def main() -> None:
     )
 
     commit_list = "\n".join(
-        f"- `{c['sha'][:7]}` {c['oneline']}" for c in commit_details
+        f"- `{c['sha'][:7]}` {commit_subject(c['oneline'])}" for c in commit_details
     ) or "- (none)"
 
     joined = "\n\n---\n\n".join(sections)

@@ -68,14 +68,32 @@ jobs:
             try {
               const body = fs.readFileSync('/tmp/commit_analysis.md', 'utf8');
               const title = `🌌 Commit Analysis — ${new Date().toISOString().slice(0,10)}`;
-              await github.rest.issues.create({
+              const { data: issues } = await github.rest.issues.listForRepo({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                title: title,
-                body: body,
-                labels: ['nexus-analysis', 'automated']
+                state: 'open',
+                labels: 'nexus-analysis,automated',
+                per_page: 100
               });
-              console.log('✅ Analysis issue created');
+              const existing = issues.find((issue) => issue.title === title);
+              if (existing) {
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: existing.number,
+                  body: body
+                });
+                console.log(`✅ Analysis issue updated (#${existing.number})`);
+              } else {
+                await github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title: title,
+                  body: body,
+                  labels: ['nexus-analysis', 'automated']
+                });
+                console.log('✅ Analysis issue created');
+              }
             } catch (error) {
               console.log('⚠️ Could not create issue:', error.message);
             }
