@@ -144,7 +144,7 @@ def main() -> None:
     )
 
     commit_list = "\n".join(
-        f"- `{c['sha'][:7]}` {c['oneline']}" for c in commit_details
+        f"- `{c['sha'][:7]}` {' '.join(c['oneline'].split()[1:])}" for c in commit_details
     ) or "- (none)"
 
     joined = "\n\n---\n\n".join(sections)
