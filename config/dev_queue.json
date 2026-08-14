@@ -1,6 +1,6 @@
 {
-  "version": "1.0.0",
-  "updated_at": null,
+  "version": "1.0.1",
+  "updated_at": "2026-08-14T00:20:00Z",
   "notes": "Ranked work queue for the automated development process. Agents and humans pull from top of next[].",
   "done": [
     {
@@ -27,6 +27,26 @@
       "id": "health-check",
       "title": "Dispatchable package/system health check without AI",
       "completed": "2026-08-14"
+    },
+    {
+      "id": "automated-dev-process",
+      "title": "AUTOMATED_DEVELOPMENT.md + dev cycle runner + workflow",
+      "completed": "2026-08-14"
+    },
+    {
+      "id": "consume-dev-queue-in-audit",
+      "title": "Feed dev_queue into self-audit prompt for continuity of work",
+      "completed": "2026-08-14"
+    },
+    {
+      "id": "field-notes-from-cycles",
+      "title": "Append a field note on every successful dev cycle",
+      "completed": "2026-08-14"
+    },
+    {
+      "id": "presence-in-health-report",
+      "title": "Surface presence age and reputation freshness in health check",
+      "completed": "2026-08-14"
     }
   ],
   "next": [
@@ -36,31 +56,15 @@
       "priority": 1,
       "leverage": "high",
       "risk": "low",
-      "why": "Organic scores and Layer-1 unlock triggers are inert until real runs succeed."
+      "why": "Organic scores and Layer-1 unlock triggers are inert until real runs succeed. Dispatch Pulse, Self-Audit, or Commit Analyzer from GitHub Actions UI with GROK_API_KEY set."
     },
     {
-      "id": "consume-dev-queue-in-audit",
-      "title": "Feed dev_queue into self-audit prompt for continuity of work",
+      "id": "verify-health-on-ci",
+      "title": "Confirm health-check + dev-cycle workflows succeed on GitHub Actions",
       "priority": 2,
-      "leverage": "medium",
+      "leverage": "high",
       "risk": "low",
-      "why": "Closes the loop between automated proposals and critical reflection."
-    },
-    {
-      "id": "field-notes-from-cycles",
-      "title": "Append a field note on every successful dev cycle",
-      "priority": 3,
-      "leverage": "medium",
-      "risk": "low",
-      "why": "Builds durable memory without chat-log bloat."
-    },
-    {
-      "id": "presence-in-health-report",
-      "title": "Surface presence age and reputation freshness in health check",
-      "priority": 4,
-      "leverage": "medium",
-      "risk": "low",
-      "why": "Makes staleness visible without new workflows."
+      "why": "Code is in-repo; first green runs prove the automated cadence."
     }
   ],
   "backlog": [
