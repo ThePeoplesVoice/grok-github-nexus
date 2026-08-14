@@ -22,10 +22,43 @@ CLAUDE_URL = "https://api.anthropic.com/v1/messages"
 # grok-3 was retired 2026-05-15. Default to current frontier; override with GROK_MODEL.
 DEFAULT_GROK_MODEL = "grok-4.6"
 DEFAULT_CLAUDE_MODEL = "claude-sonnet-4-20250514"
+RETIRED_GROK_MODELS = {"grok-3"}
 
 
-def _grok_model() -> str:
-    return (os.environ.get("GROK_MODEL") or DEFAULT_GROK_MODEL).strip()
+def _grok_model(model: str | None = None) -> str:
+    candidate = (model or os.environ.get("GROK_MODEL") or DEFAULT_GROK_MODEL).strip()
+    if candidate.lower() in RETIRED_GROK_MODELS:
+        return DEFAULT_GROK_MODEL
+    return candidate
+
+
+def _call_grok_api(
+    *,
+    key: str,
+    model_name: str,
+    system: str,
+    user_content: str,
+    temperature: float,
+    max_tokens: int,
+    timeout: int,
+) -> requests.Response:
+    return requests.post(
+        GROK_URL,
+        headers={
+            "Authorization": f"Bearer {key}",
+            "Content-Type": "application/json",
+        },
+        json={
+            "model": model_name,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": user_content},
+            ],
+            "temperature": temperature,
+            "max_tokens": max_tokens,
+        },
+        timeout=timeout,
+    )
 
 
 def _claude_model() -> str:
@@ -85,26 +118,30 @@ def call_grok(
     if not key:
         return None, "GROK_API_KEY (or XAI_API_KEY) missing"
 
-    model_name = (model or _grok_model()).strip()
+    model_name = _grok_model(model)
 
     try:
-        response = requests.post(
-            GROK_URL,
-            headers={
-                "Authorization": f"Bearer {key}",
-                "Content-Type": "application/json",
-            },
-            json={
-                "model": model_name,
-                "messages": [
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": user_content},
-                ],
-                "temperature": temperature,
-                "max_tokens": max_tokens,
-            },
+        response = _call_grok_api(
+            key=key,
+            model_name=model_name,
+            system=system,
+            user_content=user_content,
+            temperature=temperature,
+            max_tokens=max_tokens,
             timeout=timeout,
         )
+        if response.status_code == 400 and model_name != DEFAULT_GROK_MODEL:
+            fallback_model = _grok_model(DEFAULT_GROK_MODEL)
+            response = _call_grok_api(
+                key=key,
+                model_name=fallback_model,
+                system=system,
+                user_content=user_content,
+                temperature=temperature,
+                max_tokens=max_tokens,
+                timeout=timeout,
+            )
+            model_name = fallback_model
         if response.status_code == 200:
             data = response.json()
             text = data["choices"][0]["message"]["content"]

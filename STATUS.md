@@ -20,7 +20,7 @@
 
 ### Diagnosis (2026-08-14)
 
-Live runs showed **Grok API 400** on every self-audit and commit analyzer falling back to local git. Root cause: **`grok-3` retired 15 May 2026**. Provider now defaults to **`grok-4.6`**, accepts `GROK_MODEL` / `XAI_API_KEY` overrides, and surfaces richer error bodies.
+Live runs showed **Grok API 400** on every self-audit and commit analyzer falling back to local git. Root cause: **`grok-3` retired 15 May 2026**. Provider now defaults to **`grok-4.6`**, auto-ignores retired `grok-3`, retries once after a bad non-default model override, accepts `GROK_MODEL` / `XAI_API_KEY` overrides, and surfaces richer error bodies.
 
 Usage counters remain **0** until a successful provider call lands after this fix.
 
