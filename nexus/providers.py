@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import re
 from typing import Any
 
 import requests
@@ -33,6 +34,56 @@ def _grok_model() -> str:
 
 def _claude_model() -> str:
     return (os.environ.get("CLAUDE_MODEL") or DEFAULT_CLAUDE_MODEL).strip()
+
+
+# ---------------------------------------------------------------------------
+# Shared payload factory — always disables tools/search for analysis calls
+# ---------------------------------------------------------------------------
+
+def grok_analysis_payload(
+    user_content: str,
+    *,
+    system: str = ARA_SYSTEM,
+    temperature: float = 0.55,
+    max_tokens: int = 1000,
+    model: str | None = None,
+) -> dict[str, Any]:
+    """Return a Grok API payload with live search/tools disabled.
+
+    Centralises the no-tools contract so every analysis call (self-audit,
+    commit review, field notes, etc.) enforces it from a single place.
+    """
+    model_name = (model or _grok_model()).strip()
+    return {
+        "model": model_name,
+        "messages": [
+            {"role": "system", "content": system},
+            {"role": "user", "content": user_content},
+        ],
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+        "search": False,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Output guard — reject replies that look like tool / shell traces
+# ---------------------------------------------------------------------------
+
+_TOOL_TRACE_PATTERNS = [
+    re.compile(r"^\d+[▌▎▏▍▋▊█]\s", re.MULTILINE),       # numbered tool output prefixes
+    re.compile(r"^\s*```\s*(sh|bash|shell)\b", re.MULTILINE),  # fenced shell blocks
+    re.compile(r"^(ls|cat|find|pwd|echo|cd|grep)\s", re.MULTILINE),  # bare shell commands
+    re.compile(r"\n\d+\s+(total|drwx|lrwx|-rw)", re.MULTILINE),     # ls -l output
+]
+
+
+def _looks_like_tool_trace(text: str) -> bool:
+    """Return True if *text* looks like raw shell/tool output rather than prose."""
+    for pattern in _TOOL_TRACE_PATTERNS:
+        if pattern.search(text):
+            return True
+    return False
 
 
 def format_api_error(provider: str, response: requests.Response) -> str:
@@ -91,27 +142,31 @@ def call_grok(
     model_name = (model or _grok_model()).strip()
 
     try:
+        payload = grok_analysis_payload(
+            user_content,
+            system=system,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            model=model_name,
+        )
         response = requests.post(
             GROK_URL,
             headers={
                 "Authorization": f"Bearer {key}",
                 "Content-Type": "application/json",
             },
-            json={
-                "model": model_name,
-                "messages": [
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": user_content},
-                ],
-                "temperature": temperature,
-                "max_tokens": max_tokens,
-                "search": False,
-            },
+            json=payload,
             timeout=timeout,
         )
         if response.status_code == 200:
             data = response.json()
             text = data["choices"][0]["message"]["content"]
+            if _looks_like_tool_trace(text):
+                return None, (
+                    "Grok response contained tool/shell traces instead of prose analysis. "
+                    "The reply has been discarded. "
+                    "Check that the xAI API search/tools contract is still respected."
+                )
             return text, None
         return None, format_api_error("Grok", response) + f" [model={model_name}]"
     except Exception as e:
