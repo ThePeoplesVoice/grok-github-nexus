@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-08-14 (ops: spam cut + KEY_SETUP)
 
-![Reputation](https://img.shields.io/badge/nexus_reputation-3.0-blue)
+![Reputation](https://img.shields.io/badge/nexus_reputation-4.0-blue)
 
 ---
 
