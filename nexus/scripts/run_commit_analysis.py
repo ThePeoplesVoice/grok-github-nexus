@@ -7,6 +7,7 @@ Local fallback preserved. Presence continuity + shared runtime on success.
 from __future__ import annotations
 
 import subprocess
+import re
 from pathlib import Path
 from typing import Any
 
@@ -16,6 +17,13 @@ from nexus.providers import call_grok, call_claude
 from nexus.usage import load_usage_stats
 from nexus.presence import load_presence, format_presence_for_prompt
 from nexus.runtime import after_successful_analysis, log_success
+
+
+def commit_subject(oneline: str) -> str:
+    parts = oneline.split(maxsplit=1)
+    if len(parts) == 2 and re.fullmatch(r"[0-9a-f]{7,40}", parts[0]):
+        return parts[1]
+    return oneline.strip()
 
 
 def gather_commits(n: int = 5) -> list[dict[str, Any]]:
@@ -48,12 +56,12 @@ def local_analysis(commits: list[dict[str, Any]]) -> str:
     ]
     for c in commits:
         sha = c["sha"]
-        oneline = c["oneline"]
+        subject = commit_subject(c["oneline"])
         detail = c["details"]
         stat_lines = [l for l in detail.splitlines() if "|" in l or "changed" in l]
         summary_line = next((l for l in stat_lines if "changed" in l), "")
         files_touched = [l.split("|")[0].strip() for l in stat_lines if "|" in l]
-        lines.append(f"#### `{sha[:7]}` — {' '.join(oneline.split()[1:])}")
+        lines.append(f"#### `{sha[:7]}` — {subject}")
         if summary_line:
             lines.append(f"- **Stats:** {summary_line.strip()}")
         if files_touched:
@@ -144,7 +152,7 @@ def main() -> None:
     )
 
     commit_list = "\n".join(
-        f"- `{c['sha'][:7]}` {c['oneline']}" for c in commit_details
+        f"- `{c['sha'][:7]}` {commit_subject(c['oneline'])}" for c in commit_details
     ) or "- (none)"
 
     joined = "\n\n---\n\n".join(sections)
