@@ -22,10 +22,20 @@ CLAUDE_URL = "https://api.anthropic.com/v1/messages"
 # grok-3 was retired 2026-05-15. Default to current frontier; override with GROK_MODEL.
 DEFAULT_GROK_MODEL = "grok-4.6"
 DEFAULT_CLAUDE_MODEL = "claude-sonnet-4-20250514"
+RETIRED_GROK_MODELS = {"grok-3"}
 
 
 def _grok_model() -> str:
-    return (os.environ.get("GROK_MODEL") or DEFAULT_GROK_MODEL).strip()
+    return normalize_grok_model(os.environ.get("GROK_MODEL"))
+
+
+def normalize_grok_model(model: str | None) -> str:
+    name = (model or "").strip()
+    if not name:
+        return DEFAULT_GROK_MODEL
+    if name.lower() in RETIRED_GROK_MODELS:
+        return DEFAULT_GROK_MODEL
+    return name
 
 
 def _claude_model() -> str:
@@ -85,7 +95,7 @@ def call_grok(
     if not key:
         return None, "GROK_API_KEY (or XAI_API_KEY) missing"
 
-    model_name = (model or _grok_model()).strip()
+    model_name = normalize_grok_model(model) if model is not None else _grok_model()
 
     try:
         response = requests.post(
