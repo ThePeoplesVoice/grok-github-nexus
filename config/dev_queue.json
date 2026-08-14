@@ -1,7 +1,7 @@
 {
-  "version": "1.0.2",
-  "updated_at": "2026-08-14T04:10:00Z",
-  "notes": "Ranked work queue for the automated development process.",
+  "version": "1.0.3",
+  "updated_at": "2026-08-14T08:25:00Z",
+  "notes": "Ranked work queue. Human owns API key; agent owns architecture.",
   "done": [
     {
       "id": "usage-write-path",
@@ -52,16 +52,26 @@
       "id": "fix-retired-grok-3",
       "title": "Migrate default Grok model from retired grok-3 to grok-4.6",
       "completed": "2026-08-14"
+    },
+    {
+      "id": "cut-self-audit-push-spam",
+      "title": "Self-audit schedule+dispatch only; remove push-triggered issue flood",
+      "completed": "2026-08-14"
+    },
+    {
+      "id": "key-setup-doc",
+      "title": "docs/KEY_SETUP.md with ACL and secret checklist",
+      "completed": "2026-08-14"
     }
   ],
   "next": [
     {
       "id": "verify-grok-key-and-dispatch",
-      "title": "Confirm GROK_API_KEY/XAI_API_KEY and dispatch Pulse + Self-Audit",
+      "title": "Fix GROK_API_KEY (Incorrect API key per Self-Audit #36) then dispatch Self-Audit/Pulse",
       "priority": 1,
       "leverage": "high",
       "risk": "low",
-      "why": "Model fixed; need one successful provider call to prove the stack and move usage off zero."
+      "why": "Only remaining hard blocker. See docs/KEY_SETUP.md."
     },
     {
       "id": "verify-health-on-ci",
@@ -69,7 +79,15 @@
       "priority": 2,
       "leverage": "high",
       "risk": "low",
-      "why": "No runs yet on these workflows."
+      "why": "No AI required; proves package install path on Actions."
+    },
+    {
+      "id": "cleanup-automated-issues",
+      "title": "Bulk-close obsolete self-audit/commit-analysis issues from build phase",
+      "priority": 3,
+      "leverage": "medium",
+      "risk": "low",
+      "why": "Signal density: dozens of failed-API issues clutter the tracker."
     }
   ],
   "backlog": [

@@ -2,18 +2,10 @@ name: Nexus Self-Audit
 
 on:
   schedule:
-    - cron: '0 9 * * 3'
+    - cron: '0 9 * * 3'   # Wednesday 09:00 UTC
   workflow_dispatch:
-  push:
-    paths:
-      - 'nexus/**'
-      - 'config/progressive.json'
-      - 'NORTH_STAR.md'
-      - 'NEXUS_CONTEXT.md'
-      - 'STATUS.md'
-      - 'CHECKS_AND_BALANCES.md'
-      - 'ORGANIC_SYSTEMS.md'
-      - 'AUTOMATED_DEVELOPMENT.md'
+  # Push trigger removed: rapid package edits were flooding issues with
+  # failed API audits. Dispatch manually or wait for schedule once key works.
 
 jobs:
   self-audit:
