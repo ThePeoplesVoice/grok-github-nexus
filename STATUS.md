@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-08-15 (measurement live)
 
-![Reputation](https://img.shields.io/badge/nexus_reputation-5.0-blue)
+![Reputation](https://img.shields.io/badge/nexus_reputation-5.5-blue)
 
 ---
 

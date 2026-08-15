@@ -1,8 +1,8 @@
 {
   "version": "0.2.0",
   "description": "Read-only contribution reputation derived from usage_stats. Not a currency.",
-  "raw_score": 5.0,
-  "score": 5.0,
+  "raw_score": 5.5,
+  "score": 5.5,
   "decay_factor": 1.0,
   "days_idle": 0.0,
   "freshness": "fresh",
@@ -11,7 +11,7 @@
     "issue": 0.0,
     "commit": 3.0,
     "self_audit": 2.0,
-    "pulse": 0.0,
+    "pulse": 0.5,
     "other": 0.0
   },
   "weights": {
@@ -23,8 +23,8 @@
     "other": 0.5
   },
   "half_life_days": 30.0,
-  "total_successful_analyses": 4,
-  "last_activity": "2026-08-15T13:52:48Z",
-  "last_computed": "2026-08-15T13:52:48Z",
+  "total_successful_analyses": 5,
+  "last_activity": "2026-08-15T13:53:52Z",
+  "last_computed": "2026-08-15T13:53:52Z",
   "notes": "effective score = raw_score × 0.5^(days_idle / 30). Subject to continuous critique. Open Core forever free."
 }
