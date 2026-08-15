@@ -1,5 +1,5 @@
 {
-  "version": "1.5.1",
+  "version": "1.6.0",
   "protocol": "Nexus Progressive Value Capture",
   "mission": "Seek truth in systems the same way xAI seeks truth in the universe, test ideas in the open the way X tests them, and build with the same first-principles refusal to accept permanent limits that defines SpaceX.",
   "alignment": {
@@ -25,6 +25,8 @@
     "public_badge": true,
     "field_notes": true,
     "dev_queue": true,
+    "astra": true,
+    "astra_spendable": false,
     "gates_open_core": false
   },
   "layers": {
@@ -50,9 +52,10 @@
         "self_audit",
         "presence_continuity",
         "reputation_surface",
+        "astra_currency",
         "automated_dev_cycle"
       ],
-      "status": "Organic measurement live — usage 5, reputation 5.5. Live-tool guard on. Scripts ROOT fixed. Accumulating toward min_successful_analyses 50."
+      "status": "Organic measurement live — usage 5, reputation 5.5, Astra 5.5. Live-tool guard on. Scripts ROOT fixed. Accumulating toward min_successful_analyses 50. Astra launched 2026-08-15."
     },
     "2_micropayment_agent": {
       "enabled": false,
@@ -66,11 +69,12 @@
       "features": ["multi_repo_dashboard", "team_seats", "sanctuary_revenue_share", "workflow_marketplace"]
     }
   },
-  "current_phase": "Layer 0 + Layer 1 live — measurement writing (usage 5 · reputation 5.5) · automated development process active (v1.5.1)",
+  "current_phase": "Layer 0 + Layer 1 live — Astra currency launched (balance 5.5) · measurement writing · automated development process active (v1.6.0)",
   "usage_stats_file": "config/usage_stats.json",
   "reputation_file": "config/reputation.json",
+  "astra_file": "config/astra.json",
   "presence_state_file": "config/presence_state.json",
   "dev_queue_file": "config/dev_queue.json",
   "field_notes_file": "config/field_notes.jsonl",
-  "notes": "Control plane for progressive flags, mission, governance, organic signal, and automated development. Organic reputation never gates Open Core. Presence is continuity context only. Dev queue drives disciplined iteration."
+  "notes": "Control plane for progressive flags, mission, governance, organic signal (including Astra), and automated development. Organic reputation and Astra never gate Open Core. Presence is continuity context only. Dev queue drives disciplined iteration."
 }
