@@ -1,6 +1,6 @@
 {
   "version": "1.0.5",
-  "updated_at": "2026-08-15T13:50:00Z",
+  "updated_at": "2026-08-15T13:58:41Z",
   "notes": "Measurement path live. Human optional ops; agent continues architecture.",
   "done": [
     {
@@ -97,6 +97,14 @@
       "why": "Presence is wired but pulse counter still 0."
     },
     {
+      "id": "first-real-pulse",
+      "title": "Dispatch Nexus Pulse once secrets are present to seed presence_state",
+      "priority": 2,
+      "leverage": "high",
+      "risk": "low",
+      "why": "Presence continuity is scaffolded but not yet populated by a live pulse."
+    },
+    {
       "id": "cleanup-automated-issues",
       "title": "Bulk-close obsolete self-audit/commit-analysis issues from build phase",
       "priority": 3,
@@ -129,5 +137,14 @@
       "title": "Deepen sanctuary-tied credit design after measurement demand",
       "why": "Conceptual until land/work linkage is concrete."
     }
-  ]
+  ],
+  "last_cycle": {
+    "structural_health": 100,
+    "triad_hits": 49,
+    "total_analyses": 5,
+    "reputation_effective": 5.5,
+    "reputation_freshness": "fresh",
+    "presence_at": null,
+    "package_version": "0.7.0"
+  }
 }
