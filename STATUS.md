@@ -1,6 +1,6 @@
 # 📡 Nexus Status
 
-**Last updated:** 2026-08-15 (measurement live)
+**Last updated:** 2026-08-15 (measurement live + path fix)
 
 ![Reputation](https://img.shields.io/badge/nexus_reputation-5.5-blue)
 
@@ -14,13 +14,13 @@
 
 | Signal | Value |
 |--------|-------|
-| Successful analyses | **3** |
-| By type | commit 2 · self_audit 1 |
-| Reputation (raw / effective) | **4.0 / 4.0** |
+| Successful analyses | **5** |
+| By type | commit 3 · self_audit 1 · pulse 1 |
+| Reputation (raw / effective) | **5.5 / 5.5** |
 | Freshness | fresh (0 days idle) |
-| Last activity | 2026-08-14T11:47:17Z |
+| Last activity | 2026-08-15T13:53:52Z |
 
-Provider path works. Live-tool guard is in place (`search: false` + prose-only system instruction). Open Core remains ungated.
+Provider path works. Live-tool guard is in place (`search: false` + prose-only system instruction). Open Core remains ungated. Scripts ROOT path corrected so presence + queue write to repo-root `config/`.
 
 ---
 
@@ -41,7 +41,7 @@ Provider path works. Live-tool guard is in place (`search: false` + prose-only s
 
 Progressive triggers (from `config/progressive.json`):
 
-- `min_successful_analyses`: **50** (now at 3)
+- `min_successful_analyses`: **50** (now at 5)
 - `min_stars`: 10
 - `min_community_prs`: 3
 
