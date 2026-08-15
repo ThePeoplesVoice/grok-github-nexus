@@ -1,0 +1,19 @@
+{
+  "version": "1.0.0",
+  "name": "Astra",
+  "description": "Organic land-backed contribution currency. Derived from reputation. Never gates Open Core.",
+  "balance": 5.5,
+  "raw_balance": 5.5,
+  "decay_factor": 1.0,
+  "days_idle": 0.0,
+  "freshness": "fresh",
+  "unit": "Astra",
+  "land_backed": true,
+  "spendable": false,
+  "sanctuary_tie": "Keysbrook jarrah / black cockatoo sanctuary vision",
+  "source_reputation_score": 5.5,
+  "total_successful_analyses": 5,
+  "last_activity": "2026-08-15T13:53:52Z",
+  "last_computed": "2026-08-15T14:04:00Z",
+  "notes": "Launch balance = effective reputation. Formula and spend rules live in ASTRA.md and nexus/astra.py."
+}
