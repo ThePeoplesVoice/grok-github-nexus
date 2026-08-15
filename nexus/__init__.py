@@ -1,6 +1,6 @@
 """Nexus shared analysis core."""
 
-__version__ = "0.7.0"
+__version__ = "0.8.0"
 
 from .context import load_context, load_progressive, load_usage_stats, layer1_enabled, current_phase
 from .providers import call_grok, call_claude, format_api_error
@@ -23,6 +23,12 @@ from .reputation import (
     reputation_summary_md,
     reputation_badge_line,
     sync_public_badges,
+)
+from .astra import (
+    compute_astra,
+    refresh_astra,
+    load_astra,
+    astra_summary_md,
 )
 from .presence import load_presence, format_presence_for_prompt
 from .runtime import after_successful_analysis, log_success
@@ -51,6 +57,10 @@ __all__ = [
     "reputation_summary_md",
     "reputation_badge_line",
     "sync_public_badges",
+    "compute_astra",
+    "refresh_astra",
+    "load_astra",
+    "astra_summary_md",
     "load_presence",
     "format_presence_for_prompt",
     "after_successful_analysis",
