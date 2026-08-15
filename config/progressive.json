@@ -52,7 +52,7 @@
         "reputation_surface",
         "automated_dev_cycle"
       ],
-      "status": "Full package path. Organic measurement stack live. Automated development process live. Awaiting real provider runs to move counters."
+      "status": "Organic measurement live — usage 3, reputation 4.0. Live-tool guard on. Accumulating toward min_successful_analyses 50."
     },
     "2_micropayment_agent": {
       "enabled": false,
@@ -66,7 +66,7 @@
       "features": ["multi_repo_dashboard", "team_seats", "sanctuary_revenue_share", "workflow_marketplace"]
     }
   },
-  "current_phase": "Layer 0 + Layer 1 live — automated development process + organic measurement stack (v1.5.1)",
+  "current_phase": "Layer 0 + Layer 1 live — measurement writing (usage 3 · reputation 4.0) · automated development process active (v1.5.1)",
   "usage_stats_file": "config/usage_stats.json",
   "reputation_file": "config/reputation.json",
   "presence_state_file": "config/presence_state.json",

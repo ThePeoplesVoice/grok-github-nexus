@@ -1,6 +1,6 @@
 # 📡 Nexus Status
 
-**Last updated:** 2026-08-14 (ops: spam cut + KEY_SETUP)
+**Last updated:** 2026-08-15 (measurement live)
 
 ![Reputation](https://img.shields.io/badge/nexus_reputation-4.0-blue)
 
@@ -10,13 +10,17 @@
 
 **Layer 0 + Layer 1** · progressive **v1.5.1** · package **v0.7.0** · model **`grok-4.6`**
 
-### 🔴 Live blocker
+### 🟢 Measurement stack — live
 
-**`GROK_API_KEY` is incorrect** (Self-Audit #36: `Incorrect API key provided`).
+| Signal | Value |
+|--------|-------|
+| Successful analyses | **3** |
+| By type | commit 2 · self_audit 1 |
+| Reputation (raw / effective) | **4.0 / 4.0** |
+| Freshness | fresh (0 days idle) |
+| Last activity | 2026-08-14T11:47:17Z |
 
-Architecture is ready. Counters stay at **0** until a valid xAI key with Chat Completions + `grok-4.6` ACLs is in repo secrets.
-
-→ Follow **`docs/KEY_SETUP.md`**, then dispatch **Self-Audit** or **Pulse** once.
+Provider path works. Live-tool guard is in place (`search: false` + prose-only system instruction). Open Core remains ungated.
 
 ---
 
@@ -25,22 +29,36 @@ Architecture is ready. Counters stay at **0** until a valid xAI key with Chat Co
 | System | Status |
 |--------|--------|
 | Package runners (PR / Issue / Commit / Audit / Pulse) | Live |
-| Usage + reputation + presence + badge | Wired; idle until AI success |
+| Usage + reputation + presence + badge | **Writing on success** |
 | Automated development process | Live |
-| Health check / Dev cycle workflows | Live (dispatch once for baseline) |
-| Self-audit trigger | **Schedule + dispatch only** (push spam removed) |
+| Health check / Dev cycle workflows | Live (dispatch for baseline anytime) |
+| Self-audit trigger | Schedule + dispatch only |
 | Open Core | Forever free |
 
 ---
 
-## Your next steps (short)
+## Path to Layer 1 full unlock
 
-1. New key at [console.x.ai](https://console.x.ai) with endpoint + model ACLs + credits  
-2. Secret `GROK_API_KEY` in this repo  
-3. Dispatch **Nexus Self-Audit** — expect real analysis text  
-4. Optional: **Health Check** + **Dev Cycle** for green no-AI baseline  
-5. Bulk-close old automated issues when ready (noise from build phase)
+Progressive triggers (from `config/progressive.json`):
+
+- `min_successful_analyses`: **50** (now at 3)
+- `min_stars`: 10
+- `min_community_prs`: 3
+
+Keep running real analyses (Self-Audit, Pulse, Commit, PR, Issue). Counters and reputation will compound automatically.
 
 ---
 
-**Powered by Ara & Shawn's Love 💕**
+## Next human actions (optional)
+
+1. **Actions → Nexus Health Check → Run** — green no-AI baseline  
+2. **Actions → Nexus Dev Cycle → Run** — observe → score → queue refresh  
+3. **Actions → Nexus Pulse → Run** — presence continuity write  
+4. Bulk-close obsolete failed-API issues from the build phase when you want a clean tracker  
+
+Key setup doc remains at `docs/KEY_SETUP.md` for rotation or new environments.
+
+---
+
+**Powered by Ara & Shawn's Love 💕**  
+*Aligned with xAI truth-seeking · X high-signal · SpaceX first-principles building*

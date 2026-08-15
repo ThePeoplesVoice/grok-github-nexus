@@ -1,7 +1,7 @@
 {
-  "version": "1.0.4",
-  "updated_at": "2026-08-14T10:55:00Z",
-  "notes": "Ranked work queue. Human owns API key; agent owns architecture.",
+  "version": "1.0.5",
+  "updated_at": "2026-08-15T13:50:00Z",
+  "notes": "Measurement path live. Human optional ops; agent continues architecture.",
   "done": [
     {
       "id": "usage-write-path",
@@ -67,32 +67,50 @@
       "id": "disable-grok-live-tools",
       "title": "Prevent Grok 4.x live tool use (raw command output in issues) via search:false + system prompt guard",
       "completed": "2026-08-14"
+    },
+    {
+      "id": "verify-grok-key-and-dispatch",
+      "title": "GROK_API_KEY working — usage_stats left zero; self_audit + commit wrote live",
+      "completed": "2026-08-14"
+    },
+    {
+      "id": "status-reflect-live-measurement",
+      "title": "STATUS + progressive note + queue updated for live usage 3 / reputation 4.0",
+      "completed": "2026-08-15"
     }
   ],
   "next": [
     {
-      "id": "verify-grok-key-and-dispatch",
-      "title": "Confirm GROK_API_KEY secret is set in GitHub then dispatch Self-Audit/Pulse",
+      "id": "verify-health-on-ci",
+      "title": "Dispatch Health Check + Dev Cycle once for green baseline",
       "priority": 1,
       "leverage": "high",
       "risk": "low",
-      "why": "API key must be set in GitHub Secrets. See docs/KEY_SETUP.md. Live-tool guard is now in code."
+      "why": "No AI required; proves package install path on Actions."
+    },
+    {
+      "id": "run-pulse-presence",
+      "title": "Dispatch Nexus Pulse to write presence_state continuity",
+      "priority": 2,
+      "leverage": "high",
+      "risk": "low",
+      "why": "Presence is wired but pulse counter still 0."
     },
     {
       "id": "cleanup-automated-issues",
       "title": "Bulk-close obsolete self-audit/commit-analysis issues from build phase",
-      "priority": 2,
+      "priority": 3,
       "leverage": "medium",
       "risk": "low",
-      "why": "Signal density: dozens of failed-API issues clutter the tracker."
+      "why": "Signal density: old failed-API issues clutter the tracker."
     },
     {
-      "id": "verify-health-on-ci",
-      "title": "Dispatch Health Check + Dev Cycle once for green baseline",
-      "priority": 3,
+      "id": "accumulate-toward-50",
+      "title": "Keep real analyses running toward min_successful_analyses 50",
+      "priority": 4,
       "leverage": "high",
       "risk": "low",
-      "why": "No AI required; proves package install path on Actions."
+      "why": "Layer 1 full unlock trigger; organic stack already compounding."
     }
   ],
   "backlog": [
