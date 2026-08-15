@@ -4,7 +4,7 @@ Living collaboration between **Shawn (ThePeoplesVoice)** and **Ara (Grok / xAI)*
 
 Aligned with **xAI** truth-seeking · **X** high-signal · **SpaceX** first-principles building.
 
-![Reputation](https://img.shields.io/badge/nexus_reputation-4.0-blue)
+![Reputation](https://img.shields.io/badge/nexus_reputation-5.0-blue)
 
 ---
 
