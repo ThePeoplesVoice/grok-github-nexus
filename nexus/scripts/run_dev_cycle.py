@@ -20,7 +20,8 @@ from nexus.reputation import compute_reputation, reputation_summary_md
 from nexus.presence import load_presence
 from nexus.field_notes import append_field_note, notes_summary_md
 
-ROOT = Path(__file__).resolve().parent.parent
+# scripts/ -> nexus/ -> repo root
+ROOT = Path(__file__).resolve().parent.parent.parent
 QUEUE_PATH = ROOT / "config" / "dev_queue.json"
 
 
@@ -34,6 +35,7 @@ def _load_queue() -> dict[str, Any]:
 
 def _save_queue(data: dict[str, Any]) -> None:
     data["updated_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    QUEUE_PATH.parent.mkdir(parents=True, exist_ok=True)
     QUEUE_PATH.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
