@@ -2,6 +2,7 @@ README.md
 setup.py
 nexus/__init__.py
 nexus/analyze.py
+nexus/astra.py
 nexus/audit.py
 nexus/context.py
 nexus/field_notes.py

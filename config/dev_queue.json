@@ -1,6 +1,6 @@
 {
   "version": "1.0.5",
-  "updated_at": "2026-08-15T13:58:41Z",
+  "updated_at": "2026-08-16T05:07:15Z",
   "notes": "Measurement path live. Human optional ops; agent continues architecture.",
   "done": [
     {
@@ -141,10 +141,10 @@
   "last_cycle": {
     "structural_health": 100,
     "triad_hits": 49,
-    "total_analyses": 5,
-    "reputation_effective": 5.5,
+    "total_analyses": 6,
+    "reputation_effective": 6.41,
     "reputation_freshness": "fresh",
     "presence_at": null,
-    "package_version": "0.7.0"
+    "package_version": "0.8.0"
   }
 }

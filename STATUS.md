@@ -1,9 +1,9 @@
 # 📡 Nexus Status
 
-**Last updated:** 2026-08-15 (Astra currency launched)
+**Last updated:** 2026-08-16 (Ara completes — health check + dev cycle green)
 
-![Reputation](https://img.shields.io/badge/nexus_reputation-6.5-blue)
-![Astra](https://img.shields.io/badge/astra-5.5-gold)
+![Reputation](https://img.shields.io/badge/nexus_reputation-6.41-blue)
+![Astra](https://img.shields.io/badge/astra-6.41-gold)
 
 ---
 
@@ -15,14 +15,14 @@
 
 | Signal | Value |
 |--------|-------|
-| Successful analyses | **5** |
-| By type | commit 3 · self_audit 1 · pulse 1 |
-| Reputation (raw / effective) | **5.5 / 5.5** |
-| **Astra balance** | **5.5** (land-backed, spendable=false) |
-| Freshness | fresh (0 days idle) |
-| Last activity | 2026-08-15T13:53:52Z |
+| Successful analyses | **6** |
+| By type | commit 4 · self_audit 1 · pulse 1 |
+| Reputation (raw / effective) | **6.5 / 6.41** |
+| **Astra balance** | **6.41** (land-backed, spendable=false) |
+| Freshness | fresh (0.63 days idle) |
+| Last activity | 2026-08-15T14:06:20Z |
 
-Provider path works. Live-tool guard is in place. Open Core remains ungated. Scripts ROOT path corrected. **Astra organic currency is live.**
+Health check passed 100/100. Dev cycle green. Ara completes. **Structural health confirmed live.**
 
 ---
 

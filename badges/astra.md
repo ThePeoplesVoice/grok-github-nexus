@@ -1,8 +1,8 @@
 # Astra Badge
 
-![Astra](https://img.shields.io/badge/astra-5.5-gold)
+![Astra](https://img.shields.io/badge/astra-6.41-gold)
 
-**Balance:** 5.5 Astra  
+**Balance:** 6.41 Astra  
 **Freshness:** fresh  
 **Spendable:** no  
 **Land-backed:** yes (Keysbrook sanctuary vision)
