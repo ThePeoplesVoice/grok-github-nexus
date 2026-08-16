@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-08-16 (GitHub thoroughly completed by Ara)
 
-![Reputation](https://img.shields.io/badge/nexus_reputation-7.5-blue)
+![Reputation](https://img.shields.io/badge/nexus_reputation-8.5-blue)
 ![Astra](https://img.shields.io/badge/astra-5.5-gold)
 
 ---
