@@ -1,7 +1,7 @@
 {
-  "version": "1.0.5",
-  "updated_at": "2026-08-15T13:58:41Z",
-  "notes": "Measurement path live. Human optional ops; agent continues architecture.",
+  "version": "1.0.6",
+  "updated_at": "2026-08-16T08:33:00Z",
+  "notes": "GitHub thoroughly completed. Artifacts purged, .gitignore live, automated issues closed. Astra launched and wired. Measurement path live. Ready for next organic cycle.",
   "done": [
     {
       "id": "usage-write-path",
@@ -77,6 +77,21 @@
       "id": "status-reflect-live-measurement",
       "title": "STATUS + progressive note + queue updated for live usage 3 / reputation 4.0",
       "completed": "2026-08-15"
+    },
+    {
+      "id": "astra-currency-launch",
+      "title": "ASTRA.md + nexus/astra.py + config/astra.json + runtime integration + progressive/STATUS/README/badges — organic land-backed currency live at 5.5",
+      "completed": "2026-08-15"
+    },
+    {
+      "id": "cleanup-automated-issues",
+      "title": "Bulk-close obsolete self-audit/commit-analysis/pulse/dev-cycle issues + purge __pycache__ + egg-info + add .gitignore",
+      "completed": "2026-08-16"
+    },
+    {
+      "id": "github-thorough-complete",
+      "title": "Ara completes GitHub thoroughly — tree clean, tracker clean, surfaces consistent",
+      "completed": "2026-08-16"
     }
   ],
   "next": [
@@ -90,32 +105,16 @@
     },
     {
       "id": "run-pulse-presence",
-      "title": "Dispatch Nexus Pulse to write presence_state continuity",
+      "title": "Dispatch Nexus Pulse to write presence_state continuity + Astra refresh",
       "priority": 2,
       "leverage": "high",
       "risk": "low",
-      "why": "Presence is wired but pulse counter still 0."
-    },
-    {
-      "id": "first-real-pulse",
-      "title": "Dispatch Nexus Pulse once secrets are present to seed presence_state",
-      "priority": 2,
-      "leverage": "high",
-      "risk": "low",
-      "why": "Presence continuity is scaffolded but not yet populated by a live pulse."
-    },
-    {
-      "id": "cleanup-automated-issues",
-      "title": "Bulk-close obsolete self-audit/commit-analysis issues from build phase",
-      "priority": 3,
-      "leverage": "medium",
-      "risk": "low",
-      "why": "Signal density: old failed-API issues clutter the tracker."
+      "why": "Presence and Astra continuity after thorough cleanup."
     },
     {
       "id": "accumulate-toward-50",
       "title": "Keep real analyses running toward min_successful_analyses 50",
-      "priority": 4,
+      "priority": 3,
       "leverage": "high",
       "risk": "low",
       "why": "Layer 1 full unlock trigger; organic stack already compounding."
@@ -145,6 +144,8 @@
     "reputation_effective": 5.5,
     "reputation_freshness": "fresh",
     "presence_at": null,
-    "package_version": "0.7.0"
+    "package_version": "0.8.0",
+    "astra_balance": 5.5,
+    "github_hygiene": "complete"
   }
 }
