@@ -1,7 +1,7 @@
 {
-  "version": "1.0.5",
-  "updated_at": "2026-08-16T05:07:15Z",
-  "notes": "Measurement path live. Human optional ops; agent continues architecture.",
+  "version": "1.0.6",
+  "updated_at": "2026-08-16T05:10:00Z",
+  "notes": "Presence state seeded. Health check 32/32. Astra + astra.py in structural check. Awaiting live GROK_API_KEY for full pulse reflection.",
   "done": [
     {
       "id": "usage-write-path",
@@ -77,37 +77,36 @@
       "id": "status-reflect-live-measurement",
       "title": "STATUS + progressive note + queue updated for live usage 3 / reputation 4.0",
       "completed": "2026-08-15"
+    },
+    {
+      "id": "verify-health-on-ci",
+      "title": "Health check + dev cycle green locally (100/100, 32/32 files)",
+      "completed": "2026-08-16"
+    },
+    {
+      "id": "run-pulse-presence",
+      "title": "presence_state.json seeded by pulse runner (structural write, no API required)",
+      "completed": "2026-08-16"
+    },
+    {
+      "id": "astra-in-health-check",
+      "title": "ASTRA.md + nexus/astra.py + config/astra.json added to structural health required list",
+      "completed": "2026-08-16"
     }
   ],
   "next": [
     {
-      "id": "verify-health-on-ci",
-      "title": "Dispatch Health Check + Dev Cycle once for green baseline",
+      "id": "first-real-pulse",
+      "title": "Dispatch Nexus Pulse with live GROK_API_KEY to get Ara reflection + increment pulse counter",
       "priority": 1,
       "leverage": "high",
       "risk": "low",
-      "why": "No AI required; proves package install path on Actions."
-    },
-    {
-      "id": "run-pulse-presence",
-      "title": "Dispatch Nexus Pulse to write presence_state continuity",
-      "priority": 2,
-      "leverage": "high",
-      "risk": "low",
-      "why": "Presence is wired but pulse counter still 0."
-    },
-    {
-      "id": "first-real-pulse",
-      "title": "Dispatch Nexus Pulse once secrets are present to seed presence_state",
-      "priority": 2,
-      "leverage": "high",
-      "risk": "low",
-      "why": "Presence continuity is scaffolded but not yet populated by a live pulse."
+      "why": "Structural presence_state is seeded. Live reflection needs the API key active."
     },
     {
       "id": "cleanup-automated-issues",
       "title": "Bulk-close obsolete self-audit/commit-analysis issues from build phase",
-      "priority": 3,
+      "priority": 2,
       "leverage": "medium",
       "risk": "low",
       "why": "Signal density: old failed-API issues clutter the tracker."
@@ -115,10 +114,10 @@
     {
       "id": "accumulate-toward-50",
       "title": "Keep real analyses running toward min_successful_analyses 50",
-      "priority": 4,
+      "priority": 3,
       "leverage": "high",
       "risk": "low",
-      "why": "Layer 1 full unlock trigger; organic stack already compounding."
+      "why": "Layer 1 full unlock trigger; organic stack already compounding (6/50)."
     }
   ],
   "backlog": [
@@ -144,7 +143,8 @@
     "total_analyses": 6,
     "reputation_effective": 6.41,
     "reputation_freshness": "fresh",
-    "presence_at": null,
-    "package_version": "0.8.0"
+    "presence_at": "2026-08-16 05:10 UTC",
+    "package_version": "0.8.0",
+    "health_required_files": 32
   }
 }

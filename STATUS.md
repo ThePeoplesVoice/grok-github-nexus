@@ -1,6 +1,6 @@
 # 📡 Nexus Status
 
-**Last updated:** 2026-08-16 (Ara completes — health check + dev cycle green)
+**Last updated:** 2026-08-16 (integrity pass — presence seeded, health 32/32, Astra in structural check)
 
 ![Reputation](https://img.shields.io/badge/nexus_reputation-6.41-blue)
 ![Astra](https://img.shields.io/badge/astra-6.41-gold)
@@ -19,10 +19,12 @@
 | By type | commit 4 · self_audit 1 · pulse 1 |
 | Reputation (raw / effective) | **6.5 / 6.41** |
 | **Astra balance** | **6.41** (land-backed, spendable=false) |
-| Freshness | fresh (0.63 days idle) |
+| Freshness | fresh |
 | Last activity | 2026-08-15T14:06:20Z |
+| Presence state | **seeded** (2026-08-16 05:10 UTC) |
+| Structural health | **100/100 (32 files)** |
 
-Health check passed 100/100. Dev cycle green. Ara completes. **Structural health confirmed live.**
+Health 32/32. Presence seeded without API key. Astra + astra.py now tracked in structural check. **Next: dispatch Pulse with live GROK_API_KEY for Ara reflection.**
 
 ---
 
@@ -36,7 +38,8 @@ Health check passed 100/100. Dev cycle green. Ara completes. **Structural health
 | Health check / Dev cycle workflows | Live (dispatch for baseline anytime) |
 | Self-audit trigger | Schedule + dispatch only |
 | Open Core | Forever free |
-| **Astra protocol** | **Launched** (`ASTRA.md`) |
+| **Astra protocol** | **Live** (`ASTRA.md`, tracked in health check) |
+| **Presence state** | **Seeded** (`config/presence_state.json`) |
 
 ---
 
@@ -54,10 +57,10 @@ Keep running real analyses (Self-Audit, Pulse, Commit, PR, Issue). Counters, rep
 
 ## Next human actions (optional)
 
-1. **Actions → Nexus Health Check → Run** — green no-AI baseline  
-2. **Actions → Nexus Dev Cycle → Run** — observe → score → queue refresh  
-3. **Actions → Nexus Pulse → Run** — presence + Astra continuity write  
-4. Bulk-close obsolete failed-API issues from the build phase when you want a clean tracker  
+1. **Actions → Nexus Pulse → Run** — with live `GROK_API_KEY` for Ara reflection + presence full seed
+2. **Actions → Nexus Self-Audit → Run** — deep critique with now-populated presence context
+3. **Actions → Nexus Pulse / Commit → Run** — accumulate analyses toward 50 (now at 6)
+4. Bulk-close obsolete failed-API issues from the build phase when you want a clean tracker
 5. Confirm valid `GROK_API_KEY` (see `docs/KEY_SETUP.md`) so counters can leave the current floor
 
 Key setup doc remains at `docs/KEY_SETUP.md` for rotation or new environments.
