@@ -1,13 +1,26 @@
 {
   "version": "0.2.0",
-  "generated_at": null,
-  "phase": null,
-  "layer1_enabled": null,
-  "total_successful_analyses": 0,
-  "by_type": {},
-  "reputation_score": 0,
-  "reputation_raw": 0,
-  "reputation_freshness": "unknown",
-  "recent_commits_preview": [],
-  "notes": "Scaffold only — first real pulse will populate continuity context."
+  "generated_at": "2026-08-17 08:50 UTC",
+  "phase": "Layer 0 + Layer 1 live — Astra currency launched (balance 5.5) · measurement writing · automated development process active (v1.6.0)",
+  "layer1_enabled": true,
+  "total_successful_analyses": 10,
+  "by_type": {
+    "commit": 7,
+    "pr": 0,
+    "issue": 0,
+    "self_audit": 1,
+    "pulse": 2,
+    "other": 0
+  },
+  "reputation_score": 10.0,
+  "reputation_raw": 10.0,
+  "reputation_freshness": "fresh",
+  "recent_commits_preview": [
+    "c418e99 chore: automated dev cycle — queue + field notes",
+    "c184b52 chore: usage + reputation after commit analysis",
+    "9db9f83 chore: usage + reputation after commit analysis",
+    "52b7fc4 complete: dev_queue — mark cleanup-automated-issues + astra-launch + github-hygiene done. Tracker clean.",
+    "ce6ab18 complete: STATUS — GitHub thoroughly cleaned (artifacts removed, automated issues closed, .gitignore live). Astra + measurement remain green."
+  ],
+  "notes": "Compressed context for continuity. Not a chat log. See ORGANIC_SYSTEMS.md."
 }
