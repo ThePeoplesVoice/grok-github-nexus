@@ -21,10 +21,11 @@ jobs:
         run: |
           BAD_FILES="$(git ls-files | grep -E '(^|/)__pycache__/|\.pyc$|\.egg-info/|(^|/)(dist|build)/' || true)"
           if [ -n "$BAD_FILES" ]; then
-            echo "::error::Tracked build artifacts detected:"
+            echo "::error::Tracked build artifacts detected — remove them and re-push:"
             echo "$BAD_FILES"
             exit 1
           fi
+          echo "✅ No tracked build artifacts found"
 
       - name: Set up Python
         uses: actions/setup-python@v5
