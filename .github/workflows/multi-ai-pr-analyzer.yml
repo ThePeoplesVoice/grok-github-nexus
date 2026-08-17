@@ -17,6 +17,15 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Fail on tracked build artifacts
+        run: |
+          BAD_FILES="$(git ls-files | grep -E '(^|/)__pycache__/|\.pyc$|\.egg-info/|(^|/)(dist|build)/' || true)"
+          if [ -n "$BAD_FILES" ]; then
+            echo "::error::Tracked build artifacts detected:"
+            echo "$BAD_FILES"
+            exit 1
+          fi
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
