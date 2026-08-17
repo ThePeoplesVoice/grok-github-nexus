@@ -1,6 +1,6 @@
 {
   "version": "1.0.6",
-  "updated_at": "2026-08-16T08:33:00Z",
+  "updated_at": "2026-08-17T07:51:44Z",
   "notes": "GitHub thoroughly completed. Artifacts purged, .gitignore live, automated issues closed. Astra launched and wired. Measurement path live. Ready for next organic cycle.",
   "done": [
     {
@@ -112,6 +112,14 @@
       "why": "Presence and Astra continuity after thorough cleanup."
     },
     {
+      "id": "first-real-pulse",
+      "title": "Dispatch Nexus Pulse once secrets are present to seed presence_state",
+      "priority": 2,
+      "leverage": "high",
+      "risk": "low",
+      "why": "Presence continuity is scaffolded but not yet populated by a live pulse."
+    },
+    {
       "id": "accumulate-toward-50",
       "title": "Keep real analyses running toward min_successful_analyses 50",
       "priority": 3,
@@ -140,12 +148,10 @@
   "last_cycle": {
     "structural_health": 100,
     "triad_hits": 49,
-    "total_analyses": 5,
-    "reputation_effective": 5.5,
+    "total_analyses": 9,
+    "reputation_effective": 9.49,
     "reputation_freshness": "fresh",
     "presence_at": null,
-    "package_version": "0.8.0",
-    "astra_balance": 5.5,
-    "github_hygiene": "complete"
+    "package_version": "0.8.0"
   }
 }
