@@ -1,7 +1,7 @@
 {
-  "version": "1.0.4",
-  "updated_at": "2026-08-14T10:55:00Z",
-  "notes": "Ranked work queue. Human owns API key; agent owns architecture.",
+  "version": "1.0.7",
+  "updated_at": "2026-08-17T19:10:00Z",
+  "notes": "Artifact guard live. Commit-loop feedback fixed. Astra synced to rep 11.98. Test suite added (19 passing). Primary blocker: rotate GROK_API_KEY.",
   "done": [
     {
       "id": "usage-write-path",
@@ -67,32 +67,97 @@
       "id": "disable-grok-live-tools",
       "title": "Prevent Grok 4.x live tool use (raw command output in issues) via search:false + system prompt guard",
       "completed": "2026-08-14"
-    }
-  ],
-  "next": [
+    },
     {
       "id": "verify-grok-key-and-dispatch",
-      "title": "Confirm GROK_API_KEY secret is set in GitHub then dispatch Self-Audit/Pulse",
-      "priority": 1,
-      "leverage": "high",
-      "risk": "low",
-      "why": "API key must be set in GitHub Secrets. See docs/KEY_SETUP.md. Live-tool guard is now in code."
+      "title": "GROK_API_KEY working — usage_stats left zero; self_audit + commit wrote live",
+      "completed": "2026-08-14"
+    },
+    {
+      "id": "status-reflect-live-measurement",
+      "title": "STATUS + progressive note + queue updated for live usage 3 / reputation 4.0",
+      "completed": "2026-08-15"
+    },
+    {
+      "id": "astra-currency-launch",
+      "title": "ASTRA.md + nexus/astra.py + config/astra.json + runtime integration + progressive/STATUS/README/badges — organic land-backed currency live at 5.5",
+      "completed": "2026-08-15"
     },
     {
       "id": "cleanup-automated-issues",
-      "title": "Bulk-close obsolete self-audit/commit-analysis issues from build phase",
-      "priority": 2,
-      "leverage": "medium",
-      "risk": "low",
-      "why": "Signal density: dozens of failed-API issues clutter the tracker."
+      "title": "Bulk-close obsolete self-audit/commit-analysis/pulse/dev-cycle issues + purge __pycache__ + egg-info + add .gitignore",
+      "completed": "2026-08-16"
+    },
+    {
+      "id": "github-thorough-complete",
+      "title": "Ara completes GitHub thoroughly — tree clean, tracker clean, surfaces consistent",
+      "completed": "2026-08-16"
     },
     {
       "id": "verify-health-on-ci",
       "title": "Dispatch Health Check + Dev Cycle once for green baseline",
+      "completed": "2026-08-17"
+    },
+    {
+      "id": "run-pulse-presence",
+      "title": "Dispatch Nexus Pulse to refresh presence_state + Astra",
+      "completed": "2026-08-17"
+    },
+    {
+      "id": "first-real-pulse",
+      "title": "Dispatch Nexus Pulse once secrets present — presence seeded",
+      "completed": "2026-08-17"
+    },
+    {
+      "id": "pr-artifact-guard",
+      "title": "Add artifact guard step to multi-ai-pr-analyzer.yml",
+      "completed": "2026-08-17"
+    },
+    {
+      "id": "commit-feedback-loop-fix",
+      "title": "Block bot chore-commit triggers + deduplicate analysis issues",
+      "completed": "2026-08-17"
+    },
+    {
+      "id": "astra-sync-reputation",
+      "title": "Sync config/astra.json balance to live reputation (was 5.5, now 11.98)",
+      "completed": "2026-08-17"
+    },
+    {
+      "id": "regression-test-suite",
+      "title": "Add tests/test_providers.py + tests/test_reputation.py (19 passing)",
+      "completed": "2026-08-17"
+    },
+    {
+      "id": "test-workflow",
+      "title": "Add .github/workflows/nexus-tests.yml — CI for test suite",
+      "completed": "2026-08-17"
+    }
+  ],
+  "next": [
+    {
+      "id": "rotate-grok-api-key",
+      "title": "Rotate GROK_API_KEY in GitHub Secrets — current key invalid (400 on all AI calls)",
+      "priority": 1,
+      "leverage": "critical",
+      "risk": "low",
+      "why": "PR and issue analysis counters stuck at 0. Layer 1 progress at 24% (12/50). Every hour without a valid key is an opportunity lost."
+    },
+    {
+      "id": "close-stale-prs",
+      "title": "Close stale WIP PRs #38–66 (25 open bot PRs, all superseded by main)",
+      "priority": 2,
+      "leverage": "high",
+      "risk": "low",
+      "why": "Open PR count creates noise and confuses progressive_unlock community_prs counter."
+    },
+    {
+      "id": "accumulate-toward-50",
+      "title": "Accumulate successful analyses toward Layer 1 unlock (min_successful_analyses=50)",
       "priority": 3,
       "leverage": "high",
       "risk": "low",
-      "why": "No AI required; proves package install path on Actions."
+      "why": "Currently 12/50. With valid key and existing cadence, reaches 50 in approx 6 weeks."
     }
   ],
   "backlog": [
@@ -111,5 +176,14 @@
       "title": "Deepen sanctuary-tied credit design after measurement demand",
       "why": "Conceptual until land/work linkage is concrete."
     }
-  ]
+  ],
+  "last_cycle": {
+    "structural_health": 100,
+    "triad_hits": 49,
+    "total_analyses": 12,
+    "reputation_effective": 11.98,
+    "reputation_freshness": "fresh",
+    "presence_at": null,
+    "package_version": "0.8.0"
+  }
 }
