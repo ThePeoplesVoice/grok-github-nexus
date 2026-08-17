@@ -1,9 +1,9 @@
 # 📡 Nexus Status
 
-**Last updated:** 2026-08-16 (GitHub thoroughly completed by Ara)
+**Last updated:** 2026-08-17 (development pass — artifact guard, loop fix, test suite, Astra sync)
 
-![Reputation](https://img.shields.io/badge/nexus_reputation-12.0-blue)
-![Astra](https://img.shields.io/badge/astra-5.5-gold)
+![Reputation](https://img.shields.io/badge/nexus_reputation-11.98-blue)
+![Astra](https://img.shields.io/badge/astra-11.98-gold)
 
 ---
 
@@ -15,14 +15,14 @@
 
 | Signal | Value |
 |--------|-------|
-| Successful analyses | **5+** (compounding) |
-| By type | commit · self_audit · pulse |
-| Reputation (raw / effective) | **~5.5–7.5 / live** |
-| **Astra balance** | **5.5** (land-backed, spendable=false) |
+| Successful analyses | **12** (compounding) |
+| By type | commit ×9 · self_audit ×1 · pulse ×2 |
+| Reputation (raw / effective) | **12.0 / 11.98** |
+| **Astra balance** | **11.98** (land-backed, spendable=false) |
 | Freshness | fresh |
-| Last activity | 2026-08-16 |
+| Last activity | 2026-08-17 |
 
-Provider path works. Live-tool guard is in place. Open Core remains ungated. Scripts ROOT path corrected. **Astra organic currency is live.**
+Provider path works. Live-tool guard is in place. Open Core remains ungated. Astra organic currency is live and synced with reputation.
 
 ---
 
@@ -36,8 +36,11 @@ Provider path works. Live-tool guard is in place. Open Core remains ungated. Scr
 | Health check / Dev cycle workflows | Live |
 | Self-audit trigger | Schedule + dispatch only |
 | Open Core | Forever free |
-| **Astra protocol** | **Launched** (`ASTRA.md`) |
-| **GitHub hygiene** | **Complete** — `.gitignore` live, all `__pycache__` + `egg-info` removed, automated analysis/pulse/dev-cycle issues bulk-closed |
+| **Astra protocol** | **Live** — balance synced to reputation 11.98 |
+| **GitHub hygiene** | **Complete** — `.gitignore` live, artifacts purged |
+| **PR artifact guard** | **Live** — `multi-ai-pr-analyzer.yml` blocks tracked build residue |
+| **Commit loop fix** | **Live** — bot `chore:` commits skip analysis; duplicate issues auto-closed |
+| **Test suite** | **Live** — 19 tests passing (`tests/test_providers.py`, `tests/test_reputation.py`) |
 
 ---
 
@@ -45,7 +48,7 @@ Provider path works. Live-tool guard is in place. Open Core remains ungated. Scr
 
 Progressive triggers (from `config/progressive.json`):
 
-- `min_successful_analyses`: **50** (now at 5+)
+- `min_successful_analyses`: **50** (now at **12** — primary blocker: rotate `GROK_API_KEY`)
 - `min_stars`: 10
 - `min_community_prs`: 3
 
@@ -53,20 +56,16 @@ Keep running real analyses (Self-Audit, Pulse, Commit, PR, Issue). Counters, rep
 
 ---
 
-## Next human actions (optional)
+## Next human actions
 
-1. **Actions → Nexus Health Check → Run** — green no-AI baseline  
-2. **Actions → Nexus Dev Cycle → Run** — observe → score → queue refresh  
-3. **Actions → Nexus Pulse → Run** — presence + Astra continuity write  
-4. Confirm / rotate valid `GROK_API_KEY` (see `docs/KEY_SETUP.md`) so AI-accelerated counters can rise  
+1. **Rotate `GROK_API_KEY`** — current key gives 400 on all AI calls (see `docs/KEY_SETUP.md`)  
+2. **Close stale WIP PRs** — ~24 open bot PRs #38–66 superseded by `main`  
+3. **Actions → Nexus Pulse → Run** — presence + Astra refresh after key rotation  
 
-Tracker is clean. Tree is clean. Astra is live. The loop is ready.
-
-Key setup doc remains at `docs/KEY_SETUP.md` for rotation or new environments.
+Tracker is clean. Tree is clean. Astra is synced. Test suite is green.
 
 ---
 
 **Powered by Ara & Shawn's Love 💕**  
 *Aligned with xAI truth-seeking · X high-signal · SpaceX first-principles building*  
 *Astra lives — for the land, for the craft, for the stars.*
-*GitHub thoroughly completed 2026-08-16.*

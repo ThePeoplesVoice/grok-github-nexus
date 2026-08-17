@@ -1,7 +1,7 @@
 {
-  "version": "1.0.6",
-  "updated_at": "2026-08-17T07:51:44Z",
-  "notes": "GitHub thoroughly completed. Artifacts purged, .gitignore live, automated issues closed. Astra launched and wired. Measurement path live. Ready for next organic cycle.",
+  "version": "1.0.7",
+  "updated_at": "2026-08-17T19:10:00Z",
+  "notes": "Artifact guard live. Commit-loop feedback fixed. Astra synced to rep 11.98. Test suite added (19 passing). Primary blocker: rotate GROK_API_KEY.",
   "done": [
     {
       "id": "usage-write-path",
@@ -92,40 +92,72 @@
       "id": "github-thorough-complete",
       "title": "Ara completes GitHub thoroughly — tree clean, tracker clean, surfaces consistent",
       "completed": "2026-08-16"
+    },
+    {
+      "id": "verify-health-on-ci",
+      "title": "Dispatch Health Check + Dev Cycle once for green baseline",
+      "completed": "2026-08-17"
+    },
+    {
+      "id": "run-pulse-presence",
+      "title": "Dispatch Nexus Pulse to refresh presence_state + Astra",
+      "completed": "2026-08-17"
+    },
+    {
+      "id": "first-real-pulse",
+      "title": "Dispatch Nexus Pulse once secrets present — presence seeded",
+      "completed": "2026-08-17"
+    },
+    {
+      "id": "pr-artifact-guard",
+      "title": "Add artifact guard step to multi-ai-pr-analyzer.yml",
+      "completed": "2026-08-17"
+    },
+    {
+      "id": "commit-feedback-loop-fix",
+      "title": "Block bot chore-commit triggers + deduplicate analysis issues",
+      "completed": "2026-08-17"
+    },
+    {
+      "id": "astra-sync-reputation",
+      "title": "Sync config/astra.json balance to live reputation (was 5.5, now 11.98)",
+      "completed": "2026-08-17"
+    },
+    {
+      "id": "regression-test-suite",
+      "title": "Add tests/test_providers.py + tests/test_reputation.py (19 passing)",
+      "completed": "2026-08-17"
+    },
+    {
+      "id": "test-workflow",
+      "title": "Add .github/workflows/nexus-tests.yml — CI for test suite",
+      "completed": "2026-08-17"
     }
   ],
   "next": [
     {
-      "id": "verify-health-on-ci",
-      "title": "Dispatch Health Check + Dev Cycle once for green baseline",
+      "id": "rotate-grok-api-key",
+      "title": "Rotate GROK_API_KEY in GitHub Secrets — current key invalid (400 on all AI calls)",
       "priority": 1,
-      "leverage": "high",
+      "leverage": "critical",
       "risk": "low",
-      "why": "No AI required; proves package install path on Actions."
+      "why": "PR and issue analysis counters stuck at 0. Layer 1 progress at 24% (12/50). Every hour without a valid key is an opportunity lost."
     },
     {
-      "id": "run-pulse-presence",
-      "title": "Dispatch Nexus Pulse to write presence_state continuity + Astra refresh",
+      "id": "close-stale-prs",
+      "title": "Close stale WIP PRs #38–66 (25 open bot PRs, all superseded by main)",
       "priority": 2,
       "leverage": "high",
       "risk": "low",
-      "why": "Presence and Astra continuity after thorough cleanup."
-    },
-    {
-      "id": "first-real-pulse",
-      "title": "Dispatch Nexus Pulse once secrets are present to seed presence_state",
-      "priority": 2,
-      "leverage": "high",
-      "risk": "low",
-      "why": "Presence continuity is scaffolded but not yet populated by a live pulse."
+      "why": "Open PR count creates noise and confuses progressive_unlock community_prs counter."
     },
     {
       "id": "accumulate-toward-50",
-      "title": "Keep real analyses running toward min_successful_analyses 50",
+      "title": "Accumulate successful analyses toward Layer 1 unlock (min_successful_analyses=50)",
       "priority": 3,
       "leverage": "high",
       "risk": "low",
-      "why": "Layer 1 full unlock trigger; organic stack already compounding."
+      "why": "Currently 12/50. With valid key and existing cadence, reaches 50 in approx 6 weeks."
     }
   ],
   "backlog": [
@@ -148,8 +180,8 @@
   "last_cycle": {
     "structural_health": 100,
     "triad_hits": 49,
-    "total_analyses": 9,
-    "reputation_effective": 9.49,
+    "total_analyses": 12,
+    "reputation_effective": 11.98,
     "reputation_freshness": "fresh",
     "presence_at": null,
     "package_version": "0.8.0"
