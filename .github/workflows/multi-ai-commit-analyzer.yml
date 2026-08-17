@@ -15,8 +15,13 @@ jobs:
     if: |
       github.actor != 'github-actions[bot]' &&
       github.actor != 'nexus-bot' &&
-      !startsWith(github.event.head_commit.message, 'chore:') &&
-      !startsWith(github.event.head_commit.message, 'Merge')
+      (
+        github.event.head_commit == null ||
+        (
+          github.event.head_commit.message != 'chore: usage + reputation after commit analysis' &&
+          !startsWith(github.event.head_commit.message, 'Merge')
+        )
+      )
     runs-on: ubuntu-latest
     permissions:
       contents: write
