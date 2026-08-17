@@ -9,7 +9,7 @@ on:
 
 jobs:
   self-audit:
-    if: github.actor != 'github-actions[bot]'
+    if: github.actor != 'github-actions[bot]' && github.actor != 'nexus-bot'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -47,7 +47,7 @@ jobs:
         run: |
           git config user.name "nexus-bot"
           git config user.email "nexus-bot@users.noreply.github.com"
-          git add config/usage_stats.json config/reputation.json badges/reputation.md README.md STATUS.md || true
+          git add config/usage_stats.json config/reputation.json badges/reputation.md || true
           if git diff --staged --quiet; then
             echo "No artifact changes to commit"
           else

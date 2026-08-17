@@ -197,12 +197,12 @@ def _patch_markdown_badge(path: Path, data: dict[str, Any]) -> bool:
 
 
 def sync_public_badges(data: dict[str, Any] | None = None) -> dict[str, bool]:
-    """Rewrite badge file and patch README/STATUS badge lines."""
+    """Rewrite generated reputation badge artifacts."""
     d = data if data is not None else load_reputation()
     write_badge(d)
     return {
-        "readme": _patch_markdown_badge(README_PATH, d),
-        "status": _patch_markdown_badge(STATUS_PATH, d),
+        "readme": False,
+        "status": False,
         "badge_md": True,
     }
 
