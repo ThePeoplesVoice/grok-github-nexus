@@ -9,7 +9,7 @@ on:
 
 jobs:
   self-audit:
-    if: github.actor != 'github-actions[bot]' && github.actor != 'nexus-bot'
+    if: github.event_name != 'push' || (github.actor != 'github-actions[bot]' && github.actor != 'nexus-bot')
     runs-on: ubuntu-latest
     permissions:
       contents: write

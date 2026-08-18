@@ -11,10 +11,10 @@ import pytest
 
 from nexus.reputation import (
     compute_reputation,
-    save_reputation,
     load_reputation,
     refresh_reputation,
     reputation_badge_line,
+    save_reputation,
     _staleness,
 )
 
@@ -93,3 +93,33 @@ def test_effective_score_lower_than_raw_when_stale():
     rep = compute_reputation(stale_stats)
     assert rep["score"] <= rep["raw_score"]
     assert rep["freshness"] == "stale"
+
+
+def test_sync_public_badges_only_reports_real_badge_changes(tmp_path, monkeypatch):
+    from nexus import reputation
+
+    badge_path = tmp_path / "badges" / "reputation.md"
+    readme_path = tmp_path / "README.md"
+    status_path = tmp_path / "STATUS.md"
+
+    readme_text = "# Human-owned README\n"
+    status_text = "# Human-owned STATUS\n"
+    readme_path.write_text(readme_text, encoding="utf-8")
+    status_path.write_text(status_text, encoding="utf-8")
+
+    monkeypatch.setattr(reputation, "BADGE_PATH", badge_path)
+
+    rep = compute_reputation(SAMPLE_STATS)
+
+    assert reputation.sync_public_badges(rep) == {
+        "readme": False,
+        "status": False,
+        "badge_md": True,
+    }
+    assert reputation.sync_public_badges(rep) == {
+        "readme": False,
+        "status": False,
+        "badge_md": False,
+    }
+    assert readme_path.read_text(encoding="utf-8") == readme_text
+    assert status_path.read_text(encoding="utf-8") == status_text
