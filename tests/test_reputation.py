@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import tempfile
 from pathlib import Path
+from urllib.parse import urlparse
 
 import pytest
 
@@ -79,7 +80,9 @@ def test_load_reputation_missing_file(tmp_path):
 def test_badge_line_contains_score():
     rep = compute_reputation(SAMPLE_STATS)
     badge = reputation_badge_line(rep)
-    assert "shields.io" in badge
+    parsed = urlparse(badge.removeprefix("![Reputation](").removesuffix(")"))
+    assert parsed.scheme == "https"
+    assert parsed.netloc == "img.shields.io"
     assert "nexus_reputation" in badge
     assert str(rep["score"]) in badge
 
