@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-08-17 (development pass — artifact guard, loop fix, test suite, Astra sync)
 
-![Reputation](https://img.shields.io/badge/nexus_reputation-11.98-blue)
+![Reputation](https://img.shields.io/badge/nexus_reputation-14.0-blue)
 ![Astra](https://img.shields.io/badge/astra-11.98-gold)
 
 ---
