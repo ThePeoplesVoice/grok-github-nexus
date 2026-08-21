@@ -19,7 +19,13 @@ from nexus.audit import (
     utc_now_str,
 )
 from nexus.providers import call_grok, call_claude
-from nexus.context import layer1_enabled
+from nexus.context import (
+    load_progressive,
+    load_usage_stats,
+    successful_analysis_gate_status,
+    layer1_enabled,
+    layer1_feature_enabled,
+)
 from nexus.presence import load_presence, format_presence_for_prompt
 from nexus.runtime import after_successful_analysis, log_success
 
@@ -31,6 +37,11 @@ def main() -> None:
     signals = alignment_signals()
     presence = load_presence()
     presence_block = format_presence_for_prompt(presence)
+    prog = load_progressive()
+    stats = load_usage_stats()
+    gate = successful_analysis_gate_status(prog, stats)
+    l1_config = layer1_enabled(prog)
+    l1 = layer1_feature_enabled("multi_model_fusion", prog, stats)
 
     log = subprocess.run(
         ["git", "log", "--oneline", "-n", "12"],
@@ -62,7 +73,7 @@ def main() -> None:
 
     claude_text = None
     claude_err = None
-    if layer1_enabled() and os.environ.get("CLAUDE_API_KEY"):
+    if l1 and os.environ.get("CLAUDE_API_KEY"):
         claude_text, claude_err = call_claude(
             prompt + (
                 "\n\nRespond as a complementary high-rigor reviewer. Focus on maintenance debt, "
@@ -95,6 +106,11 @@ def main() -> None:
         fusion = "\n\n**Multi-model self-audit active (Layer 1)**"
     elif grok_text and claude_err:
         fusion = "\n\n*Claude complementary unavailable — Ara primary only.*"
+    elif l1_config and not l1 and gate["required"] > 0:
+        fusion = (
+            "\n\n*Multi-model fusion remains locked until successful analyses reach "
+            f"{gate['required']} (current {gate['current']}) — Ara primary only.*"
+        )
 
     joined = "\n\n---\n\n".join(sections)
     footer = format_audit_footer()

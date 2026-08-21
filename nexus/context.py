@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -44,6 +45,33 @@ def load_usage_stats(path: str | Path | None = None) -> dict[str, Any]:
     return _load(path)
 
 
+def successful_analysis_gate_status(
+    prog: dict[str, Any] | None = None,
+    stats: dict[str, Any] | None = None,
+) -> dict[str, int | bool]:
+    """Return the measured Layer 1 analysis gate state.
+
+    Only uses repository-local counters that are already persisted in config/usage_stats.json.
+    This makes the progressive gate real for multi-model fusion without depending on
+    unavailable external metrics at runtime.
+    """
+    state = prog if prog is not None else load_progressive()
+    counters = stats if stats is not None else load_usage_stats()
+    triggers = (
+        state.get("layers", {})
+        .get("1_progressive_unlocks", {})
+        .get("triggers", {})
+    )
+    required = int(triggers.get("min_successful_analyses", 0) or 0)
+    current = int(counters.get("total_successful_analyses", 0) or 0)
+    return {
+        "current": current,
+        "required": required,
+        "remaining": max(required - current, 0),
+        "met": current >= required,
+    }
+
+
 def layer1_enabled(prog: dict[str, Any] | None = None) -> bool:
     """Convenience: is Layer 1 progressive unlocks enabled?"""
     state = prog if prog is not None else load_progressive()
@@ -52,6 +80,32 @@ def layer1_enabled(prog: dict[str, Any] | None = None) -> bool:
         .get("1_progressive_unlocks", {})
         .get("enabled", True)
     )
+
+
+def layer1_feature_enabled(
+    feature: str,
+    prog: dict[str, Any] | None = None,
+    stats: dict[str, Any] | None = None,
+) -> bool:
+    """Return whether a Layer 1 feature is active at runtime.
+
+    Today the only feature with a measured runtime gate is multi-model fusion.
+    Other Layer 1 features continue to follow the control-plane enabled flag.
+    """
+    state = prog if prog is not None else load_progressive()
+    if not layer1_enabled(state):
+        return False
+    feature_name = (feature or "").strip().lower()
+    if feature_name == "multi_model_fusion":
+        if str(os.environ.get("NEXUS_FORCE_MULTI_MODEL_FUSION", "")).strip().lower() in {
+            "1",
+            "true",
+            "yes",
+            "on",
+        }:
+            return True
+        return bool(successful_analysis_gate_status(state, stats).get("met"))
+    return True
 
 
 def current_phase(prog: dict[str, Any] | None = None) -> str:

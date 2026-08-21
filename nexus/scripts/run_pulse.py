@@ -12,7 +12,13 @@ import subprocess
 from pathlib import Path
 
 from nexus.analyze import footer_block, utc_now_str
-from nexus.context import load_progressive, layer1_enabled, current_phase
+from nexus.context import (
+    load_progressive,
+    successful_analysis_gate_status,
+    layer1_enabled,
+    layer1_feature_enabled,
+    current_phase,
+)
 from nexus.providers import call_grok
 from nexus.usage import load_usage_stats
 from nexus.reputation import reputation_summary_md, refresh_reputation
@@ -28,10 +34,11 @@ def main() -> None:
 
     prog = load_progressive()
     phase = current_phase(prog)
-    l1 = layer1_enabled(prog)
-    mission = prog.get("mission", "")
-
     stats = load_usage_stats()
+    gate = successful_analysis_gate_status(prog, stats)
+    l1_config = layer1_enabled(prog)
+    l1 = layer1_feature_enabled("multi_model_fusion", prog, stats)
+    mission = prog.get("mission", "")
     total = int(stats.get("total_successful_analyses", 0))
     by_type = dict(stats.get("by_type") or {})
 
@@ -52,6 +59,8 @@ def main() -> None:
         "generated_at": utc_now_str(),
         "phase": phase,
         "layer1_enabled": l1,
+        "layer1_config_enabled": l1_config,
+        "successful_analysis_gate": gate,
         "total_successful_analyses": total,
         "by_type": by_type,
         "reputation_score": rep.get("score", 0),
@@ -89,7 +98,11 @@ Focus on health, direction of travel, and one concrete next lever. Warm, precise
             rep = result["reputation"]
             rep_md = reputation_summary_md(rep)
             by_type = dict(result["stats"].get("by_type") or by_type)
+            gate = successful_analysis_gate_status(prog, result["stats"])
+            l1 = layer1_feature_enabled("multi_model_fusion", prog, result["stats"])
             log_success(result, "pulse")
+            presence["layer1_enabled"] = l1
+            presence["successful_analysis_gate"] = gate
             presence["total_successful_analyses"] = total
             presence["by_type"] = by_type
             presence["reputation_score"] = rep.get("score", 0)
@@ -112,7 +125,8 @@ Focus on health, direction of travel, and one concrete next lever. Warm, precise
     body = f"""# 📡 Nexus Pulse — {now}
 
 **Progressive Phase:** {phase}  
-**Layer 1 (multi-model):** {"enabled" if l1 else "disabled"}  
+**Layer 1 config:** {"enabled" if l1_config else "disabled"}  
+**Multi-model fusion:** {"unlocked" if l1 else "locked"} ({gate['current']}/{gate['required']} successful analyses)  
 **Successful analyses recorded:** {total}  
 **By type:** commit={by_type.get('commit', 0)} · pr={by_type.get('pr', 0)} · issue={by_type.get('issue', 0)} · self_audit={by_type.get('self_audit', 0)} · pulse={by_type.get('pulse', 0)}
 

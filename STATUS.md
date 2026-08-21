@@ -9,7 +9,7 @@
 
 ## Current Phase
 
-**Layer 0 + Layer 1** · progressive **v1.6.0** · package **v0.8.0** · model **`grok-4.6`**
+**Layer 0 live · Layer 1 measurement stack live · fusion gated by progressive unlocks** · progressive **v1.6.0** · package **v0.8.0** · model **`grok-4.6`**
 
 ### 🟢 Measurement stack — live
 

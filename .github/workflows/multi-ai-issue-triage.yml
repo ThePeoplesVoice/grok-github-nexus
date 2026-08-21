@@ -37,17 +37,17 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: python -m nexus.scripts.run_issue_triage
 
-      - name: Commit usage + reputation artifacts (if changed)
+      - name: Commit usage + organic artifacts (if changed)
         if: success()
         continue-on-error: true
         run: |
           git config user.name "nexus-bot"
           git config user.email "nexus-bot@users.noreply.github.com"
-          git add config/usage_stats.json config/reputation.json badges/reputation.md || true
+          git add config/usage_stats.json config/reputation.json config/astra.json badges/reputation.md badges/astra.md || true
           if git diff --staged --quiet; then
             echo "No artifact changes to commit"
           else
-            git commit -m "chore: usage + reputation after issue triage" || true
+            git commit -m "chore: organic state after issue triage" || true
             git push || echo "⚠️ push failed (non-fatal)"
           fi
 

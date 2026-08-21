@@ -2,7 +2,15 @@
 
 __version__ = "0.8.0"
 
-from .context import load_context, load_progressive, load_usage_stats, layer1_enabled, current_phase
+from .context import (
+    load_context,
+    load_progressive,
+    load_usage_stats,
+    successful_analysis_gate_status,
+    layer1_enabled,
+    layer1_feature_enabled,
+    current_phase,
+)
 from .providers import call_grok, call_claude, format_api_error
 from .audit import (
     structural_health,
@@ -38,7 +46,9 @@ __all__ = [
     "load_context",
     "load_progressive",
     "load_usage_stats",
+    "successful_analysis_gate_status",
     "layer1_enabled",
+    "layer1_feature_enabled",
     "current_phase",
     "call_grok",
     "call_claude",

@@ -25,6 +25,7 @@ def fusion_note(
     grok_error: str | None = None,
     claude_error: str | None = None,
     layer1: bool = True,
+    layer1_reason: str | None = None,
 ) -> str:
     if grok_ok and claude_ok:
         return "\n**Multi-model fusion active (Layer 1)** — Grok primary + Claude complementary."
@@ -33,6 +34,8 @@ def fusion_note(
     if claude_ok and grok_error:
         return "\n*Ara primary analysis unavailable — complementary mode only.*"
     if not layer1:
+        if layer1_reason:
+            return f"\n*{layer1_reason}*"
         return "\n*Layer 1 currently disabled — running Open Core (Grok) only.*"
     return ""
 

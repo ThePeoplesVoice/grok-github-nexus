@@ -55,7 +55,7 @@
         "astra_currency",
         "automated_dev_cycle"
       ],
-      "status": "Organic measurement live — usage 5, reputation 5.5, Astra 5.5. Live-tool guard on. Scripts ROOT fixed. Accumulating toward min_successful_analyses 50. Astra launched 2026-08-15."
+      "status": "Organic measurement live. Multi-model fusion unlocks only after the measured successful-analysis gate is met. Live-tool guard on. Scripts ROOT fixed. Astra launched 2026-08-15."
     },
     "2_micropayment_agent": {
       "enabled": false,
@@ -69,7 +69,7 @@
       "features": ["multi_repo_dashboard", "team_seats", "sanctuary_revenue_share", "workflow_marketplace"]
     }
   },
-  "current_phase": "Layer 0 + Layer 1 live — Astra currency launched (balance 5.5) · measurement writing · automated development process active (v1.6.0)",
+  "current_phase": "Layer 0 live · Layer 1 measurement stack live · multi-model fusion unlocks at configured thresholds (v1.6.0)",
   "usage_stats_file": "config/usage_stats.json",
   "reputation_file": "config/reputation.json",
   "astra_file": "config/astra.json",

@@ -7,7 +7,15 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from .context import load_context, load_progressive, load_usage_stats, layer1_enabled, current_phase
+from .context import (
+    load_context,
+    load_progressive,
+    load_usage_stats,
+    layer1_enabled,
+    layer1_feature_enabled,
+    successful_analysis_gate_status,
+    current_phase,
+)
 from .presence import load_presence, format_presence_for_prompt
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -108,9 +116,12 @@ def alignment_signals() -> dict[str, Any]:
 def progressive_snapshot() -> dict[str, Any]:
     prog = load_progressive()
     stats = load_usage_stats()
+    analysis_gate = successful_analysis_gate_status(prog, stats)
     return {
         "phase": current_phase(prog),
-        "layer1_enabled": layer1_enabled(prog),
+        "layer1_config_enabled": layer1_enabled(prog),
+        "layer1_enabled": layer1_feature_enabled("multi_model_fusion", prog, stats),
+        "successful_analysis_gate": analysis_gate,
         "version": prog.get("version"),
         "total_successful_analyses": stats.get("total_successful_analyses", 0),
         "by_type": stats.get("by_type", {}),
@@ -166,7 +177,9 @@ Apply the triad strictly:
 
 Current snapshot:
 - Phase: {snap['phase']}
-- Layer 1 enabled: {snap['layer1_enabled']}
+- Layer 1 config enabled: {snap['layer1_config_enabled']}
+- Multi-model fusion unlocked: {snap['layer1_enabled']}
+- Successful analyses gate: {snap['successful_analysis_gate']['current']}/{snap['successful_analysis_gate']['required']} (remaining: {snap['successful_analysis_gate']['remaining']})
 - progressive.json version: {snap['version']}
 - Successful analyses recorded: {snap['total_successful_analyses']}
 - Structural health score: {health['score']}/100 (missing: {health['missing'] or 'none'})

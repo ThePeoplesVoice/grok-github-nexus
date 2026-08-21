@@ -43,11 +43,11 @@ jobs:
         run: |
           git config user.name "nexus-bot"
           git config user.email "nexus-bot@users.noreply.github.com"
-          git add config/usage_stats.json config/reputation.json config/presence_state.json badges/reputation.md README.md STATUS.md || true
+          git add config/usage_stats.json config/reputation.json config/astra.json config/presence_state.json badges/reputation.md badges/astra.md || true
           if git diff --staged --quiet; then
             echo "No pulse artifact changes to commit"
           else
-            git commit -m "chore: pulse — usage, reputation, presence_state, badges" || true
+            git commit -m "chore: pulse — organic state + presence" || true
             git push || echo "⚠️ push failed (non-fatal)"
           fi
 

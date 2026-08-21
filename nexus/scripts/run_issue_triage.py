@@ -10,7 +10,14 @@ import os
 from pathlib import Path
 
 from nexus.analyze import build_issue_prompt, fusion_note, footer_block, utc_now_str
-from nexus.context import load_context, load_progressive, layer1_enabled, current_phase
+from nexus.context import (
+    load_context,
+    load_progressive,
+    successful_analysis_gate_status,
+    layer1_enabled,
+    layer1_feature_enabled,
+    current_phase,
+)
 from nexus.providers import call_grok, call_claude
 from nexus.usage import load_usage_stats
 from nexus.presence import load_presence, format_presence_for_prompt
@@ -27,12 +34,14 @@ def main() -> None:
     context = load_context()
     prog = load_progressive()
     phase = current_phase(prog)
-    l1 = layer1_enabled(prog)
     stats = load_usage_stats()
+    gate = successful_analysis_gate_status(prog, stats)
+    l1_config = layer1_enabled(prog)
+    l1 = layer1_feature_enabled("multi_model_fusion", prog, stats)
     total_analyses = int(stats.get("total_successful_analyses", 0))
     presence_block = format_presence_for_prompt(load_presence())
 
-    print(f"✅ Progressive phase: {phase} | Layer 1 enabled: {l1}")
+    print(f"✅ Progressive phase: {phase} | Multi-model fusion unlocked: {l1}")
     print(f"📊 Current successful analyses: {total_analyses}")
     print(f"✅ Issue: {issue_title[:80]}")
 
@@ -93,6 +102,12 @@ def main() -> None:
         grok_error=grok_err,
         claude_error=claude_err,
         layer1=l1,
+        layer1_reason=(
+            f"Multi-model fusion remains locked until successful analyses reach "
+            f"{gate['required']} (current {gate['current']}) — continuing with Ara primary only."
+            if l1_config and not l1 and gate["required"] > 0
+            else None
+        ),
     )
     joined = "\n\n---\n\n".join(sections)
     issue_ref = f"#{issue_number} — " if issue_number else ""
