@@ -1,26 +1,26 @@
 {
   "version": "0.2.0",
-  "generated_at": "2026-08-17 08:50 UTC",
+  "generated_at": "2026-08-24 08:54 UTC",
   "phase": "Layer 0 + Layer 1 live — Astra currency launched (balance 5.5) · measurement writing · automated development process active (v1.6.0)",
   "layer1_enabled": true,
-  "total_successful_analyses": 10,
+  "total_successful_analyses": 15,
   "by_type": {
-    "commit": 7,
+    "commit": 10,
     "pr": 0,
     "issue": 0,
-    "self_audit": 1,
-    "pulse": 2,
+    "self_audit": 2,
+    "pulse": 3,
     "other": 0
   },
-  "reputation_score": 10.0,
-  "reputation_raw": 10.0,
+  "reputation_score": 15.5,
+  "reputation_raw": 15.5,
   "reputation_freshness": "fresh",
   "recent_commits_preview": [
-    "c418e99 chore: automated dev cycle — queue + field notes",
-    "c184b52 chore: usage + reputation after commit analysis",
-    "9db9f83 chore: usage + reputation after commit analysis",
-    "52b7fc4 complete: dev_queue — mark cleanup-automated-issues + astra-launch + github-hygiene done. Tracker clean.",
-    "ce6ab18 complete: STATUS — GitHub thoroughly cleaned (artifacts removed, automated issues closed, .gitignore live). Astra + measurement remain green."
+    "7282118 chore: automated dev cycle — queue + field notes",
+    "d96ab5b chore: usage + reputation after commit analysis",
+    "156da88 Merge pull request #105 from ThePeoplesVoice/copilot/commit-analysis-2026-08-17",
+    "9364495 chore: usage + reputation after self-audit",
+    "af22dad fix review feedback for self-audit and reputation badge sync"
   ],
   "notes": "Compressed context for continuity. Not a chat log. See ORGANIC_SYSTEMS.md."
 }
