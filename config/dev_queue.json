@@ -1,6 +1,6 @@
 {
   "version": "1.0.7",
-  "updated_at": "2026-08-17T19:10:00Z",
+  "updated_at": "2026-08-24T07:57:09Z",
   "notes": "Artifact guard live. Commit-loop feedback fixed. Astra synced to rep 11.98. Test suite added (19 passing). Primary blocker: rotate GROK_API_KEY.",
   "done": [
     {
@@ -180,10 +180,10 @@
   "last_cycle": {
     "structural_health": 100,
     "triad_hits": 49,
-    "total_analyses": 12,
-    "reputation_effective": 11.98,
+    "total_analyses": 14,
+    "reputation_effective": 14.99,
     "reputation_freshness": "fresh",
-    "presence_at": null,
+    "presence_at": "2026-08-17 08:50 UTC",
     "package_version": "0.8.0"
   }
 }
