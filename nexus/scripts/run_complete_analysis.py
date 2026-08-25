@@ -67,7 +67,7 @@ def _github_surface() -> dict:
         req = urllib.request.Request(
             f"https://api.github.com{path}",
             headers={
-                "Authorization": f"Bearer {token}",
+                "Authorization": "token " + token,
                 "Accept": "application/vnd.github+json",
                 "User-Agent": "nexus-complete",
                 "X-GitHub-Api-Version": "2022-11-28",

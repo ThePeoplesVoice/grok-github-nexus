@@ -94,7 +94,7 @@ def call_grok(
         response = requests.post(
             GROK_URL,
             headers={
-                "Authorization": f"Bearer {key}",
+                "Authorization": "Bearer " + key,
                 "Content-Type": "application/json",
             },
             json={
@@ -111,8 +111,26 @@ def call_grok(
         )
         if response.status_code == 200:
             data = response.json()
-            text = data["choices"][0]["message"]["content"]
-            return text, None
+            choices = data.get("choices") or []
+            if not choices:
+                return None, "Grok API response did not include any choices"
+            message = choices[0].get("message") or {}
+            content = message.get("content")
+            if isinstance(content, list):
+                parts: list[str] = []
+                for part in content:
+                    if isinstance(part, dict):
+                        text = part.get("text")
+                        if isinstance(text, str):
+                            parts.append(text)
+                    elif isinstance(part, str):
+                        parts.append(part)
+                if parts:
+                    return "".join(parts), None
+                return str(content), None
+            if isinstance(content, str):
+                return content, None
+            return str(data), None
         return None, format_api_error("Grok", response) + f" [model={model_name}]"
     except Exception as e:
         return None, f"Grok exception: {str(e)[:180]}"
