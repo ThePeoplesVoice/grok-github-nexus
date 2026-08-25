@@ -30,10 +30,12 @@ WEIGHTS = {
     "commit": 1.0,
     "self_audit": 2.0,
     "pulse": 0.5,
+    "complete": 1.0,
     "other": 0.5,
 }
 
 HALF_LIFE_DAYS = 30.0
+
 
 def _defaults() -> dict[str, Any]:
     return {
@@ -204,7 +206,7 @@ def reputation_summary_md(data: dict[str, Any] | None = None) -> str:
         f"- From {d.get('total_successful_analyses', 0)} successful analyses",
         f"- Components: pr={comps.get('pr', 0)} · issue={comps.get('issue', 0)} · "
         f"commit={comps.get('commit', 0)} · self_audit={comps.get('self_audit', 0)} · "
-        f"pulse={comps.get('pulse', 0)}",
+        f"pulse={comps.get('pulse', 0)} · complete={comps.get('complete', 0)}",
         "- Half-life 30 days on idle. Not a token. Does not gate Open Core.",
     ]
     return "\n".join(lines)

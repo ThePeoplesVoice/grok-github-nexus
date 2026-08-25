@@ -1,0 +1,12 @@
+{
+  "version": "1.0.0",
+  "description": "Last Complete Analysis. Written by nexus.scripts.run_complete_analysis after a Grok pass. Consumed by the Nexus dashboard. Human lands the change.",
+  "generated_at": null,
+  "source": null,
+  "summary": null,
+  "health": null,
+  "stop": null,
+  "start": null,
+  "keep": null,
+  "actions": []
+}
