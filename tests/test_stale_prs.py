@@ -41,6 +41,18 @@ def test_keep_label_wins():
     assert v == "keep"
 
 
+def test_do_not_close_label_wins():
+    pr = _pr(
+        labels=[{"name": "do-not-close"}],
+        user={"login": "Copilot", "type": "Bot"},
+        head={"ref": "copilot/commit-analysis-old"},
+        updated_at="2026-08-01T00:00:00Z",
+    )
+    v, reason = classify(pr, {"ahead_by": 2, "behind_by": 20}, now=NOW)
+    assert v == "keep"
+    assert "label" in reason
+
+
 def test_close_noisy_bot_wip():
     pr = _pr(
         title="[WIP] Analyze commits for 2026-08-13",
@@ -62,6 +74,24 @@ def test_keep_fresh_bot():
     )
     v, _ = classify(pr, {"ahead_by": 2, "behind_by": 1}, now=NOW)
     assert v == "keep"
+
+
+def test_close_bot_far_behind():
+    pr = _pr(
+        title="chore: leftover copilot branch",
+        user={"login": "github-actions[bot]", "type": "Bot"},
+        head={"ref": "copilot/fix-something-unique"},
+        updated_at="2026-08-01T00:00:00Z",
+    )
+    v, reason = classify(pr, {"ahead_by": 3, "behind_by": 14}, now=NOW)
+    assert v == "close"
+    assert "behind" in reason
+
+
+def test_keep_human_even_if_behind():
+    v, reason = classify(_pr(), {"ahead_by": 2, "behind_by": 40}, now=NOW)
+    assert v == "keep"
+    assert "human" in reason
 
 
 def test_is_bot_from_branch():
