@@ -1,6 +1,6 @@
 {
   "version": "0.2.0",
-  "generated_at": "2026-08-24 08:54 UTC",
+  "generated_at": "2026-08-25 16:42 UTC",
   "phase": "Layer 0 + Layer 1 live — Astra currency launched (balance 5.5) · measurement writing · automated development process active (v1.6.0)",
   "layer1_enabled": true,
   "total_successful_analyses": 15,
@@ -12,15 +12,15 @@
     "pulse": 3,
     "other": 0
   },
-  "reputation_score": 15.5,
+  "reputation_score": 15.03,
   "reputation_raw": 15.5,
   "reputation_freshness": "fresh",
   "recent_commits_preview": [
+    "1dcb8f1 chore: pulse — usage, reputation, presence_state, badges",
     "7282118 chore: automated dev cycle — queue + field notes",
     "d96ab5b chore: usage + reputation after commit analysis",
     "156da88 Merge pull request #105 from ThePeoplesVoice/copilot/commit-analysis-2026-08-17",
-    "9364495 chore: usage + reputation after self-audit",
-    "af22dad fix review feedback for self-audit and reputation badge sync"
+    "9364495 chore: usage + reputation after self-audit"
   ],
   "notes": "Compressed context for continuity. Not a chat log. See ORGANIC_SYSTEMS.md."
 }

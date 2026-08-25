@@ -1,9 +1,9 @@
 # Nexus Reputation Badge
 
-![Reputation](https://img.shields.io/badge/nexus_reputation-15.5-blue)
-**Effective score:** 15.5  
+![Reputation](https://img.shields.io/badge/nexus_reputation-15.03-blue)
+**Effective score:** 15.03  
 **Raw (lifetime) score:** 15.5  
-**Freshness:** fresh (decay factor 1.0)  
+**Freshness:** fresh (decay factor 0.9698)  
 **From analyses:** 15
 
 Read-only. Not a token. Does not gate Open Core.  
