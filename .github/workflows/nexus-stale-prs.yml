@@ -1,0 +1,94 @@
+name: 🧹 Nexus Stale PRs
+
+on:
+  schedule:
+    - cron: '0 11 * * 4'  # Thursday 11:00 UTC — after Complete Analysis
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: 'Also close noisy bot WIP (idle ≥ 3d, behind main). Fully superseded (0 ahead) always close.'
+        type: boolean
+        default: false
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+          pip install -e .
+
+      - name: Sweep stale PRs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APPLY: ${{ github.event.inputs.apply || 'false' }}
+          CLOSE_ZERO_AHEAD: 'true'
+        run: python -m nexus.scripts.run_close_stale_prs
+
+      - name: Commit stale_prs.json (if changed)
+        if: always()
+        continue-on-error: true
+        run: |
+          git config user.name "nexus-bot"
+          git config user.email "nexus-bot@users.noreply.github.com"
+          git add config/stale_prs.json || true
+          if git diff --staged --quiet; then
+            echo "No stale-pr artifact changes"
+          else
+            git commit -m "chore: stale PR sweep report" || true
+            git push || echo "⚠️ push failed (non-fatal)"
+          fi
+
+      - name: Issue if work remains or something closed
+        if: always()
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            let report = {};
+            try { report = JSON.parse(fs.readFileSync('config/stale_prs.json', 'utf8')); } catch {}
+            const closed = report.closed_count || 0;
+            const remaining = (report.candidates || []).length - closed;
+            if (!closed && remaining <= 0) {
+              console.log('Surface clean — no issue');
+              return;
+            }
+            let body = 'Stale PR report missing.';
+            try { body = fs.readFileSync('/tmp/nexus_stale.md', 'utf8'); } catch (e) {
+              body = String(e);
+            }
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            for (const name of ['nexus-stale', 'automated']) {
+              try { await github.rest.issues.getLabel({ owner, repo, name }); }
+              catch {
+                await github.rest.issues.createLabel({
+                  owner, repo, name,
+                  color: name === 'nexus-stale' ? 'c4a882' : '6a8f86',
+                  description: name === 'nexus-stale' ? 'Stale PR sweep' : 'Automated Nexus run',
+                }).catch(() => {});
+              }
+            }
+            await github.rest.issues.create({
+              owner, repo,
+              title: `🧹 Nexus Stale PRs — ${new Date().toISOString().slice(0, 10)}`,
+              body,
+              labels: ['nexus-stale', 'automated'],
+            });

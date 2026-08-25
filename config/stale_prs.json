@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0",
+  "description": "Last stale PR sweep. Written by nexus.scripts.run_close_stale_prs. Consumed by the Nexus dashboard.",
+  "generated_at": null,
+  "dry_run": true,
+  "apply": false,
+  "open_scanned": 0,
+  "closed_count": 0,
+  "kept_count": 0,
+  "candidates": [],
+  "closed": [],
+  "kept": [],
+  "notes": "Human PRs and keep-labeled PRs are never closed."
+}
