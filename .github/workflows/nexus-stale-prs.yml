@@ -88,7 +88,7 @@ jobs:
             }
             await github.rest.issues.create({
               owner, repo,
-              title: `\ud83e\uddf9 Nexus Stale PRs — ${new Date().toISOString().slice(0, 10)}`,
+              title: `Nexus Stale PRs — ${new Date().toISOString().slice(0, 10)}`,
               body,
               labels: ['nexus-stale', 'automated'],
             });
