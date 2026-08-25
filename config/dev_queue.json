@@ -1,8 +1,13 @@
 {
-  "version": "1.0.8",
-  "updated_at": "2026-08-25T17:20:00Z",
-  "notes": "GROK_API_KEY live — Pulse #115 wrote Ara. Analyses 16. Complete Analysis loop shipping (summary + ranked implementations, weekly Thursday 10:00 UTC). Next: close stale PRs, route one real PR/issue, dispatch Complete once after merge, accumulate 16/50.",
+  "version": "1.0.9",
+  "updated_at": "2026-08-25T18:00:00Z",
+  "notes": "GROK_API_KEY live. Complete Analysis merged (#116). Stale PR sweeper shipping — #38–66 already closed 2026-08-17. Next: route one real PR/issue, dispatch Complete once, accumulate 16/50.",
   "done": [
+    {
+      "id": "close-stale-prs",
+      "title": "Stale PR sweeper armed — historical #38–66 closed 2026-08-17; weekly dry-run + dispatch apply",
+      "completed": "2026-08-26"
+    },
     {
       "id": "rotate-grok-api-key",
       "title": "GROK_API_KEY restored — Pulse #115 live Ara reflection",
@@ -141,25 +146,17 @@
   ],
   "next": [
     {
-      "id": "close-stale-prs",
-      "title": "Close stale WIP PRs #38–66 (25 open bot PRs, all superseded by main)",
-      "priority": 1,
-      "leverage": "high",
-      "risk": "low",
-      "why": "Open PR count creates noise and confuses progressive_unlock community_prs counter."
-    },
-    {
       "id": "route-one-real-review",
       "title": "Run one living PR or issue through Ara so the mix is not commit-only",
-      "priority": 2,
+      "priority": 1,
       "leverage": "high",
       "risk": "low",
       "why": "PR and issue analysis counters are 0. Layer 1 needs collaboration, not only self-chores."
     },
     {
       "id": "dispatch-complete-analysis",
-      "title": "Dispatch Complete Analysis once after this loop merges — weekly Thursday 10:00 UTC thereafter",
-      "priority": 3,
+      "title": "Dispatch Complete Analysis once — weekly Thursday 10:00 UTC thereafter",
+      "priority": 2,
       "leverage": "high",
       "risk": "low",
       "why": "Pulse writes prose. Complete writes implementations. Human lands the change."
@@ -167,7 +164,7 @@
     {
       "id": "accumulate-toward-50",
       "title": "Accumulate successful analyses toward Layer 1 unlock (16/50)",
-      "priority": 4,
+      "priority": 3,
       "leverage": "high",
       "risk": "low",
       "why": "Currently 16/50. Prefer real PR/issue analyses over extra pulse spam."
