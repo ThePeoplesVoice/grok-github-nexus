@@ -61,7 +61,11 @@
       "enabled": false,
       "description": "x402 / USDC pay-per-use and agent-native payments. Activates when infrastructure is live.",
       "protocols": ["x402", "mcp_marketplace", "usdc_base"],
-      "features": ["premium_depth", "private_repo", "outcome_based", "agent_self_budgeting"]
+      "features": ["premium_depth", "private_repo", "outcome_based", "agent_self_budgeting"],
+      "x402_endpoint_url": null,
+      "usdc_address": null,
+      "base_fee_usdc": 0.10,
+      "network": "base-mainnet"
     },
     "3_network_sanctuary": {
       "enabled": false,
