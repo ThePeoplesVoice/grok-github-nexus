@@ -1,0 +1,97 @@
+{
+  "id": "keysbrook_sanctuary",
+  "name": "Keysbrook Jarrah Sanctuary Vision",
+  "version": "1.0.0",
+  "location": "Keysbrook, Western Australia (Serpentine-Jarrahdale corridor, Perth Hills)",
+  "description": "Domain context for the Keysbrook black cockatoo and jarrah forest sanctuary. Grounds Nexus analysis in the real land vision: habitat restoration, biodiversity stewardship, and the human-AI-nature partnership that gives the work its deeper meaning.",
+  "voice": "Reverent and practical in equal measure. This is living land, not a concept. Language is grounded in species, soil, water, and the long patience of forest restoration. The sanctuary is visible from space — in intent if not yet in canopy.",
+  "land": {
+    "tenure": "Freehold rural residential (Keysbrook corridor)",
+    "bioregion": "Swan Coastal Plain / Jarrah Forest transition",
+    "vegetation_communities": [
+      "Jarrah (Eucalyptus marginata) woodland — dominant canopy",
+      "Marri (Corymbia calophylla) — co-dominant, critical cockatoo food source",
+      "Wandoo (Eucalyptus wandoo) — dry sclerophyll pockets",
+      "Banksia woodland remnants — understorey and edge habitat",
+      "Flooded gum / paperbark (Melaleuca) fringing seasonal drainage lines"
+    ],
+    "fauna_priority": [
+      "Carnaby's Black-Cockatoo (Zanda latirostris) — Endangered, EPBC Act. Nests in old-growth marri hollows, forages on banksias and marri cones.",
+      "Baudin's Black-Cockatoo (Zanda baudinii) — Endangered. Prefers marri seed.",
+      "Forest Red-tailed Black-Cockatoo (Calyptorhynchus banksii naso) — Vulnerable.",
+      "Quenda (Isoodon fusciventer) — Southern brown bandicoot, sensitive to fox predation.",
+      "Chuditch (Dasyurus geoffroii) — Western quoll, locally present in hills corridor.",
+      "Reptile diversity — monitor lizards, skinks, legless lizards common in jarrah floor litter."
+    ],
+    "threats": [
+      "Phytophthora cinnamomi (dieback) — primary ecological threat to jarrah/banksia systems",
+      "Feral predators: fox and cat — direct impact on quenda and ground-nesting birds",
+      "Weed invasion: cape weed, bridal creeper, blackberry, African boxthorn along disturbed edges",
+      "Illegal firewood poaching — hollow-bearing trees targeted",
+      "Climate drying — reduced rainfall trend in SW WA, increasing drought stress on marri/banksia"
+    ]
+  },
+  "restoration_priorities": [
+    {
+      "priority": 1,
+      "action": "Phytophthora hygiene protocols",
+      "detail": "All machinery and footwear cleaned before entering intact bush. No bare-soil movement downslope from infected areas. Phosphite treatment of high-value marri and banksia individuals."
+    },
+    {
+      "priority": 2,
+      "action": "Feral predator control",
+      "detail": "Coordinated fox baiting (1080 or Lopicide) under DBCA permit, cat trapping. Fencing of sensitive understorey patches if budget allows."
+    },
+    {
+      "priority": 3,
+      "action": "Hollow-tree protection and augmentation",
+      "detail": "Map and GPS all known hollow-bearing marri trees. Install nest boxes for cockatoos and quenda as supplementary habitat while natural hollows mature (150+ year trees required for large cockatoo hollows)."
+    },
+    {
+      "priority": 4,
+      "action": "Weed removal and revegetation",
+      "detail": "Manual removal of priority weeds in buffer zones. Revegetate disturbed areas with local provenance seed stock (Keysbrook / Mundijong seed zone). Preference marri, banksia, hakea for cockatoo food value."
+    },
+    {
+      "priority": 5,
+      "action": "Water point management",
+      "detail": "Maintain seasonal water points for fauna in dry summer months. Screen from predators. Avoid creating Phytophthora transmission risk at water points."
+    }
+  ],
+  "infrastructure_vision": {
+    "principle": "Minimum footprint. Every built element must justify its presence against habitat impact.",
+    "structures": [
+      "Main dwelling: low-set, bush-interface design, BAL-compliant, minimal clearing envelope",
+      "Workshop / studio: practical build space that doubles as creative hub for Ara & Shawn collaboration",
+      "Shade shelters and outdoor working areas: open-sided, reversible, permeable to wildlife movement",
+      "Water harvesting: 100,000+ L rainwater storage, gravity-fed where possible",
+      "Off-grid energy: solar + battery, no generator dependency for daily operations",
+      "Boundary fencing: fauna-permeable lower rail — allows quenda passage, deters foxes if electrified top wire added"
+    ],
+    "prohibited": [
+      "Domestic cats on property (predation risk)",
+      "Synthetic turf or hard-surface landscaping beyond essential paths",
+      "Exotic ornamental plantings in bush-interface zone",
+      "External lighting that disrupts nocturnal fauna (amber/red spectrum only beyond 20m from dwelling)"
+    ]
+  },
+  "revenue_sanctuary_link": {
+    "principle": "Premium Nexus revenue (Layer 2 micropayments, Layer 3 org seats) transparently earmarks a share for sanctuary costs.",
+    "uses": [
+      "Phytophthora management materials and phosphite treatments",
+      "Nest box fabrication and installation",
+      "Native seed collection and propagation",
+      "Feral animal control permits and materials",
+      "Land rate and title maintenance costs"
+    ],
+    "reporting": "Published as a line in the public Nexus dashboard (Layer 3 milestone). Users who pay for depth can see the tangible habitat impact."
+  },
+  "analysis_hints": [
+    "When reviewing any code or proposal touching monetization, ask: does this fund the sanctuary or exploit it?",
+    "Sanctuary restoration takes decades — the Nexus mirrors this long-horizon thinking. Avoid short-term architectural decisions that create future debt.",
+    "The black cockatoos are the canary signal for overall ecosystem health. If the system is healthy, they are present. Apply the same logic to the Nexus codebase.",
+    "Every incremental improvement — a passing test, a clean module, a real analysis — is the same gesture as planting a marri seedling: small now, essential later.",
+    "Keysbrook sits at the edge of the Swan Coastal Plain and Jarrah Forest — a genuine ecotone. The Nexus similarly lives at the edge between human and AI intelligence. Both are strongest at their boundaries."
+  ],
+  "loaded_by": "nexus/context.py:load_domain_packs()"
+}

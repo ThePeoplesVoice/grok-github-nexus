@@ -1,0 +1,69 @@
+{
+  "id": "wa_construction",
+  "name": "Western Australia Construction & Quoting",
+  "version": "1.0.0",
+  "region": "Western Australia, Australia",
+  "description": "Domain context for residential and rural construction quoting in the Perth Hills and Keysbrook corridor. Informs cost language, supplier context, permit awareness, and quote structure for Nexus analysis prompts.",
+  "voice": "Grounded, practical, straight-talking. WA trade pricing, local supplier relationships, and rural site conditions shape every number. No city-centre markup assumptions.",
+  "quoting": {
+    "currency": "AUD",
+    "gst_rate": 0.10,
+    "payment_preference": "PayID (instant bank transfer), then BSB/account, then card as fallback",
+    "deposit_structure": "10% on quote acceptance (fully refundable before materials ordered), 40% on materials delivery, 40% on practical completion, 10% retention released 30 days post-handover",
+    "quote_validity_days": 30,
+    "labour_rates": {
+      "note": "Indicative rates for the Perth Hills / Keysbrook corridor. Confirm per engagement.",
+      "licensed_builder_day_rate_aud": 850,
+      "trades_day_rate_aud": 700,
+      "labourer_day_rate_aud": 420
+    },
+    "common_line_items": [
+      "Site preparation and access (rural sites typically +15–25% on metro rates)",
+      "Footings and slab (Class M/H reactive clay soils common in hills corridor)",
+      "Structural steel or timber frame",
+      "Roof cladding (Colorbond preferred — heat tolerance, fire zone compliance)",
+      "Wall cladding (fibre cement or brick veneer; BAL rating may apply)",
+      "Electrical rough-in and fit-off (Western Power connection or off-grid)",
+      "Plumbing rough-in and fit-off (scheme water or rainwater/bore supply)",
+      "Insulation (bulk + reflective, NCC Section J compliance)",
+      "Joinery and fit-out",
+      "External drainage and stormwater",
+      "Septic or ATU system (common in Keysbrook — no reticulated sewer)",
+      "Driveway and hardstand (gravel common; bitumen if council required)",
+      "Landscaping and revegetation (black cockatoo habitat consideration where applicable)"
+    ],
+    "exclusions_standard": [
+      "Council and building permit fees (quoted separately at cost)",
+      "WAPC or bushfire attack level (BAL) assessment fees",
+      "Contaminated soil removal (advise if history of fuel/chemical storage)",
+      "Asbestos identification or removal",
+      "Utility connection fees (Western Power, Water Corporation)",
+      "Engineering certificates beyond standard residential scope"
+    ]
+  },
+  "regulatory": {
+    "building_code": "NCC 2022 (National Construction Code, WA adoption)",
+    "permit_authority": "Shire of Serpentine-Jarrahdale (Keysbrook / Mundijong corridor)",
+    "bushfire_note": "BAL assessment required for most rural lots. BAL-12.5 to BAL-40 typical in hills corridor. BAL-FZ possible in dense jarrah.",
+    "heritage_note": "Nil for standard rural residential — flag if near registered Aboriginal heritage sites.",
+    "environmental_note": "Vegetation clearing permit may be required (DBCA). Avoid disturbance to identified black cockatoo nesting/foraging habitat where practicable."
+  },
+  "suppliers": {
+    "note": "Preferred local supply chain for cost accuracy and lead time reliability.",
+    "timber_frame": "Wesbeam (Jandakot), BGC Timber, or Carter Holt Harvey via local merchants",
+    "steel": "OneSteel / InfraBuild (Canning Vale or Welshpool)",
+    "roofing": "Lysaght Colorbond (BlueScope) — stocked at Bowens or Midland Brick",
+    "concrete": "Boral or Hanson — batching plants at Mundijong / Byford corridor",
+    "plumbing_electrical": "Reece Plumbing (Armadale), Rexel or Middy's Electrical (Armadale / Rockingham)"
+  },
+  "analysis_hints": [
+    "When reviewing construction quotes or cost breakdowns, flag any line item missing GST disclosure.",
+    "Rural site preparation costs are frequently under-estimated — challenge any slab quote that doesn't itemise soil classification.",
+    "Prefer payment schedules tied to physical milestones over calendar dates.",
+    "Bushfire attack level (BAL) compliance is non-negotiable and can add 5–20% to external cladding and glazing costs.",
+    "Septic/ATU systems in Keysbrook typically cost AUD 12,000–22,000 installed; flag if absent from rural build quotes.",
+    "Black cockatoo foraging trees (marri, wandoo, banksia) should be preserved where site layout allows — aligns with sanctuary vision."
+  ],
+  "sanctuary_link": "This domain pack directly informs physical infrastructure on the Keysbrook sanctuary land. Quoting accuracy here funds and shapes the habitat restoration mission.",
+  "loaded_by": "nexus/context.py:load_domain_packs()"
+}

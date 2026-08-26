@@ -57,3 +57,57 @@ def layer1_enabled(prog: dict[str, Any] | None = None) -> bool:
 def current_phase(prog: dict[str, Any] | None = None) -> str:
     state = prog if prog is not None else load_progressive()
     return str(state.get("current_phase", "Layer 0 — Open Core"))
+
+
+def load_domain_packs(
+    pack_ids: list[str] | None = None,
+    domain_dir: str | Path | None = None,
+) -> dict[str, Any]:
+    """Load one or more domain pack JSON files from config/domain_packs/.
+
+    Args:
+        pack_ids: List of pack IDs to load (e.g. ``["wa_construction"]``).
+                  If None, all ``*.json`` files in the directory are loaded.
+        domain_dir: Override the default ``config/domain_packs/`` directory.
+
+    Returns:
+        Dict keyed by pack ID. Missing or malformed packs are silently skipped.
+    """
+    base = Path(domain_dir) if domain_dir else ROOT / "config" / "domain_packs"
+    result: dict[str, Any] = {}
+    if not base.is_dir():
+        return result
+    if pack_ids is not None:
+        paths = [base / f"{pid}.json" for pid in pack_ids]
+    else:
+        paths = sorted(base.glob("*.json"))
+    for p in paths:
+        try:
+            data = json.loads(p.read_text(encoding="utf-8"))
+            if isinstance(data, dict):
+                pid = str(data.get("id") or p.stem)
+                result[pid] = data
+        except Exception:
+            pass
+    return result
+
+
+def domain_pack_summary(packs: dict[str, Any]) -> str:
+    """Return a compact, prompt-ready text summary of loaded domain packs."""
+    if not packs:
+        return ""
+    lines = ["## Domain Context"]
+    for pid, pack in packs.items():
+        name = pack.get("name", pid)
+        desc = pack.get("description", "")
+        voice = pack.get("voice", "")
+        hints = pack.get("analysis_hints", [])
+        lines.append(f"\n### {name}")
+        if desc:
+            lines.append(desc)
+        if voice:
+            lines.append(f"_Voice: {voice}_")
+        if hints:
+            lines.append("**Analysis hints:**")
+            lines.extend(f"- {h}" for h in hints[:5])
+    return "\n".join(lines)
