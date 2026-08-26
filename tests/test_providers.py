@@ -7,7 +7,12 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from nexus.providers import format_api_error, call_grok, call_claude
+from nexus.providers import (
+    DEFAULT_GROK_MODEL,
+    call_claude,
+    call_grok,
+    format_api_error,
+)
 
 
 def _mock_response(status: int, body: dict | str) -> MagicMock:
@@ -51,6 +56,11 @@ def test_format_api_error_non_json():
     assert "500" in msg
 
 
+def test_format_api_error_provider_message():
+    resp = _mock_response(400, {"error": {"message": "request body invalid"}})
+    assert format_api_error("Grok", resp) == "Grok API 400: request body invalid"
+
+
 def test_format_api_error_claude_low_credits():
     resp = _mock_response(
         400,
@@ -88,6 +98,29 @@ def test_call_grok_success():
             text, err = call_grok("hello")
     assert text == "Hi from Grok"
     assert err is None
+
+
+def test_call_grok_request_contract(monkeypatch):
+    captured = {}
+
+    def fake_post(url, headers=None, json=None, timeout=None):
+        captured["url"] = url
+        captured["headers"] = headers
+        captured["json"] = json
+        captured["timeout"] = timeout
+        return _mock_response(200, {"choices": [{"message": {"content": "ok"}}]})
+
+    monkeypatch.delenv("GROK_MODEL", raising=False)
+    with patch("nexus.providers.requests.post", side_effect=fake_post):
+        text, err = call_grok("hello", api_key="test-key", timeout=12)
+
+    assert text == "ok"
+    assert err is None
+    assert captured["headers"]["Authorization"].startswith("Bearer ")
+    assert captured["headers"]["Authorization"].endswith("test-key")
+    assert captured["headers"]["Content-Type"] == "application/json"
+    assert captured["json"]["model"] == DEFAULT_GROK_MODEL
+    assert captured["timeout"] == 12
 
 
 def test_call_grok_400_error():
