@@ -12,7 +12,13 @@ on:
 
 jobs:
   analyze-commits:
-    if: github.actor != 'github-actions[bot]'
+    if: |
+      github.event_name != 'push' || (
+        github.actor != 'github-actions[bot]' &&
+        github.actor != 'nexus-bot' &&
+        !startsWith(github.event.head_commit.message, 'chore:') &&
+        !startsWith(github.event.head_commit.message, 'Merge')
+      )
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -50,7 +56,7 @@ jobs:
         run: |
           git config user.name "nexus-bot"
           git config user.email "nexus-bot@users.noreply.github.com"
-          git add config/usage_stats.json config/reputation.json badges/reputation.md README.md STATUS.md || true
+          git add config/usage_stats.json config/reputation.json badges/reputation.md || true
           if git diff --staged --quiet; then
             echo "No artifact changes to commit"
           else
@@ -66,8 +72,28 @@ jobs:
           script: |
             const fs = require('fs');
             try {
+              // Deduplicate: close any open nexus-analysis issues created today before making a new one
+              const today = new Date().toISOString().slice(0, 10);
+              const existing = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                labels: 'nexus-analysis,automated',
+                per_page: 50,
+              });
+              for (const issue of existing.data) {
+                if (issue.title.includes(today)) {
+                  await github.rest.issues.update({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    state: 'closed',
+                  });
+                  console.log(`🗑️ Closed duplicate analysis issue #${issue.number}`);
+                }
+              }
               const body = fs.readFileSync('/tmp/commit_analysis.md', 'utf8');
-              const title = `🌌 Commit Analysis — ${new Date().toISOString().slice(0,10)}`;
+              const title = `🌌 Commit Analysis — ${today}`;
               await github.rest.issues.create({
                 owner: context.repo.owner,
                 repo: context.repo.repo,

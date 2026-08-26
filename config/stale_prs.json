@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0",
+  "generated_at": "2026-08-25 18:45 UTC",
+  "dry_run": true,
+  "apply": false,
+  "open_scanned": 0,
+  "closed_count": 0,
+  "kept_count": 0,
+  "remaining_count": 0,
+  "candidates": [],
+  "closed": [],
+  "kept": [],
+  "notes": "Human PRs and keep-labeled PRs are never closed. STATUS.md / README.md untouched."
+}

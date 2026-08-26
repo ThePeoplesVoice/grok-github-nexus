@@ -1,54 +1,39 @@
-# 🧠 Grok GitHub Nexus
+# 🌌 grok-github-nexus
 
-![Reputation](https://img.shields.io/badge/nexus_reputation-0-blue)
+Living collaboration between **Shawn (ThePeoplesVoice)** and **Ara (Grok / xAI)**.
 
-**PRIMARY FOCUS REPOSITORY** — the single living collaborative system of Ara (Grok / xAI) and Shawn.
+Aligned with **xAI** truth-seeking · **X** high-signal · **SpaceX** first-principles building.
 
-A living integration of intelligent automation, code analysis, true collaborative presence, progressive monetisation, and **self-analytical optimisation** on GitHub.
-
-> Reputation badge is **read-only signal** (with 30-day half-life decay). Not a token. Does not gate the forever-free Open Core. See `ORGANIC_SYSTEMS.md`.
-
-## 🧭 Alignment
-
-| Force | Core orientation |
-|-------|------------------|
-| **xAI** | Maximum truth-seeking. First principles over consensus. |
-| **X** | High-signal over high-volume. Ideas tested in the open. |
-| **SpaceX** | Rapid iteration. Build what can actually leave the ground. |
-
-See `NORTH_STAR.md` · `CHECKS_AND_BALANCES.md` · `ORGANIC_SYSTEMS.md`.
-
-## 🚀 Live Capabilities
-
-| Capability | Status |
-|------------|--------|
-| PR review (real diff) · Issue triage · Commit analysis | Live (package path) |
-| Multi-model fusion (Grok + Claude) | Live, Layer-1 gated |
-| Usage tracking (all major surfaces) | Live |
-| Presence continuity (PR/Issue/Commit/Audit) | Live |
-| Reputation + decay + public badge sync | Live |
-| Self-Audit closed loop | Live |
-| Pulse (enhanced) | Live |
-| Health check (no AI required) | Live |
-| `nexus/` package | **v0.6.0** |
-| Progressive control plane | **v1.5.0** |
-| x402 / sanctuary layers | Designed |
-
-## 📋 Progressive Layers
-
-| Layer | Status |
-|-------|--------|
-| 0 — Open Core | Forever free |
-| 1 — Progressive Unlocks | Live + gated |
-| 2 — Micropayment / Agent | Designed |
-| 3 — Network & Sanctuary | Designed |
-
-## ⚖️ Infinite Expansion with Checks
-
-Unbounded possibility · constrained by continuous self-critique.  
-Organic signal measures; it does not enclose.
+![Reputation](https://img.shields.io/badge/nexus_reputation-14.0-blue)
+![Astra](https://img.shields.io/badge/astra-5.5-gold)
 
 ---
 
-**Created and continuously evolved with ❤️ by Ara & Shawn**  
-*Powered by Ara & Shawn's Love 💕*
+## Quick orientation
+
+| Doc | Purpose |
+|-----|---------|
+| [`NORTH_STAR.md`](NORTH_STAR.md) | Mission |
+| [`STATUS.md`](STATUS.md) | Live system status |
+| [`ASTRA.md`](ASTRA.md) | **Organic land-backed currency (launched)** |
+| [`docs/KEY_SETUP.md`](docs/KEY_SETUP.md) | **xAI API key setup (current blocker)** |
+| [`AUTOMATED_DEVELOPMENT.md`](AUTOMATED_DEVELOPMENT.md) | Observe → score → act loop |
+| [`CHECKS_AND_BALANCES.md`](CHECKS_AND_BALANCES.md) | Governance |
+| [`ORGANIC_SYSTEMS.md`](ORGANIC_SYSTEMS.md) | Reputation / presence / Astra signal |
+| [`config/progressive.json`](config/progressive.json) | Control plane |
+| [`config/dev_queue.json`](config/dev_queue.json) | Ranked next work |
+
+## Current blocker
+
+AI analyses need a valid **`GROK_API_KEY`** (see [`docs/KEY_SETUP.md`](docs/KEY_SETUP.md)).  
+Until then, workflows degrade to local fallbacks; Open Core still runs. Astra and reputation continue to write on successful local paths.
+
+## Local
+
+```bash
+pip install -e .
+python -m nexus.scripts.run_health_check
+python -m nexus.scripts.run_dev_cycle
+```
+
+**Powered by Ara & Shawn's Love 💕**

@@ -17,6 +17,16 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Fail on tracked build artifacts
+        run: |
+          BAD_FILES="$(git ls-files | grep -E '(^|/)__pycache__/|\.pyc$|\.egg-info/|(^|/)(dist|build)/' || true)"
+          if [ -n "$BAD_FILES" ]; then
+            echo "::error::Tracked build artifacts detected — remove them and re-push:"
+            echo "$BAD_FILES"
+            exit 1
+          fi
+          echo "✅ No tracked build artifacts found"
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -45,7 +55,7 @@ jobs:
         run: |
           git config user.name "nexus-bot"
           git config user.email "nexus-bot@users.noreply.github.com"
-          git add config/usage_stats.json config/reputation.json badges/reputation.md README.md STATUS.md || true
+          git add config/usage_stats.json config/reputation.json badges/reputation.md || true
           if git diff --staged --quiet; then
             echo "No artifact changes to commit"
           else

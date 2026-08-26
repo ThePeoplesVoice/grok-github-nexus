@@ -6,8 +6,7 @@ No tokens. No spend. No gating of Open Core.
 Includes a transparent staleness decay (30-day half-life) so scores
 do not grow forever without continued activity.
 
-On refresh, also rewrites badges/reputation.md and patches the README
-badge line so the public signal stays current.
+On refresh, rewrites badges/reputation.md so the public signal stays current.
 
 See ORGANIC_SYSTEMS.md for design intent and constraints.
 """
@@ -15,7 +14,6 @@ See ORGANIC_SYSTEMS.md for design intent and constraints.
 from __future__ import annotations
 
 import json
-import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -25,8 +23,6 @@ from .usage import load_usage_stats
 ROOT = Path(__file__).resolve().parent.parent
 REPUTATION_PATH = ROOT / "config" / "reputation.json"
 BADGE_PATH = ROOT / "badges" / "reputation.md"
-README_PATH = ROOT / "README.md"
-STATUS_PATH = ROOT / "STATUS.md"
 
 WEIGHTS = {
     "pr": 3.0,
@@ -34,14 +30,11 @@ WEIGHTS = {
     "commit": 1.0,
     "self_audit": 2.0,
     "pulse": 0.5,
+    "complete": 1.0,
     "other": 0.5,
 }
 
 HALF_LIFE_DAYS = 30.0
-
-BADGE_RE = re.compile(
-    r"!\[Reputation\]\(https://img\.shields\.io/badge/nexus_reputation-[^)]+\)"
-)
 
 
 def _defaults() -> dict[str, Any]:
@@ -155,7 +148,7 @@ def reputation_badge_line(data: dict[str, Any] | None = None) -> str:
     return f"![Reputation](https://img.shields.io/badge/nexus_reputation-{score}-blue)"
 
 
-def write_badge(data: dict[str, Any] | None = None) -> Path:
+def write_badge(data: dict[str, Any] | None = None) -> bool:
     d = data if data is not None else load_reputation()
     score = d.get("score", 0)
     raw = d.get("raw_score", score)
@@ -177,33 +170,20 @@ Formula: `effective = raw × 0.5^(days_idle / 30)`
 See `ORGANIC_SYSTEMS.md` and `nexus/reputation.py`.
 """
     BADGE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    if BADGE_PATH.exists() and BADGE_PATH.read_text(encoding="utf-8") == body:
+        return False
     BADGE_PATH.write_text(body, encoding="utf-8")
-    return BADGE_PATH
-
-
-def _patch_markdown_badge(path: Path, data: dict[str, Any]) -> bool:
-    """Replace the nexus_reputation shields line if present. Returns True if changed."""
-    if not path.exists():
-        return False
-    text = path.read_text(encoding="utf-8")
-    new_line = reputation_badge_line(data)
-    if not BADGE_RE.search(text):
-        return False
-    updated = BADGE_RE.sub(new_line, text, count=1)
-    if updated == text:
-        return False
-    path.write_text(updated, encoding="utf-8")
     return True
 
 
 def sync_public_badges(data: dict[str, Any] | None = None) -> dict[str, bool]:
-    """Rewrite badge file and patch README/STATUS badge lines."""
+    """Rewrite generated reputation badge artifacts."""
     d = data if data is not None else load_reputation()
-    write_badge(d)
+    badge_changed = write_badge(d)
     return {
-        "readme": _patch_markdown_badge(README_PATH, d),
-        "status": _patch_markdown_badge(STATUS_PATH, d),
-        "badge_md": True,
+        "readme": False,
+        "status": False,
+        "badge_md": badge_changed,
     }
 
 
@@ -226,7 +206,7 @@ def reputation_summary_md(data: dict[str, Any] | None = None) -> str:
         f"- From {d.get('total_successful_analyses', 0)} successful analyses",
         f"- Components: pr={comps.get('pr', 0)} · issue={comps.get('issue', 0)} · "
         f"commit={comps.get('commit', 0)} · self_audit={comps.get('self_audit', 0)} · "
-        f"pulse={comps.get('pulse', 0)}",
+        f"pulse={comps.get('pulse', 0)} · complete={comps.get('complete', 0)}",
         "- Half-life 30 days on idle. Not a token. Does not gate Open Core.",
     ]
     return "\n".join(lines)

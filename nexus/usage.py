@@ -18,7 +18,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_PATH = ROOT / "config" / "usage_stats.json"
 
-VALID_TYPES = ("commit", "pr", "issue", "self_audit", "pulse", "other")
+VALID_TYPES = ("commit", "pr", "issue", "self_audit", "pulse", "complete", "other")
 
 
 def _defaults() -> dict[str, Any]:
@@ -32,6 +32,7 @@ def _defaults() -> dict[str, Any]:
             "issue": 0,
             "self_audit": 0,
             "pulse": 0,
+            "complete": 0,
             "other": 0,
         },
         "last_updated": None,

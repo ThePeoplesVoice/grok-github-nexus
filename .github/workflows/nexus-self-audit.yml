@@ -2,22 +2,14 @@ name: Nexus Self-Audit
 
 on:
   schedule:
-    - cron: '0 9 * * 3'
+    - cron: '0 9 * * 3'   # Wednesday 09:00 UTC
   workflow_dispatch:
-  push:
-    paths:
-      - 'nexus/**'
-      - 'config/progressive.json'
-      - 'NORTH_STAR.md'
-      - 'NEXUS_CONTEXT.md'
-      - 'STATUS.md'
-      - 'CHECKS_AND_BALANCES.md'
-      - 'ORGANIC_SYSTEMS.md'
-      - 'AUTOMATED_DEVELOPMENT.md'
+  # Push trigger removed: rapid package edits were flooding issues with
+  # failed API audits. Dispatch manually or wait for schedule once key works.
 
 jobs:
   self-audit:
-    if: github.actor != 'github-actions[bot]'
+    if: github.event_name != 'push' || (github.actor != 'github-actions[bot]' && github.actor != 'nexus-bot')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -55,7 +47,7 @@ jobs:
         run: |
           git config user.name "nexus-bot"
           git config user.email "nexus-bot@users.noreply.github.com"
-          git add config/usage_stats.json config/reputation.json badges/reputation.md README.md STATUS.md || true
+          git add config/usage_stats.json config/reputation.json badges/reputation.md || true
           if git diff --staged --quiet; then
             echo "No artifact changes to commit"
           else

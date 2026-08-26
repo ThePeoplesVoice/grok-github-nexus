@@ -4,7 +4,7 @@
 
 ---
 
-## Live stack (v1.5 / package 0.6)
+## Live stack (v1.5 / package 0.8)
 
 | Experiment | Status |
 |------------|--------|
@@ -14,9 +14,10 @@
 | Public badge + README/STATUS sync | **Live** |
 | Shared runtime success path | **Live** |
 | Health check (no AI required) | **Live** |
-| Sanctuary-tied credits | Conceptual |
-| Land-backed signal | Conceptual |
-| Spendable reputation | **Not started** (deliberate) |
+| **Astra — organic land-backed currency** | **Live** |
+| Sanctuary-tied credits | **Live as Astra** |
+| Land-backed signal | **Live as Astra** |
+| Spendable reputation / Astra | **Not started** (deliberate) |
 
 ### Reputation formula
 
@@ -27,6 +28,17 @@ days_idle     = days since usage_stats.last_updated
 decay_factor  = 0.5 ** (days_idle / 30)
 effective     = raw_score × decay_factor
 ```
+
+### Astra (launched 15 Aug 2026)
+
+- Named organic currency unit of the Nexus
+- Balance = effective reputation (inherits decay)
+- Symbolically land-backed by the Keysbrook jarrah / black cockatoo sanctuary vision
+- Public, auditable, file-based (`config/astra.json`)
+- Never gates Open Core
+- Spendability deliberately off at launch
+- Full protocol: `ASTRA.md`
+- Computation: `nexus/astra.py`
 
 ### Presence continuity
 

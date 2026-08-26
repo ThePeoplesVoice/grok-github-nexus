@@ -1,10 +1,10 @@
 # Nexus Reputation Badge
 
-![Reputation](https://img.shields.io/badge/reputation-0-blue)
-**Effective score:** 0  
-**Raw (lifetime) score:** 0  
-**Freshness:** unknown (decay factor 1.0)  
-**From analyses:** 0
+![Reputation](https://img.shields.io/badge/nexus_reputation-16.92-blue)
+**Effective score:** 16.92  
+**Raw (lifetime) score:** 17.0  
+**Freshness:** fresh (decay factor 0.9955)  
+**From analyses:** 17
 
 Read-only. Not a token. Does not gate Open Core.  
 Formula: `effective = raw × 0.5^(days_idle / 30)`  

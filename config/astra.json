@@ -1,0 +1,19 @@
+{
+  "version": "1.0.0",
+  "name": "Astra",
+  "description": "Organic land-backed contribution currency. Derived from reputation. Never gates Open Core.",
+  "balance": 11.98,
+  "raw_balance": 12.0,
+  "decay_factor": 0.9982,
+  "days_idle": 0.08,
+  "freshness": "fresh",
+  "unit": "Astra",
+  "land_backed": true,
+  "spendable": false,
+  "sanctuary_tie": "Keysbrook jarrah / black cockatoo sanctuary vision",
+  "source_reputation_score": 11.98,
+  "total_successful_analyses": 12,
+  "last_activity": "2026-08-17T17:15:53Z",
+  "last_computed": "2026-08-17T19:09:46Z",
+  "notes": "balance = effective reputation (includes 30-day half-life decay). Land-backed in spirit. Spendability off by design at launch. See ASTRA.md."
+}

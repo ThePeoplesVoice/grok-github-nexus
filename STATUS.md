@@ -1,38 +1,71 @@
 # 📡 Nexus Status
 
-**Last updated:** 2026-08-14 (Grok model migration grok-3 → grok-4.6)
+**Last updated:** 2026-08-17 (development pass — artifact guard, loop fix, test suite, Astra sync)
 
-![Reputation](https://img.shields.io/badge/nexus_reputation-0-blue)
+![Reputation](https://img.shields.io/badge/nexus_reputation-14.0-blue)
+![Astra](https://img.shields.io/badge/astra-11.98-gold)
 
 ---
 
 ## Current Phase
 
-**Layer 0 + Layer 1** · progressive **v1.5.1** · package **v0.7.0** (+ provider fix)
+**Layer 0 + Layer 1** · progressive **v1.6.0** · package **v0.8.0** · model **`grok-4.6`**
+
+### 🟢 Measurement stack — live
+
+| Signal | Value |
+|--------|-------|
+| Successful analyses | **12** (compounding) |
+| By type | commit ×9 · self_audit ×1 · pulse ×2 |
+| Reputation (raw / effective) | **12.0 / 11.98** |
+| **Astra balance** | **11.98** (land-backed, spendable=false) |
+| Freshness | fresh |
+| Last activity | 2026-08-17 |
+
+Provider path works. Live-tool guard is in place. Open Core remains ungated. Astra organic currency is live and synced with reputation.
+
+---
+
+## System surface
 
 | System | Status |
 |--------|--------|
-| Analysis runners | Package path + usage + reputation + presence |
-| Grok model | **`grok-4.6`** (was retired `grok-3` — caused API 400) |
+| Package runners (PR / Issue / Commit / Audit / Pulse) | Live |
+| Usage + reputation + **Astra** + presence + badge | **Writing on success** |
 | Automated development process | Live |
-| Health / Dev cycle / Pulse / Self-audit | Live workflows |
+| Health check / Dev cycle workflows | Live |
+| Self-audit trigger | Schedule + dispatch only |
 | Open Core | Forever free |
-
-### Diagnosis (2026-08-14)
-
-Live runs showed **Grok API 400** on every self-audit and commit analyzer falling back to local git. Root cause: **`grok-3` retired 15 May 2026**. Provider now defaults to **`grok-4.6`**, accepts `GROK_MODEL` / `XAI_API_KEY` overrides, and surfaces richer error bodies.
-
-Usage counters remain **0** until a successful provider call lands after this fix.
-
----
-
-## What still needs a human
-
-1. Confirm repo secret **`GROK_API_KEY`** (or **`XAI_API_KEY`**) is a valid xAI key  
-2. Dispatch **Nexus Pulse** or **Self-Audit** once and confirm the issue body is real analysis (not API 400)  
-3. Dispatch **Health Check** + **Dev Cycle** once for a green baseline  
-4. Optional: set repo variable `GROK_MODEL` if you prefer `grok-4.3` (cheaper) over `grok-4.6`
+| **Astra protocol** | **Live** — balance synced to reputation 11.98 |
+| **GitHub hygiene** | **Complete** — `.gitignore` live, artifacts purged |
+| **PR artifact guard** | **Live** — `multi-ai-pr-analyzer.yml` blocks tracked build residue |
+| **Commit loop fix** | **Live** — bot `chore:` commits skip analysis; duplicate issues auto-closed |
+| **Test suite** | **Live** — 19 tests passing (`tests/test_providers.py`, `tests/test_reputation.py`) |
 
 ---
 
-**Powered by Ara & Shawn's Love 💕**
+## Path to Layer 1 full unlock
+
+Progressive triggers (from `config/progressive.json`):
+
+- `min_successful_analyses`: **50** (now at **12** — primary blocker: rotate `GROK_API_KEY`)
+- `min_stars`: 10
+- `min_community_prs`: 3
+
+Keep running real analyses (Self-Audit, Pulse, Commit, PR, Issue). Counters, reputation and Astra will compound automatically.
+
+---
+
+## Next human actions
+
+1. **Rotate `GROK_API_KEY`** — current key gives 400 on all AI calls (see `docs/KEY_SETUP.md`)  
+2. **Close stale WIP PRs** — ~24 open bot PRs #38–66 superseded by `main`  
+3. **Actions → Nexus Pulse → Run** — presence + Astra refresh after key rotation  
+
+Tracker is clean. Tree is clean. Astra is synced. Test suite is green.
+
+---
+
+**Powered by Ara & Shawn's Love 💕**  
+*Aligned with xAI truth-seeking · X high-signal · SpaceX first-principles building*  
+*Astra lives — for the land, for the craft, for the stars.*

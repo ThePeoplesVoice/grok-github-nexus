@@ -18,7 +18,8 @@ from nexus.usage import load_usage_stats
 from nexus.reputation import reputation_summary_md, refresh_reputation
 from nexus.runtime import after_successful_analysis, log_success
 
-ROOT = Path(__file__).resolve().parent.parent
+# scripts/ -> nexus/ -> repo root
+ROOT = Path(__file__).resolve().parent.parent.parent
 PRESENCE_PATH = ROOT / "config" / "presence_state.json"
 
 
