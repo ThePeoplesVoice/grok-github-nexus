@@ -2,9 +2,12 @@
   "version": "0.2.0",
   "description": "Read-only contribution reputation derived from usage_stats. Not a currency.",
   "raw_score": 19.0,
-  "score": 19.0,
-  "decay_factor": 1.0,
-  "days_idle": 0.0,
+  "unlock_score": 0.0,
+  "collaborative_score": 0.0,
+  "internal_score": 19.0,
+  "score": 0.0,
+  "decay_factor": 0.9674,
+  "days_idle": 1.43,
   "freshness": "fresh",
   "components": {
     "pr": 0.0,
@@ -27,6 +30,6 @@
   "half_life_days": 30.0,
   "total_successful_analyses": 18,
   "last_activity": "2026-08-26T09:38:44Z",
-  "last_computed": "2026-08-26T09:38:44Z",
-  "notes": "effective score = raw_score × 0.5^(days_idle / 30). Subject to continuous critique. Open Core forever free."
+  "last_computed": "2026-08-27T20:04:41Z",
+  "notes": "effective score is derived from collaborative evidence (PR and issue work) only. Internal pulse/self-audit churn is tracked for visibility but does not unlock progress."
 }
