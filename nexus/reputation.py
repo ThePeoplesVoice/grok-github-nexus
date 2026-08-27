@@ -33,6 +33,7 @@ WEIGHTS = {
     "complete": 1.0,
     "other": 0.5,
 }
+COLLABORATIVE_TYPES = ("pr", "issue")
 
 HALF_LIFE_DAYS = 30.0
 
@@ -96,19 +97,29 @@ def compute_reputation(usage: dict[str, Any] | None = None) -> dict[str, Any]:
 
     components: dict[str, float] = {}
     raw = 0.0
+    collaborative_raw = 0.0
+    internal_raw = 0.0
     for key, weight in WEIGHTS.items():
         count = int(by_type.get(key, 0))
         part = round(count * weight, 2)
         components[key] = part
         raw += part
+        if key in COLLABORATIVE_TYPES:
+            collaborative_raw += part
+        else:
+            internal_raw += part
 
     days_idle, decay_factor, freshness = _staleness(last_activity)
-    effective = round(raw * decay_factor, 2)
+    unlock_score = round(collaborative_raw, 2)
+    effective = round(unlock_score * decay_factor, 2)
 
     return {
         "version": "0.2.0",
         "description": "Read-only contribution reputation derived from usage_stats. Not a currency.",
         "raw_score": round(raw, 2),
+        "unlock_score": unlock_score,
+        "collaborative_score": unlock_score,
+        "internal_score": round(internal_raw, 2),
         "score": effective,
         "decay_factor": decay_factor,
         "days_idle": days_idle,
@@ -120,8 +131,8 @@ def compute_reputation(usage: dict[str, Any] | None = None) -> dict[str, Any]:
         "last_activity": last_activity,
         "last_computed": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "notes": (
-            "effective score = raw_score × 0.5^(days_idle / 30). "
-            "Subject to continuous critique. Open Core forever free."
+            "effective score is derived from collaborative evidence (PR and issue work) only. "
+            "Internal pulse/self-audit churn is tracked for visibility but does not unlock progress."
         ),
     }
 
@@ -200,13 +211,14 @@ def reputation_summary_md(data: dict[str, Any] | None = None) -> str:
     comps = d.get("components") or {}
     lines = [
         f"**Reputation (read-only):** effective **{d.get('score', 0)}** "
-        f"(raw {d.get('raw_score', d.get('score', 0))}, "
+        f"(collaborative {d.get('collaborative_score', d.get('score', 0))}, "
+        f"raw {d.get('raw_score', d.get('score', 0))}, "
         f"freshness={d.get('freshness', 'unknown')}, "
         f"decay={d.get('decay_factor', 1.0)})",
         f"- From {d.get('total_successful_analyses', 0)} successful analyses",
         f"- Components: pr={comps.get('pr', 0)} · issue={comps.get('issue', 0)} · "
         f"commit={comps.get('commit', 0)} · self_audit={comps.get('self_audit', 0)} · "
         f"pulse={comps.get('pulse', 0)} · complete={comps.get('complete', 0)}",
-        "- Half-life 30 days on idle. Not a token. Does not gate Open Core.",
+        "- Internal churn is tracked for visibility, but collaborative PR/issue signal drives the unlock score.",
     ]
     return "\n".join(lines)
