@@ -8,9 +8,12 @@ on:
   workflow_dispatch:
     # Manual only — never runs on push/PR
 
+permissions: {}
+
 jobs:
   noop:
     runs-on: ubuntu-latest
+    timeout-minutes: 1
     steps:
       - name: Intentional no-op
         run: |
