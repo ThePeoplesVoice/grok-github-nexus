@@ -9,6 +9,7 @@ from urllib.parse import urlparse
 
 import pytest
 
+from nexus.context import layer1_enabled
 from nexus.reputation import (
     compute_reputation,
     load_reputation,
@@ -17,6 +18,7 @@ from nexus.reputation import (
     save_reputation,
     _staleness,
 )
+from nexus.usage import increment_usage
 
 
 SAMPLE_STATS = {
@@ -35,8 +37,11 @@ SAMPLE_STATS = {
 
 def test_compute_reputation_weights():
     rep = compute_reputation(SAMPLE_STATS)
-    # commit: 9 * 1.0 = 9.0 ; self_audit: 1 * 2.0 = 2.0 ; pulse: 2 * 0.5 = 1.0 → raw = 12.0
+    # Internal churn is tracked, but collaborative PR/issue evidence is what drives the unlock score.
     assert rep["raw_score"] == pytest.approx(12.0, abs=0.01)
+    assert rep["internal_score"] == pytest.approx(12.0, abs=0.01)
+    assert rep["collaborative_score"] == pytest.approx(0.0, abs=0.01)
+    assert rep["score"] == pytest.approx(0.0, abs=0.01)
     assert rep["total_successful_analyses"] == 12
     assert rep["components"]["commit"] == pytest.approx(9.0)
     assert rep["components"]["self_audit"] == pytest.approx(2.0)
@@ -93,6 +98,27 @@ def test_effective_score_lower_than_raw_when_stale():
     rep = compute_reputation(stale_stats)
     assert rep["score"] <= rep["raw_score"]
     assert rep["freshness"] == "stale"
+
+
+def test_layer1_requires_collaborative_evidence(tmp_path):
+    path = tmp_path / "usage_stats.json"
+    prog = {
+        "layers": {
+            "1_progressive_unlocks": {
+                "enabled": True,
+                "triggers": {"min_successful_analyses": 1, "min_community_prs": 1},
+            }
+        }
+    }
+
+    stats = increment_usage("self_audit", path=path, persist=True)
+    assert stats["total_successful_analyses"] == 0
+    assert layer1_enabled(prog=prog, usage=stats) is False
+
+    collaborative = increment_usage("pr", path=path, persist=True)
+    assert collaborative["by_type"]["pr"] == 1
+    assert collaborative["total_successful_analyses"] == 1
+    assert layer1_enabled(prog=prog, usage=collaborative) is True
 
 
 def test_sync_public_badges_only_reports_real_badge_changes(tmp_path, monkeypatch):

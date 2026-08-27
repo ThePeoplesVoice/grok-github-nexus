@@ -44,11 +44,11 @@ def _defaults() -> dict[str, Any]:
 
 
 def compute_astra(reputation: dict[str, Any] | None = None) -> dict[str, Any]:
-    """Derive current Astra state from reputation (or recompute reputation)."""
+    """Derive current Astra state from collaborative reputation only."""
     rep = reputation if reputation is not None else compute_reputation()
 
     balance = float(rep.get("score", 0.0))
-    raw = float(rep.get("raw_score", balance))
+    raw = float(rep.get("unlock_score", rep.get("raw_score", balance)))
     decay = float(rep.get("decay_factor", 1.0))
     days = float(rep.get("days_idle", 0.0))
     freshness = rep.get("freshness", "unknown")
@@ -56,7 +56,7 @@ def compute_astra(reputation: dict[str, Any] | None = None) -> dict[str, Any]:
     return {
         "version": "1.0.0",
         "name": "Astra",
-        "description": "Organic land-backed contribution currency. Derived from reputation. Never gates Open Core.",
+        "description": "Organic land-backed contribution currency. Derived from collaborative reputation. Never gates Open Core.",
         "balance": round(balance, 2),
         "raw_balance": round(raw, 2),
         "decay_factor": decay,
@@ -71,9 +71,8 @@ def compute_astra(reputation: dict[str, Any] | None = None) -> dict[str, Any]:
         "last_activity": rep.get("last_activity"),
         "last_computed": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "notes": (
-            "balance = effective reputation (includes 30-day half-life decay). "
-            "Land-backed in spirit. Spendability off by design at launch. "
-            "See ASTRA.md."
+            "balance = effective collaborative reputation (includes 30-day half-life decay). "
+            "Internal pulse/self-audit churn does not create Astra value. See ASTRA.md."
         ),
     }
 
