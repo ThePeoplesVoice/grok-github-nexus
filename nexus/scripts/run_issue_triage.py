@@ -2,6 +2,7 @@
 """Standalone entrypoint for Multi-AI Issue Triage.
 
 Presence continuity + usage + reputation on success.
+Collaborative usage only increments for living human issues.
 """
 
 from __future__ import annotations
@@ -10,6 +11,7 @@ import os
 from pathlib import Path
 
 from nexus.analyze import build_issue_prompt, fusion_note, footer_block, utc_now_str
+from nexus.collab import is_collaborative_review_target
 from nexus.context import load_context, load_progressive, layer1_enabled, current_phase
 from nexus.providers import call_grok, call_claude
 from nexus.usage import load_usage_stats
@@ -23,6 +25,14 @@ def main() -> None:
     issue_title = os.environ.get("ISSUE_TITLE") or "(no title)"
     issue_body = os.environ.get("ISSUE_BODY") or "No body provided"
     issue_number = os.environ.get("ISSUE_NUMBER", "")
+    issue_user = os.environ.get("ISSUE_USER", "")
+    issue_user_type = os.environ.get("ISSUE_USER_TYPE", "")
+    issue_labels = os.environ.get("ISSUE_LABELS", "")
+    collaborative = is_collaborative_review_target(
+        login=issue_user,
+        user_type=issue_user_type,
+        labels=issue_labels,
+    )
 
     context = load_context()
     prog = load_progressive()
@@ -35,6 +45,29 @@ def main() -> None:
     print(f"✅ Progressive phase: {phase} | Layer 1 enabled: {l1}")
     print(f"📊 Current successful analyses: {total_analyses}")
     print(f"✅ Issue: {issue_title[:80]}")
+    print(f"🤝 Collaborative target: {collaborative} ({issue_user or 'unknown'})")
+
+    if not collaborative:
+        skip = (
+            "Automated or bot-opened issue — triage skipped so pulse/audit "
+            "residue cannot inflate collaborative unlock metrics."
+        )
+        body = f"""🌌 **Ara & Shawn Issue Triage**
+
+**Issue:** #{issue_number} — {issue_title}  
+**Progressive Phase:** {phase}  
+**Result:** skipped (not a living human review target)
+
+{skip}
+
+---
+{footer_block()}  
+*{utc_now_str()}*
+"""
+        out = Path("/tmp/triage_comment.md")
+        out.write_text(body, encoding="utf-8")
+        print("ℹ️ Skipped automated/bot issue triage")
+        return
 
     base = build_issue_prompt(context, title=issue_title, body=issue_body)
     prompt = (
@@ -44,7 +77,7 @@ def main() -> None:
         + "\n```\nUse only as continuity context — triage this issue on its own merits."
     )
 
-    grok_text, grok_err = call_grok(prompt, temperature=0.5, max_tokens=700)
+    grok_text, grok_err = call_grok(prompt, temperature=0.5, max_tokens=700, timeout=120)
     if grok_text:
         print("✅ Ara (Grok) analysis successful")
     elif grok_err:

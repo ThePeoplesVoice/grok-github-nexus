@@ -2,6 +2,7 @@
 """Standalone entrypoint for Multi-AI PR analysis.
 
 Presence continuity + usage + reputation on success.
+Collaborative usage only increments for living human review targets.
 """
 
 from __future__ import annotations
@@ -12,6 +13,7 @@ from pathlib import Path
 import requests
 
 from nexus.analyze import build_pr_prompt, fusion_note, footer_block, utc_now_str
+from nexus.collab import is_collaborative_review_target
 from nexus.context import load_context, load_progressive, layer1_enabled, current_phase
 from nexus.providers import call_grok, call_claude
 from nexus.usage import load_usage_stats
@@ -77,7 +79,17 @@ def main() -> None:
     pr_title = pr_data.get("title") or "PR Analysis"
     pr_body = pr_data.get("body") or "No description provided"
     pr_files = pr_data.get("changed_files", 0)
+    author = pr_data.get("user") or {}
+    author_login = author.get("login") or os.environ.get("PR_AUTHOR", "")
+    author_type = author.get("type") or os.environ.get("PR_AUTHOR_TYPE", "")
+    label_names = [str((label or {}).get("name") or "") for label in (pr_data.get("labels") or [])]
+    collaborative = is_collaborative_review_target(
+        login=author_login,
+        user_type=author_type,
+        labels=label_names,
+    )
     print(f"✅ PR: {pr_title} ({pr_files} files)")
+    print(f"🤝 Collaborative target: {collaborative} ({author_login or 'unknown'})")
 
     base = build_pr_prompt(
         context,
@@ -93,7 +105,7 @@ def main() -> None:
         + "\n```\nUse only as continuity context — judge this PR on its own merits."
     )
 
-    grok_text, grok_err = call_grok(prompt, temperature=0.55, max_tokens=1100)
+    grok_text, grok_err = call_grok(prompt, temperature=0.55, max_tokens=1100, timeout=120)
     if grok_text:
         print("✅ Ara (Grok) analysis complete")
     elif grok_err:
@@ -120,13 +132,15 @@ def main() -> None:
 
     success = bool(grok_text or claude_text)
 
-    if success:
+    if success and collaborative:
         try:
             result = after_successful_analysis("pr")
             total_analyses = int(result.get("total", total_analyses + 1))
             log_success(result, "pr")
         except Exception as e:
             print(f"⚠️ Could not persist usage/reputation: {e}")
+    elif success:
+        print("ℹ️ Analysis posted without collaborative usage increment (bot/automated target)")
 
     sections: list[str] = []
     if grok_text:
@@ -145,13 +159,14 @@ def main() -> None:
         layer1=l1,
     )
     diff_note = " · **diff ingested**" if diff_excerpt else " · diff unavailable"
+    collab_note = " · collaborative" if collaborative else " · internal/bot — usage not incremented"
     joined = "\n\n---\n\n".join(sections)
 
     body = f"""## 🌌 Ara & Shawn PR Analysis
 
 **PR:** #{pr_number}  
 **Title:** {pr_title}  
-**Files Changed:** {pr_files}{diff_note}  
+**Files Changed:** {pr_files}{diff_note}{collab_note}  
 **Progressive Phase:** {phase}  
 **Successful analyses to date:** {total_analyses}{note}
 
