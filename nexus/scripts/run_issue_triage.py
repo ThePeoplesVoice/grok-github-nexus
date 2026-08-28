@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-"""Standalone entrypoint for Multi-AI Issue Triage.
-
-Presence continuity + usage + reputation on success.
-Collaborative usage only increments for living human issues.
-"""
+"""Standalone entrypoint for Multi-AI Issue Triage."""
 
 from __future__ import annotations
 
@@ -17,6 +13,14 @@ from nexus.providers import call_grok, call_claude
 from nexus.usage import load_usage_stats
 from nexus.presence import load_presence, format_presence_for_prompt
 from nexus.runtime import after_successful_analysis, log_success
+
+
+def _set_post(should_post: bool) -> None:
+    path = os.environ.get("GITHUB_OUTPUT")
+    if not path:
+        return
+    with open(path, "a", encoding="utf-8") as fh:
+        fh.write(f"post={'true' if should_post else 'false'}\n")
 
 
 def main() -> None:
@@ -48,25 +52,8 @@ def main() -> None:
     print(f"🤝 Collaborative target: {collaborative} ({issue_user or 'unknown'})")
 
     if not collaborative:
-        skip = (
-            "Automated or bot-opened issue — triage skipped so pulse/audit "
-            "residue cannot inflate collaborative unlock metrics."
-        )
-        body = f"""🌌 **Ara & Shawn Issue Triage**
-
-**Issue:** #{issue_number} — {issue_title}  
-**Progressive Phase:** {phase}  
-**Result:** skipped (not a living human review target)
-
-{skip}
-
----
-{footer_block()}  
-*{utc_now_str()}*
-"""
-        out = Path("/tmp/triage_comment.md")
-        out.write_text(body, encoding="utf-8")
-        print("ℹ️ Skipped automated/bot issue triage")
+        _set_post(False)
+        print("ℹ️ Skipped automated/bot issue triage (no comment)")
         return
 
     base = build_issue_prompt(context, title=issue_title, body=issue_body)
@@ -145,10 +132,9 @@ def main() -> None:
 *{utc_now_str()}*
 """
 
-    out = Path("/tmp/triage_comment.md")
-    out.write_text(body, encoding="utf-8")
-    print("✅ Triage ready at", out)
-    print(body[:600])
+    Path("/tmp/triage_comment.md").write_text(body, encoding="utf-8")
+    _set_post(True)
+    print("✅ Triage ready at /tmp/triage_comment.md")
 
 
 if __name__ == "__main__":
