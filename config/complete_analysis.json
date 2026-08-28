@@ -1,8 +1,8 @@
 {
   "version": "1.0.0",
-  "generated_at": "2026-08-27 20:06 UTC",
+  "generated_at": "2026-08-28 22:08 UTC",
   "source": "surface",
-  "summary": "Grok complete-analysis unavailable (Grok exception: HTTPSConnectionPool(host='api.x.ai', port=443): Read timed out. (read timeout=90)). Analyses=18 mix={'commit': 11, 'pr': 0, 'issue': 0, 'self_audit': 3, 'pulse': 4, 'complete': 0, 'other': 0}. Queue head=Run one living PR or issue through Ara so the mix is not commit-only.",
+  "summary": "Grok complete-analysis unavailable (empty response). Analyses=18 mix={'commit': 11, 'pr': 0, 'issue': 0, 'self_audit': 3, 'pulse': 4, 'complete': 0, 'other': 0}. Queue head=Run one living PR or issue through Ara so the mix is not commit-only.",
   "health": null,
   "stop": "Do not invent implementations without a live Grok pass.",
   "start": "Fix the Grok call, then re-run Complete Analysis.",
