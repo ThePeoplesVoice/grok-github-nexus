@@ -5,6 +5,8 @@ from __future__ import annotations
 import os
 from unittest.mock import MagicMock, patch
 
+import requests
+
 import pytest
 
 from nexus.providers import (
@@ -27,7 +29,7 @@ def _mock_response(status: int, body: dict | str) -> MagicMock:
     return resp
 
 
-# ── format_api_error ──────────────────────────────────────────────────────────
+# ── format_api_error ──────────────────────────────────────────
 
 def test_format_api_error_dict_message():
     resp = _mock_response(400, {"error": {"message": "Incorrect API key provided."}})
@@ -71,7 +73,7 @@ def test_format_api_error_claude_low_credits():
     assert "Grok-only" in msg
 
 
-# ── call_grok ─────────────────────────────────────────────────────────────────
+# ── call_grok ────────────────────────────────────────────────
 
 def test_call_grok_no_key():
     with patch.dict(os.environ, {}, clear=False):
@@ -141,7 +143,7 @@ def test_call_grok_request_exception():
     assert "exception" in err.lower()
 
 
-# ── call_claude ───────────────────────────────────────────────────────────────
+# ── call_claude ──────────────────────────────────────────────
 
 def test_call_claude_no_key():
     env_backup = os.environ.pop("CLAUDE_API_KEY", None)
@@ -162,4 +164,14 @@ def test_call_claude_success():
         with patch.dict(os.environ, {"CLAUDE_API_KEY": "sk-ant-test"}):
             text, err = call_claude("hello")
     assert text == "Hi from Claude"
+    assert err is None
+
+
+def test_call_grok_retries_timeout_then_succeeds():
+    timeout_exc = requests.exceptions.ReadTimeout("Read timed out. (read timeout=90)")
+    ok_resp = _mock_response(200, {"choices": [{"message": {"content": "recovered"}}]})
+    with patch("nexus.providers.requests.post", side_effect=[timeout_exc, ok_resp]):
+        with patch.dict(os.environ, {"GROK_API_KEY": "xai-test-key"}):
+            text, err = call_grok("hello", retries=1)
+    assert text == "recovered"
     assert err is None
