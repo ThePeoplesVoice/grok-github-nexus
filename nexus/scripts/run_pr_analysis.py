@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-"""Standalone entrypoint for Multi-AI PR analysis.
-
-Presence continuity + usage + reputation on success.
-Collaborative usage only increments for living human review targets.
-"""
+"""Standalone entrypoint for Multi-AI PR analysis."""
 
 from __future__ import annotations
 
@@ -13,7 +9,7 @@ from pathlib import Path
 import requests
 
 from nexus.analyze import build_pr_prompt, fusion_note, footer_block, utc_now_str
-from nexus.collab import is_collaborative_review_target
+from nexus.collab import is_collaborative_review_target, parse_label_list
 from nexus.context import load_context, load_progressive, layer1_enabled, current_phase
 from nexus.providers import call_grok, call_claude
 from nexus.usage import load_usage_stats
@@ -60,9 +56,12 @@ def fetch_pr(repo_name: str, pr_number: str, token: str) -> tuple[dict, str]:
 def main() -> None:
     print("🌌 Starting Ara & Shawn multi-model PR Analysis (package path)...")
 
-    pr_number = os.environ.get("PR_NUMBER", "")
+    raw_number = os.environ.get("PR_NUMBER", "").strip()
+    pr_number = "".join(ch for ch in raw_number if ch.isdigit())
     repo_name = os.environ.get("REPO_NAME", "")
     github_token = os.environ.get("GITHUB_TOKEN", "")
+    if not pr_number:
+        print("⚠️ PR_NUMBER missing or not digits — aborting collaborative increment")
 
     context = load_context()
     prog = load_progressive()
@@ -75,7 +74,7 @@ def main() -> None:
     print(f"✅ Progressive phase: {phase} | Layer 1 enabled: {l1}")
     print(f"📊 Current successful analyses: {total_analyses}")
 
-    pr_data, diff_excerpt = fetch_pr(repo_name, pr_number, github_token)
+    pr_data, diff_excerpt = fetch_pr(repo_name, pr_number, github_token) if pr_number else ({}, "")
     pr_title = pr_data.get("title") or "PR Analysis"
     pr_body = pr_data.get("body") or "No description provided"
     pr_files = pr_data.get("changed_files", 0)
@@ -83,7 +82,8 @@ def main() -> None:
     author_login = author.get("login") or os.environ.get("PR_AUTHOR", "")
     author_type = author.get("type") or os.environ.get("PR_AUTHOR_TYPE", "")
     label_names = [str((label or {}).get("name") or "") for label in (pr_data.get("labels") or [])]
-    collaborative = is_collaborative_review_target(
+    label_names.extend(parse_label_list(os.environ.get("PR_LABELS", "")))
+    collaborative = bool(pr_number) and is_collaborative_review_target(
         login=author_login,
         user_type=author_type,
         labels=label_names,
@@ -181,10 +181,8 @@ def main() -> None:
 *{utc_now_str()}*
 """
 
-    out = Path("/tmp/pr_analysis.md")
-    out.write_text(body, encoding="utf-8")
-    print("✅ Analysis ready at", out)
-    print(body[:700] + "...")
+    Path("/tmp/pr_analysis.md").write_text(body, encoding="utf-8")
+    print("✅ Analysis ready at /tmp/pr_analysis.md")
 
 
 if __name__ == "__main__":
