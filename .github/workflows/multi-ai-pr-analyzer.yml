@@ -3,6 +3,12 @@ name: 🤖 Multi-AI PR Analyzer (Ara & Shawn)
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Living PR number to review
+        required: true
+        type: string
 
 jobs:
   analyze-with-ara:
@@ -45,8 +51,10 @@ jobs:
           GROK_MODEL: ${{ vars.GROK_MODEL }}
           CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
           REPO_NAME: ${{ github.repository }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_AUTHOR_TYPE: ${{ github.event.pull_request.user.type }}
         run: python -m nexus.scripts.run_pr_analysis
 
       - name: Commit usage + reputation artifacts (if changed)

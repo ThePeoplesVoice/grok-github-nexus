@@ -35,6 +35,12 @@ def _claude_model() -> str:
     return (os.environ.get("CLAUDE_MODEL") or DEFAULT_CLAUDE_MODEL).strip()
 
 
+def _is_timeout_error(exc: Exception) -> bool:
+    name = type(exc).__name__.lower()
+    message = str(exc).lower()
+    return "timeout" in name or "timed out" in message or "timeout" in message
+
+
 def format_api_error(provider: str, response: requests.Response) -> str:
     """Turn provider error payloads into short, human-readable messages."""
     message = ""
@@ -82,40 +88,59 @@ def call_grok(
     timeout: int = 90,
     api_key: str | None = None,
     model: str | None = None,
+    retries: int | None = None,
 ) -> tuple[str | None, str | None]:
-    """Call Grok. Returns (analysis_text, error_message)."""
+    """Call Grok. Returns (analysis_text, error_message).
+
+    Retries once on transport timeouts by default (override with GROK_RETRIES).
+    """
     key = api_key or os.environ.get("GROK_API_KEY") or os.environ.get("XAI_API_KEY")
     if not key:
         return None, "GROK_API_KEY (or XAI_API_KEY) missing"
 
     model_name = (model or _grok_model()).strip()
+    if retries is None:
+        raw = (os.environ.get("GROK_RETRIES") or "1").strip()
+        try:
+            retries = max(0, int(raw))
+        except ValueError:
+            retries = 1
 
-    try:
-        response = requests.post(
-            GROK_URL,
-            headers={
-                "Authorization": f"Bearer {key}",
-                "Content-Type": "application/json",
-            },
-            json={
-                "model": model_name,
-                "messages": [
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": user_content},
-                ],
-                "temperature": temperature,
-                "max_tokens": max_tokens,
-                "search": False,
-            },
-            timeout=timeout,
-        )
-        if response.status_code == 200:
-            data = response.json()
-            text = data["choices"][0]["message"]["content"]
-            return text, None
-        return None, format_api_error("Grok", response) + f" [model={model_name}]"
-    except Exception as e:
-        return None, f"Grok exception: {str(e)[:180]}"
+    attempts = 1 + max(0, retries)
+    last_error = "Grok exception: request failed"
+
+    for attempt in range(attempts):
+        try:
+            response = requests.post(
+                GROK_URL,
+                headers={
+                    "Authorization": f"Bearer {key}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": model_name,
+                    "messages": [
+                        {"role": "system", "content": system},
+                        {"role": "user", "content": user_content},
+                    ],
+                    "temperature": temperature,
+                    "max_tokens": max_tokens,
+                    "search": False,
+                },
+                timeout=timeout,
+            )
+            if response.status_code == 200:
+                data = response.json()
+                text = data["choices"][0]["message"]["content"]
+                return text, None
+            return None, format_api_error("Grok", response) + f" [model={model_name}]"
+        except Exception as e:
+            last_error = f"Grok exception: {str(e)[:180]}"
+            if attempt + 1 < attempts and _is_timeout_error(e):
+                continue
+            return None, last_error
+
+    return None, last_error
 
 
 def call_claude(

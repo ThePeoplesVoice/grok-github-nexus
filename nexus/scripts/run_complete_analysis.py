@@ -230,7 +230,7 @@ Recent commits:
 {log}
 """
 
-    text, err = call_grok(prompt, temperature=0.35, max_tokens=1200)
+    text, err = call_grok(prompt, temperature=0.35, max_tokens=900, timeout=180, retries=1)
     parsed = _extract_json(text) if text else None
     success = bool(parsed and (parsed.get("summary") or parsed.get("actions")))
 
