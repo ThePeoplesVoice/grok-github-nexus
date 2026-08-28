@@ -27,6 +27,7 @@ jobs:
           pip install -e .
 
       - name: Ara + Claude Issue Analysis
+        id: analyze
         env:
           GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
@@ -42,7 +43,7 @@ jobs:
         run: python -m nexus.scripts.run_issue_triage
 
       - name: Commit usage + reputation artifacts (if changed)
-        if: success()
+        if: success() && steps.analyze.outputs.post == 'true'
         continue-on-error: true
         run: |
           git config user.name "nexus-bot"
@@ -56,6 +57,7 @@ jobs:
           fi
 
       - name: Post Full Analysis Comment
+        if: steps.analyze.outputs.post == 'true'
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
