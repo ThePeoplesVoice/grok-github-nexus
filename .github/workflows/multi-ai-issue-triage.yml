@@ -6,6 +6,7 @@ on:
 
 jobs:
   triage:
+    if: ${{ github.event.issue.user.type != 'Bot' }}
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -35,6 +36,9 @@ jobs:
           ISSUE_TITLE: ${{ github.event.issue.title }}
           ISSUE_BODY: ${{ github.event.issue.body }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_USER: ${{ github.event.issue.user.login }}
+          ISSUE_USER_TYPE: ${{ github.event.issue.user.type }}
+          ISSUE_LABELS: ${{ join(github.event.issue.labels.*.name, ',') }}
         run: python -m nexus.scripts.run_issue_triage
 
       - name: Commit usage + reputation artifacts (if changed)

@@ -34,6 +34,7 @@ jobs:
           GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
           GROK_MODEL: ${{ vars.GROK_MODEL }}
+          GROK_RETRIES: "1"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python -m nexus.scripts.run_complete_analysis
 
