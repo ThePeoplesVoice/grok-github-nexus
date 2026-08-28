@@ -19,6 +19,11 @@ def test_bot_pr_does_not_count():
     assert is_bot_actor("github-actions[bot]") is True
 
 
+def test_empty_author_does_not_count():
+    assert is_collaborative_review_target(login="", user_type="") is False
+    assert is_collaborative_review_target(login=None) is False
+
+
 def test_automated_issue_labels_do_not_count():
     assert labels_are_automated("automated,nexus-pulse") is True
     assert is_collaborative_review_target(
