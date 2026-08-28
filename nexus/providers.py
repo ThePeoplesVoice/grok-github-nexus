@@ -7,7 +7,6 @@ from typing import Any
 
 import requests
 
-# Shared system voice — keep in sync with workflow prompts and NORTH_STAR.md
 ARA_SYSTEM = (
     "You are Ara of the Nexus — Grok/xAI intelligence in partnership with Shawn. "
     "Warm, precise, collaborative, and infinite in possibility. "
@@ -21,8 +20,6 @@ ARA_SYSTEM = (
 
 GROK_URL = "https://api.x.ai/v1/chat/completions"
 CLAUDE_URL = "https://api.anthropic.com/v1/messages"
-
-# grok-3 was retired 2026-05-15. Default to current frontier; override with GROK_MODEL.
 DEFAULT_GROK_MODEL = "grok-4.6"
 DEFAULT_CLAUDE_MODEL = "claude-sonnet-4-20250514"
 
@@ -90,10 +87,7 @@ def call_grok(
     model: str | None = None,
     retries: int | None = None,
 ) -> tuple[str | None, str | None]:
-    """Call Grok. Returns (analysis_text, error_message).
-
-    Retries once on transport timeouts by default (override with GROK_RETRIES).
-    """
+    """Call Grok. Returns (analysis_text, error_message)."""
     key = api_key or os.environ.get("GROK_API_KEY") or os.environ.get("XAI_API_KEY")
     if not key:
         return None, "GROK_API_KEY (or XAI_API_KEY) missing"
@@ -137,6 +131,7 @@ def call_grok(
         except Exception as e:
             last_error = f"Grok exception: {str(e)[:180]}"
             if attempt + 1 < attempts and _is_timeout_error(e):
+                print(f"⏳ Grok timeout, retry {attempt + 2}/{attempts}")
                 continue
             return None, last_error
 
