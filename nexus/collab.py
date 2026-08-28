@@ -58,6 +58,8 @@ def is_collaborative_review_target(
     labels: str | list[str] | None = None,
 ) -> bool:
     """True when this PR/issue should increment collaborative usage."""
+    if not normalize_login(login):
+        return False
     if is_bot_actor(login, user_type):
         return False
     if labels_are_automated(labels):
