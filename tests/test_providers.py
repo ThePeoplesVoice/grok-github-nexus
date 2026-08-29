@@ -29,8 +29,6 @@ def _mock_response(status: int, body: dict | str) -> MagicMock:
     return resp
 
 
-# ── format_api_error ──────────────────────────────────────────
-
 def test_format_api_error_dict_message():
     resp = _mock_response(400, {"error": {"message": "Incorrect API key provided."}})
     msg = format_api_error("Grok", resp)
@@ -72,8 +70,6 @@ def test_format_api_error_claude_low_credits():
     assert "insufficient credits" in msg.lower()
     assert "Grok-only" in msg
 
-
-# ── call_grok ────────────────────────────────────────────────
 
 def test_call_grok_no_key():
     with patch.dict(os.environ, {}, clear=False):
@@ -125,6 +121,26 @@ def test_call_grok_request_contract(monkeypatch):
     assert captured["timeout"] == 12
 
 
+def test_call_grok_empty_content_retries_then_reports_error():
+    empty_resp = _mock_response(200, {"choices": [{"message": {"content": ""}}]})
+    with patch("nexus.providers.requests.post", return_value=empty_resp) as post:
+        text, err = call_grok("hello", api_key="test-key", retries=1)
+    assert text is None
+    assert err == "Grok response empty content"
+    assert post.call_count == 2
+
+
+def test_call_grok_passes_requested_response_format():
+    ok_resp = _mock_response(200, {"choices": [{"message": {"content": "{}"}}]})
+    with patch("nexus.providers.requests.post", return_value=ok_resp) as post:
+        call_grok(
+            "hello",
+            api_key="test-key",
+            response_format={"type": "json_object"},
+        )
+    assert post.call_args.kwargs["json"]["response_format"] == {"type": "json_object"}
+
+
 def test_call_grok_400_error():
     err_resp = _mock_response(400, {"error": {"message": "Incorrect API key provided."}})
     with patch("nexus.providers.requests.post", return_value=err_resp):
@@ -142,8 +158,6 @@ def test_call_grok_request_exception():
     assert text is None
     assert "exception" in err.lower()
 
-
-# ── call_claude ──────────────────────────────────────────────
 
 def test_call_claude_no_key():
     env_backup = os.environ.pop("CLAUDE_API_KEY", None)
