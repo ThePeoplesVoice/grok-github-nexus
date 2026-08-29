@@ -87,6 +87,7 @@ def call_grok(
     model: str | None = None,
     retries: int | None = None,
     response_format: dict[str, Any] | None = None,
+    diagnostics: bool = False,
 ) -> tuple[str | None, str | None]:
     """Call Grok. Returns (analysis_text, error_message)."""
     key = api_key or os.environ.get("GROK_API_KEY") or os.environ.get("XAI_API_KEY")
@@ -130,13 +131,20 @@ def call_grok(
             if response.status_code == 200:
                 data = response.json()
                 choices = data.get("choices") if isinstance(data, dict) else None
-                message = (
-                    choices[0].get("message")
+                choice = (
+                    choices[0]
                     if isinstance(choices, list) and choices and isinstance(choices[0], dict)
                     else None
                 )
+                message = choice.get("message") if isinstance(choice, dict) else None
                 text = message.get("content") if isinstance(message, dict) else None
                 if isinstance(text, str) and text.strip():
+                    if diagnostics:
+                        finish_reason = choice.get("finish_reason") if choice else None
+                        print(
+                            "ℹ️ Grok response received "
+                            f"({len(text)} chars; finish_reason={finish_reason or 'unknown'})"
+                        )
                     return text, None
                 last_error = "Grok response empty content"
                 if attempt + 1 < attempts:

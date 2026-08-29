@@ -57,6 +57,37 @@ def _extract_json(text: str) -> dict | None:
         return None
 
 
+def _validate_complete(parsed: dict | None) -> str | None:
+    if not parsed:
+        return "response was not parseable JSON"
+    missing = []
+    if not isinstance(parsed.get("summary"), str) or not parsed["summary"].strip():
+        missing.append("summary")
+    if not isinstance(parsed.get("actions"), list):
+        missing.append("actions")
+    if missing:
+        return f"response JSON did not match the required schema (missing {', '.join(missing)})"
+    return None
+
+
+def _call_complete_grok(prompt: str) -> tuple[dict | None, str | None]:
+    for attempt in range(2):
+        text, err = call_grok(
+            prompt,
+            temperature=0.35,
+            max_tokens=1200,
+            timeout=180,
+            retries=1,
+            response_format={"type": "json_object"},
+            diagnostics=True,
+        )
+        parsed = _extract_json(text) if text else None
+        if parsed or err or attempt:
+            return parsed, err
+        print("⏳ Grok malformed JSON response, retry 2/2")
+    return None, "response was not parseable JSON"
+
+
 def _github_surface() -> dict:
     token = (os.environ.get("GITHUB_TOKEN") or "").strip()
     repo = os.environ.get("GITHUB_REPOSITORY") or "ThePeoplesVoice/grok-github-nexus"
@@ -230,16 +261,9 @@ Recent commits:
 {log}
 """
 
-    text, err = call_grok(
-        prompt,
-        temperature=0.35,
-        max_tokens=1200,
-        timeout=180,
-        retries=1,
-        response_format={"type": "json_object"},
-    )
-    parsed = _extract_json(text) if text else None
-    success = bool(parsed and (parsed.get("summary") or parsed.get("actions")))
+    parsed, err = _call_complete_grok(prompt)
+    validation_error = _validate_complete(parsed)
+    success = not err and not validation_error
 
     if success:
         try:
@@ -249,9 +273,7 @@ Recent commits:
             print(f"⚠️ Could not persist complete usage: {e}")
         payload = _normalize(parsed or {}, "grok")
     else:
-        diagnostic = err or (
-            "response was not parseable JSON" if text else "empty response"
-        )
+        diagnostic = err or validation_error or "empty response"
         payload = _fallback(diagnostic, stats, queue)
 
     OUT_JSON.parent.mkdir(parents=True, exist_ok=True)

@@ -145,6 +145,15 @@ def test_call_grok_passes_requested_response_format():
     assert post.call_args.kwargs["json"]["response_format"] == {"type": "json_object"}
 
 
+def test_call_grok_diagnostics_report_content_metadata(capsys):
+    ok_resp = _mock_response(
+        200, {"choices": [{"message": {"content": "{}"}, "finish_reason": "stop"}]}
+    )
+    with patch("nexus.providers.requests.post", return_value=ok_resp):
+        call_grok("hello", api_key="test-key", diagnostics=True)
+    assert "2 chars; finish_reason=stop" in capsys.readouterr().out
+
+
 def test_call_grok_400_error():
     err_resp = _mock_response(400, {"error": {"message": "Incorrect API key provided."}})
     with patch("nexus.providers.requests.post", return_value=err_resp):
