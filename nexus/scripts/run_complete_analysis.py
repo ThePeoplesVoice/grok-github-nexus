@@ -230,7 +230,14 @@ Recent commits:
 {log}
 """
 
-    text, err = call_grok(prompt, temperature=0.35, max_tokens=900, timeout=180, retries=1)
+    text, err = call_grok(
+        prompt,
+        temperature=0.35,
+        max_tokens=1200,
+        timeout=180,
+        retries=1,
+        response_format={"type": "json_object"},
+    )
     parsed = _extract_json(text) if text else None
     success = bool(parsed and (parsed.get("summary") or parsed.get("actions")))
 
@@ -242,7 +249,10 @@ Recent commits:
             print(f"⚠️ Could not persist complete usage: {e}")
         payload = _normalize(parsed or {}, "grok")
     else:
-        payload = _fallback(err or "empty response", stats, queue)
+        diagnostic = err or (
+            "response was not parseable JSON" if text else "empty response"
+        )
+        payload = _fallback(diagnostic, stats, queue)
 
     OUT_JSON.parent.mkdir(parents=True, exist_ok=True)
     OUT_JSON.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
