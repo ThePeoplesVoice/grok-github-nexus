@@ -125,6 +125,26 @@ def test_call_grok_request_contract(monkeypatch):
     assert captured["timeout"] == 12
 
 
+def test_call_grok_empty_content_retries_then_reports_error():
+    empty_resp = _mock_response(200, {"choices": [{"message": {"content": ""}}]})
+    with patch("nexus.providers.requests.post", return_value=empty_resp) as post:
+        text, err = call_grok("hello", api_key="test-key", retries=1)
+    assert text is None
+    assert err == "Grok response empty content"
+    assert post.call_count == 2
+
+
+def test_call_grok_passes_requested_response_format():
+    ok_resp = _mock_response(200, {"choices": [{"message": {"content": "{}"}}]})
+    with patch("nexus.providers.requests.post", return_value=ok_resp) as post:
+        call_grok(
+            "hello",
+            api_key="test-key",
+            response_format={"type": "json_object"},
+        )
+    assert post.call_args.kwargs["json"]["response_format"] == {"type": "json_object"}
+
+
 def test_call_grok_400_error():
     err_resp = _mock_response(400, {"error": {"message": "Incorrect API key provided."}})
     with patch("nexus.providers.requests.post", return_value=err_resp):
