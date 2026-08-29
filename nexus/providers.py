@@ -86,6 +86,7 @@ def call_grok(
     api_key: str | None = None,
     model: str | None = None,
     retries: int | None = None,
+    response_format: dict[str, Any] | None = None,
 ) -> tuple[str | None, str | None]:
     """Call Grok. Returns (analysis_text, error_message)."""
     key = api_key or os.environ.get("GROK_API_KEY") or os.environ.get("XAI_API_KEY")
@@ -105,28 +106,43 @@ def call_grok(
 
     for attempt in range(attempts):
         try:
+            payload: dict[str, Any] = {
+                "model": model_name,
+                "messages": [
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": user_content},
+                ],
+                "temperature": temperature,
+                "max_tokens": max_tokens,
+                "search": False,
+            }
+            if response_format:
+                payload["response_format"] = response_format
             response = requests.post(
                 GROK_URL,
                 headers={
                     "Authorization": f"Bearer {key}",
                     "Content-Type": "application/json",
                 },
-                json={
-                    "model": model_name,
-                    "messages": [
-                        {"role": "system", "content": system},
-                        {"role": "user", "content": user_content},
-                    ],
-                    "temperature": temperature,
-                    "max_tokens": max_tokens,
-                    "search": False,
-                },
+                json=payload,
                 timeout=timeout,
             )
             if response.status_code == 200:
                 data = response.json()
-                text = data["choices"][0]["message"]["content"]
-                return text, None
+                choices = data.get("choices") if isinstance(data, dict) else None
+                message = (
+                    choices[0].get("message")
+                    if isinstance(choices, list) and choices and isinstance(choices[0], dict)
+                    else None
+                )
+                text = message.get("content") if isinstance(message, dict) else None
+                if isinstance(text, str) and text.strip():
+                    return text, None
+                last_error = "Grok response empty content"
+                if attempt + 1 < attempts:
+                    print(f"⏳ Grok empty response, retry {attempt + 2}/{attempts}")
+                    continue
+                return None, last_error
             return None, format_api_error("Grok", response) + f" [model={model_name}]"
         except Exception as e:
             last_error = f"Grok exception: {str(e)[:180]}"
