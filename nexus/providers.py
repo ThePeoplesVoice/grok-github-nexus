@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import os
-from typing import Any
+from typing import Any, Literal
 
 import requests
 
@@ -22,6 +22,10 @@ GROK_URL = "https://api.x.ai/v1/chat/completions"
 CLAUDE_URL = "https://api.anthropic.com/v1/messages"
 DEFAULT_GROK_MODEL = "grok-4.6"
 DEFAULT_CLAUDE_MODEL = "claude-sonnet-4-20250514"
+# Hard cap so GROK_RETRIES cannot become a quiet spend loop.
+MAX_GROK_RETRIES = 2
+
+GrokOutcome = Literal["ok", "empty", "malformed", "truncated", "auth", "timeout", "error"]
 
 
 def _grok_model() -> str:
@@ -36,6 +40,43 @@ def _is_timeout_error(exc: Exception) -> bool:
     name = type(exc).__name__.lower()
     message = str(exc).lower()
     return "timeout" in name or "timed out" in message or "timeout" in message
+
+
+def resolve_grok_retries(retries: int | None = None) -> int:
+    """Clamp extra attempts to [0, MAX_GROK_RETRIES]."""
+    if retries is None:
+        raw = (os.environ.get("GROK_RETRIES") or "1").strip()
+        try:
+            retries = int(raw)
+        except ValueError:
+            retries = 1
+    return max(0, min(MAX_GROK_RETRIES, retries))
+
+
+def classify_grok_result(text: str | None, error: str | None) -> GrokOutcome:
+    """Typed pipe outcome for Complete/Pulse diagnostics.
+
+    empty | malformed | truncated | ok | auth | timeout | error
+    """
+    if isinstance(text, str) and text.strip():
+        stripped = text.strip()
+        if stripped.startswith("{") and not stripped.endswith("}"):
+            return "truncated"
+        return "ok"
+    blob = (error or "").lower()
+    if "incorrect api key" in blob or "401" in blob or "missing" in blob:
+        return "auth"
+    if "timeout" in blob or "timed out" in blob:
+        return "timeout"
+    if "empty content" in blob or blob.endswith("empty") or "empty body" in blob:
+        return "empty"
+    if "malformed" in blob or "json" in blob or "parse" in blob:
+        return "malformed"
+    if "truncat" in blob:
+        return "truncated"
+    if error:
+        return "error"
+    return "empty"
 
 
 def format_api_error(provider: str, response: requests.Response) -> str:
@@ -94,14 +135,9 @@ def call_grok(
         return None, "GROK_API_KEY (or XAI_API_KEY) missing"
 
     model_name = (model or _grok_model()).strip()
-    if retries is None:
-        raw = (os.environ.get("GROK_RETRIES") or "1").strip()
-        try:
-            retries = max(0, int(raw))
-        except ValueError:
-            retries = 1
+    retries = resolve_grok_retries(retries)
 
-    attempts = 1 + max(0, retries)
+    attempts = 1 + retries
     last_error = "Grok exception: request failed"
 
     for attempt in range(attempts):

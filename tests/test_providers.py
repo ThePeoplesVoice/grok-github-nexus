@@ -11,9 +11,12 @@ import pytest
 
 from nexus.providers import (
     DEFAULT_GROK_MODEL,
+    MAX_GROK_RETRIES,
     call_claude,
     call_grok,
+    classify_grok_result,
     format_api_error,
+    resolve_grok_retries,
 )
 
 
@@ -130,6 +133,34 @@ def test_call_grok_empty_content_retries_then_reports_error():
     assert post.call_count == 2
 
 
+def test_call_grok_retries_capped_at_max():
+    empty_resp = _mock_response(200, {"choices": [{"message": {"content": ""}}]})
+    with patch("nexus.providers.requests.post", return_value=empty_resp) as post:
+        text, err = call_grok("hello", api_key="test-key", retries=99)
+    assert text is None
+    assert err == "Grok response empty content"
+    assert post.call_count == 1 + MAX_GROK_RETRIES
+
+
+def test_resolve_grok_retries_clamps():
+    assert resolve_grok_retries(0) == 0
+    assert resolve_grok_retries(1) == 1
+    assert resolve_grok_retries(2) == 2
+    assert resolve_grok_retries(99) == MAX_GROK_RETRIES
+    assert resolve_grok_retries(-3) == 0
+
+
+def test_classify_grok_result_types():
+    assert classify_grok_result("hello", None) == "ok"
+    assert classify_grok_result(None, "Grok response empty content") == "empty"
+    assert classify_grok_result(None, None) == "empty"
+    assert classify_grok_result(None, "Grok API 400: Incorrect API key provided.") == "auth"
+    assert classify_grok_result(None, "Grok exception: Read timed out.") == "timeout"
+    assert classify_grok_result(None, "Grok complete-analysis malformed JSON") == "malformed"
+    assert classify_grok_result('{"phase": "Layer 0"', None) == "truncated"
+    assert classify_grok_result(None, "Grok API 500: boom") == "error"
+
+
 def test_call_grok_passes_requested_response_format():
     ok_resp = _mock_response(200, {"choices": [{"message": {"content": "{}"}}]})
     with patch("nexus.providers.requests.post", return_value=ok_resp) as post:
@@ -149,6 +180,7 @@ def test_call_grok_400_error():
     assert text is None
     assert "400" in err
     assert "Incorrect API key" in err
+    assert classify_grok_result(text, err) == "auth"
 
 
 def test_call_grok_request_exception():
