@@ -13,7 +13,7 @@ from pathlib import Path
 
 from nexus.analyze import footer_block, utc_now_str
 from nexus.context import load_progressive, layer1_enabled, current_phase
-from nexus.providers import call_grok
+from nexus.providers import call_grok, classify_grok_result
 from nexus.usage import load_usage_stats
 from nexus.reputation import reputation_summary_md, refresh_reputation
 from nexus.runtime import after_successful_analysis, log_success
@@ -48,7 +48,7 @@ def main() -> None:
     ).stdout.strip()
 
     presence = {
-        "version": "0.2.0",
+        "version": "0.3.0",
         "generated_at": utc_now_str(),
         "phase": phase,
         "layer1_enabled": l1,
@@ -57,6 +57,7 @@ def main() -> None:
         "reputation_score": rep.get("score", 0),
         "reputation_raw": rep.get("raw_score", 0),
         "reputation_freshness": rep.get("freshness", "unknown"),
+        "grok_outcome": None,
         "recent_commits_preview": log.splitlines()[:5] if log else [],
         "notes": "Compressed context for continuity. Not a chat log. See ORGANIC_SYSTEMS.md.",
     }
@@ -81,6 +82,8 @@ Also note one observation about organic systems direction (reputation decay / pr
 Focus on health, direction of travel, and one concrete next lever. Warm, precise, first-principles."""
 
     text, err = call_grok(prompt, temperature=0.5, max_tokens=500)
+    outcome = classify_grok_result(text, err)
+    presence["grok_outcome"] = outcome
     if text:
         reflection = text
         try:
@@ -95,18 +98,19 @@ Focus on health, direction of travel, and one concrete next lever. Warm, precise
             presence["reputation_score"] = rep.get("score", 0)
             presence["reputation_raw"] = rep.get("raw_score", 0)
             presence["reputation_freshness"] = rep.get("freshness", "unknown")
-            PRESENCE_PATH.write_text(
-                json.dumps(presence, indent=2, ensure_ascii=False) + "\n",
-                encoding="utf-8",
-            )
         except Exception as e:
             print(f"⚠️ Could not persist pulse usage: {e}")
     else:
         reflection = (
-            f"_Grok reflection unavailable: {err or 'no response'}_\n\n"
+            f"_Grok reflection unavailable ({outcome}): {err or 'no response'}_\n\n"
             "_Pulse still recorded structural state + presence_state for continuity._"
         )
-        print(f"⚠️ Grok unavailable: {err}")
+        print(f"⚠️ Grok unavailable ({outcome}): {err}")
+
+    PRESENCE_PATH.write_text(
+        json.dumps(presence, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
 
     now = utc_now_str()
     body = f"""# 📡 Nexus Pulse — {now}
@@ -114,6 +118,7 @@ Focus on health, direction of travel, and one concrete next lever. Warm, precise
 **Progressive Phase:** {phase}  
 **Layer 1 (multi-model):** {"enabled" if l1 else "disabled"}  
 **Successful analyses recorded:** {total}  
+**Grok outcome:** `{outcome}`  
 **By type:** commit={by_type.get('commit', 0)} · pr={by_type.get('pr', 0)} · issue={by_type.get('issue', 0)} · self_audit={by_type.get('self_audit', 0)} · pulse={by_type.get('pulse', 0)}
 
 ## Mission (from control plane)

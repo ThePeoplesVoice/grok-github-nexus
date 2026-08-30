@@ -17,7 +17,7 @@ from pathlib import Path
 
 from nexus.analyze import footer_block, utc_now_str
 from nexus.context import current_phase, layer1_enabled, load_progressive
-from nexus.providers import call_grok
+from nexus.providers import call_grok, refine_parse_outcome
 from nexus.reputation import refresh_reputation, reputation_summary_md
 from nexus.runtime import after_successful_analysis, log_success
 from nexus.usage import load_usage_stats
@@ -131,7 +131,7 @@ def _normalize(parsed: dict, source: str) -> dict:
     if not isinstance(health, (int, float)):
         health = None
     return {
-        "version": "1.0.0",
+        "version": "1.1.0",
         "generated_at": utc_now_str(),
         "source": source,
         "summary": str(parsed.get("summary") or "").strip(),
@@ -240,6 +240,7 @@ Recent commits:
     )
     parsed = _extract_json(text) if text else None
     success = bool(parsed and (parsed.get("summary") or parsed.get("actions")))
+    outcome = refine_parse_outcome(text, err, success)
 
     if success:
         try:
@@ -254,9 +255,12 @@ Recent commits:
         )
         payload = _fallback(diagnostic, stats, queue)
 
+    payload["outcome"] = outcome
+    payload["diagnostic"] = None if success else (err or "unparseable")
+
     OUT_JSON.parent.mkdir(parents=True, exist_ok=True)
     OUT_JSON.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(f"✅ {OUT_JSON} written")
+    print(f"✅ {OUT_JSON} written outcome={outcome}")
 
     actions = payload.get("actions") or []
     action_md = []
@@ -281,6 +285,7 @@ Recent commits:
 **Layer 1:** {"enabled" if layer1_enabled(prog) else "disabled"}
 **Health:** {payload.get("health") if payload.get("health") is not None else "n/a"}
 **Source:** {payload.get("source")}
+**Outcome:** `{payload.get("outcome")}`
 
 ## Summary
 
