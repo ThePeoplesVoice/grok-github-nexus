@@ -32,7 +32,8 @@ Repo → **Settings → Secrets and variables → Actions**
 |--------|----------|
 | `GROK_API_KEY` | **Yes** |
 | `XAI_API_KEY` | Optional alias (code accepts either) |
-| `CLAUDE_API_KEY` | Optional (Layer-1 fusion only) |
+| `CLAUDE_API_KEY` | Optional (Layer-1 fusion only; `ANTHROPIC_API_KEY` also works) |
+| `FIRECRAWL_API_KEY` | Optional (link a URL so Claude can scrape page context) |
 
 Paste the raw key only — no quotes, no `Bearer ` prefix, no trailing space.
 

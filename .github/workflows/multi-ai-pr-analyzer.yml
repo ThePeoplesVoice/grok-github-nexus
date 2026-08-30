@@ -50,6 +50,7 @@ jobs:
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
           GROK_MODEL: ${{ vars.GROK_MODEL }}
           CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+          FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
           REPO_NAME: ${{ github.repository }}

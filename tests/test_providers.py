@@ -18,6 +18,7 @@ from nexus.providers import (
     format_api_error,
     refine_parse_outcome,
     resolve_grok_retries,
+    scrape_with_firecrawl,
 )
 
 
@@ -234,6 +235,42 @@ def test_call_claude_success():
             text, err = call_claude("hello")
     assert text == "Hi from Claude"
     assert err is None
+
+
+def test_scrape_with_firecrawl_no_key():
+    with patch.dict(os.environ, {}, clear=False):
+        env_backup = {}
+        for k in ("FIRECRAWL_API_KEY", "FIRECRAWL_KEY"):
+            env_backup[k] = os.environ.pop(k, None)
+        try:
+            text, err = scrape_with_firecrawl("https://example.com")
+            assert text is None
+            assert "FIRECRAWL_API_KEY" in err
+        finally:
+            for k, v in env_backup.items():
+                if v is not None:
+                    os.environ[k] = v
+
+
+def test_call_claude_firecrawl_url_appends_context():
+    firecrawl_resp = _mock_response(200, {"data": {"markdown": "Page text here"}})
+    claude_resp = _mock_response(200, {"content": [{"text": "Hi from Claude"}]})
+    seen = {}
+
+    def fake_post(url, headers=None, json=None, timeout=None):
+        if url == "https://api.firecrawl.dev/v1/scrape":
+            seen["firecrawl"] = json
+            return firecrawl_resp
+        seen["claude"] = json
+        return claude_resp
+
+    with patch("nexus.providers.requests.post", side_effect=fake_post):
+        with patch.dict(os.environ, {"CLAUDE_API_KEY": "sk-ant-test", "FIRECRAWL_API_KEY": "fc-test"}):
+            text, err = call_claude("hello", firecrawl_url="https://example.com")
+    assert text == "Hi from Claude"
+    assert err is None
+    assert seen["firecrawl"]["url"] == "https://example.com"
+    assert "Page text here" in seen["claude"]["messages"][0]["content"]
 
 
 def test_call_grok_retries_timeout_then_succeeds():

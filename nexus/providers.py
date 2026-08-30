@@ -20,6 +20,7 @@ ARA_SYSTEM = (
 
 GROK_URL = "https://api.x.ai/v1/chat/completions"
 CLAUDE_URL = "https://api.anthropic.com/v1/messages"
+FIRECRAWL_URL = "https://api.firecrawl.dev/v1/scrape"
 DEFAULT_GROK_MODEL = "grok-4.6"
 DEFAULT_CLAUDE_MODEL = "claude-sonnet-4-20250514"
 # Hard cap so GROK_RETRIES cannot become a quiet spend loop.
@@ -225,6 +226,50 @@ def call_grok(
     return None, last_error
 
 
+def scrape_with_firecrawl(
+    url: str,
+    *,
+    api_key: str | None = None,
+    timeout: int = 90,
+) -> tuple[str | None, str | None]:
+    """Fetch a page through Firecrawl and return scraped markdown/text."""
+    key = api_key or os.environ.get("FIRECRAWL_API_KEY") or os.environ.get("FIRECRAWL_KEY")
+    if not key:
+        return None, "FIRECRAWL_API_KEY missing"
+    if not url or not str(url).strip():
+        return None, "Firecrawl URL is missing"
+
+    try:
+        response = requests.post(
+            FIRECRAWL_URL,
+            headers={
+                "Authorization": f"******",
+                "Content-Type": "application/json",
+            },
+            json={
+                "url": str(url).strip(),
+                "pageOptions": {"onlyMainContent": True},
+                "formats": ["markdown"],
+            },
+            timeout=timeout,
+        )
+        if response.status_code == 200:
+            data = response.json()
+            if isinstance(data, dict):
+                payload = data.get("data") if isinstance(data.get("data"), dict) else data
+                markdown = payload.get("markdown") if isinstance(payload, dict) else None
+                if isinstance(markdown, str) and markdown.strip():
+                    return markdown.strip(), None
+                if isinstance(payload, dict):
+                    content = payload.get("content") or payload.get("text")
+                    if isinstance(content, str) and content.strip():
+                        return content.strip(), None
+            return None, "Firecrawl response empty content"
+        return None, format_api_error("Firecrawl", response)
+    except Exception as e:
+        return None, f"Firecrawl exception: {str(e)[:180]}"
+
+
 def call_claude(
     user_content: str,
     *,
@@ -233,13 +278,30 @@ def call_claude(
     timeout: int = 90,
     api_key: str | None = None,
     model: str | None = None,
+    firecrawl_url: str | None = None,
+    firecrawl_api_key: str | None = None,
+    firecrawl_timeout: int | None = None,
 ) -> tuple[str | None, str | None]:
     """Call Claude. Returns (analysis_text, error_message)."""
-    key = api_key or os.environ.get("CLAUDE_API_KEY")
+    key = api_key or os.environ.get("CLAUDE_API_KEY") or os.environ.get("ANTHROPIC_API_KEY")
     if not key:
-        return None, "CLAUDE_API_KEY missing"
+        return None, "CLAUDE_API_KEY (or ANTHROPIC_API_KEY) missing"
 
     model_name = (model or _claude_model()).strip()
+    prompt = user_content
+    if firecrawl_url:
+        firecrawl_text, firecrawl_err = scrape_with_firecrawl(
+            firecrawl_url,
+            api_key=firecrawl_api_key,
+            timeout=firecrawl_timeout or timeout,
+        )
+        if firecrawl_text:
+            prompt = (
+                f"{user_content}\n\nAdditional context from Firecrawl ({firecrawl_url}):\n"
+                f"{firecrawl_text[:12000]}"
+            )
+        elif firecrawl_err:
+            prompt = f"{user_content}\n\nFirecrawl context unavailable: {firecrawl_err}"
 
     try:
         headers = {
@@ -250,7 +312,7 @@ def call_claude(
         payload: dict[str, Any] = {
             "model": model_name,
             "max_tokens": max_tokens,
-            "messages": [{"role": "user", "content": user_content}],
+            "messages": [{"role": "user", "content": prompt}],
         }
         response = requests.post(
             CLAUDE_URL, headers=headers, json=payload, timeout=timeout
