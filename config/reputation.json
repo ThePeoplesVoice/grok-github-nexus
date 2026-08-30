@@ -29,7 +29,7 @@
   },
   "half_life_days": 30.0,
   "total_successful_analyses": 18,
-  "last_activity": "2026-08-30T00:11:09Z",
-  "last_computed": "2026-08-30T00:11:09Z",
+  "last_activity": "2026-08-30T10:08:56Z",
+  "last_computed": "2026-08-30T10:08:56Z",
   "notes": "effective score is derived from collaborative evidence (PR and issue work) only. Internal pulse/self-audit churn is tracked for visibility but does not unlock progress."
 }
