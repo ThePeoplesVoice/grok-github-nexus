@@ -1,26 +1,27 @@
 {
   "version": "0.2.0",
-  "generated_at": "2026-08-25 16:54 UTC",
-  "phase": "Layer 0 + Layer 1 live — Astra currency launched (balance 5.5) · measurement writing · automated development process active (v1.6.0)",
-  "layer1_enabled": true,
-  "total_successful_analyses": 16,
+  "generated_at": "2026-08-30 10:10 UTC",
+  "phase": "Layer 0 — Open Core (Layer 1 gated on collaborative evidence)",
+  "layer1_enabled": false,
+  "total_successful_analyses": 18,
   "by_type": {
-    "commit": 10,
+    "commit": 11,
     "pr": 0,
     "issue": 0,
-    "self_audit": 2,
+    "self_audit": 3,
     "pulse": 4,
+    "complete": 0,
     "other": 0
   },
-  "reputation_score": 16.0,
-  "reputation_raw": 16.0,
+  "reputation_score": 0.0,
+  "reputation_raw": 19.0,
   "reputation_freshness": "fresh",
   "recent_commits_preview": [
-    "874d90b chore: pulse — usage, reputation, presence_state, badges",
-    "1dcb8f1 chore: pulse — usage, reputation, presence_state, badges",
-    "7282118 chore: automated dev cycle — queue + field notes",
-    "d96ab5b chore: usage + reputation after commit analysis",
-    "156da88 Merge pull request #105 from ThePeoplesVoice/copilot/commit-analysis-2026-08-17"
+    "729f609 chore: usage + reputation after self-audit",
+    "3e5b32b chore: usage + reputation after commit analysis",
+    "cd0c70e complete: 2026-08-30 Ara ping — STATUS matches the pipe, queue honest, automated issue sweep",
+    "9929203 chore: complete analysis — implementations + usage",
+    "bef51a8 Merge pull request #127 from ThePeoplesVoice/feat/complete-grok-harden"
   ],
   "notes": "Compressed context for continuity. Not a chat log. See ORGANIC_SYSTEMS.md."
 }
