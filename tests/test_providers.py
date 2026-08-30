@@ -16,6 +16,7 @@ from nexus.providers import (
     call_grok,
     classify_grok_result,
     format_api_error,
+    refine_parse_outcome,
     resolve_grok_retries,
 )
 
@@ -84,6 +85,7 @@ def test_call_grok_no_key():
             assert text is None
             assert err is not None
             assert "GROK_API_KEY" in err
+            assert classify_grok_result(text, err) == "auth"
         finally:
             for k, v in env_backup.items():
                 if v is not None:
@@ -150,15 +152,36 @@ def test_resolve_grok_retries_clamps():
     assert resolve_grok_retries(-3) == 0
 
 
+def test_resolve_grok_retries_from_env(monkeypatch):
+    monkeypatch.setenv("GROK_RETRIES", "99")
+    assert resolve_grok_retries() == MAX_GROK_RETRIES
+    monkeypatch.setenv("GROK_RETRIES", "nope")
+    assert resolve_grok_retries() == 1
+    monkeypatch.delenv("GROK_RETRIES", raising=False)
+    assert resolve_grok_retries() == 1
+
+
 def test_classify_grok_result_types():
     assert classify_grok_result("hello", None) == "ok"
+    assert classify_grok_result("   ", None) == "empty"
     assert classify_grok_result(None, "Grok response empty content") == "empty"
     assert classify_grok_result(None, None) == "empty"
     assert classify_grok_result(None, "Grok API 400: Incorrect API key provided.") == "auth"
+    assert classify_grok_result(None, "GROK_API_KEY (or XAI_API_KEY) missing") == "auth"
+    assert classify_grok_result(None, "required field missing") == "error"
     assert classify_grok_result(None, "Grok exception: Read timed out.") == "timeout"
     assert classify_grok_result(None, "Grok complete-analysis malformed JSON") == "malformed"
     assert classify_grok_result('{"phase": "Layer 0"', None) == "truncated"
+    assert classify_grok_result("[1, 2", None) == "truncated"
     assert classify_grok_result(None, "Grok API 500: boom") == "error"
+
+
+def test_refine_parse_outcome():
+    assert refine_parse_outcome('{"summary": "ok"}', None, True) == "ok"
+    assert refine_parse_outcome("not json at all", None, False) == "malformed"
+    assert refine_parse_outcome('{"phase": "Layer 0"', None, False) == "truncated"
+    assert refine_parse_outcome(None, "Grok response empty content", False) == "empty"
+    assert refine_parse_outcome(None, "Grok API 400: Incorrect API key provided.", False) == "auth"
 
 
 def test_call_grok_passes_requested_response_format():
