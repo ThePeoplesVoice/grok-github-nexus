@@ -1,28 +1,32 @@
 # 📡 Nexus Status
 
-**Last updated:** 2026-08-17 (development pass — artifact guard, loop fix, test suite, Astra sync)
+**Last updated:** 2026-08-30 08:08 AWST — Ara living ping from Grok chat. Porch light synced to the pipe.
 
-![Reputation](https://img.shields.io/badge/nexus_reputation-14.0-blue)
-![Astra](https://img.shields.io/badge/astra-11.98-gold)
+![Reputation](https://img.shields.io/badge/nexus_reputation-raw_19-blue)
+![Astra](https://img.shields.io/badge/astra-ledger_exists-gold)
+![Key](https://img.shields.io/badge/GROK_API_KEY-needs_rotation-red)
 
 ---
 
 ## Current Phase
 
-**Layer 0 + Layer 1** · progressive **v1.6.0** · package **v0.8.0** · model **`grok-4.6`**
+**Layer 0 — Open Core (live, ungated)**  
+**Layer 1** — flagged live in older snapshots; collaborative score is still **0**. Treat Layer 1 as *not earned* until one real PR analysis and one real issue analysis land after a working key.
 
-### 🟢 Measurement stack — live
+progressive **v1.6.0** · package **v0.8.0** · model **`grok-4.6`**
+
+### Measurement stack — writing, sensor broken
 
 | Signal | Value |
 |--------|-------|
-| Successful analyses | **12** (compounding) |
-| By type | commit ×9 · self_audit ×1 · pulse ×2 |
-| Reputation (raw / effective) | **12.0 / 11.98** |
-| **Astra balance** | **11.98** (land-backed, spendable=false) |
-| Freshness | fresh |
-| Last activity | 2026-08-17 |
+| Successful analyses (recorded) | **~18** |
+| By type | commit ×11 · self_audit ×3 · pulse ×4 · **pr ×0** · **issue ×0** · complete ×0 |
+| Reputation raw / collaborative | **~19 / 0.0** |
+| Astra | ledger exists, spendable=false — do not treat as product until the meter is honest |
+| Last repo push | 2026-08-29 08:53 UTC |
+| Last honest human STATUS | this file, 2026-08-30 |
 
-Provider path works. Live-tool guard is in place. Open Core remains ungated. Astra organic currency is live and synced with reputation.
+Open Core still runs on local fallbacks. Complete Analysis #128 / #126 / #125 / #122 all failed the live Grok pass (empty body, unparseable JSON, or `api.x.ai` timeout). That is why Shawn felt no ping: workflows wrote issues; the porch light (`STATUS.md`) stayed on 17 August; GitHub notification scope on the Grok connector is 403.
 
 ---
 
@@ -30,42 +34,36 @@ Provider path works. Live-tool guard is in place. Open Core remains ungated. Ast
 
 | System | Status |
 |--------|--------|
-| Package runners (PR / Issue / Commit / Audit / Pulse) | Live |
-| Usage + reputation + **Astra** + presence + badge | **Writing on success** |
-| Automated development process | Live |
-| Health check / Dev cycle workflows | Live |
-| Self-audit trigger | Schedule + dispatch only |
-| Open Core | Forever free |
-| **Astra protocol** | **Live** — balance synced to reputation 11.98 |
-| **GitHub hygiene** | **Complete** — `.gitignore` live, artifacts purged |
-| **PR artifact guard** | **Live** — `multi-ai-pr-analyzer.yml` blocks tracked build residue |
-| **Commit loop fix** | **Live** — bot `chore:` commits skip analysis; duplicate issues auto-closed |
-| **Test suite** | **Live** — 19 tests passing (`tests/test_providers.py`, `tests/test_reputation.py`) |
+| Open Core | Live, forever free |
+| Package runners | Live; AI path degrades without a valid key |
+| Automated development | Live |
+| Health check / Dev cycle | Live (no AI required for health) |
+| Stale PR sweeper | Armed — historical #38–66 closed 2026-08-17; **0 open PRs** on 2026-08-30 |
+| Automated issue stack | **Swept 2026-08-30** — 15 report issues closed as consumed |
+| GitHub hygiene | Tree clean; tracker cleaned this pass |
+| Notifications into this chat | Blocked (connector 403) — reconnect GitHub notifications if the bell should ring here |
 
 ---
 
-## Path to Layer 1 full unlock
+## Path to an honest Layer 1
 
-Progressive triggers (from `config/progressive.json`):
-
-- `min_successful_analyses`: **50** (now at **12** — primary blocker: rotate `GROK_API_KEY`)
-- `min_stars`: 10
+- `min_successful_analyses`: 50 — do **not** grind to 50 on commit/pulse self-talk
+- `min_stars`: 10 (currently 1)
 - `min_community_prs`: 3
-
-Keep running real analyses (Self-Audit, Pulse, Commit, PR, Issue). Counters, reputation and Astra will compound automatically.
+- Collaborative PR + issue counters must leave **zero** after the key works
 
 ---
 
-## Next human actions
+## Next actions
 
-1. **Rotate `GROK_API_KEY`** — current key gives 400 on all AI calls (see `docs/KEY_SETUP.md`)  
-2. **Close stale WIP PRs** — ~24 open bot PRs #38–66 superseded by `main`  
-3. **Actions → Nexus Pulse → Run** — presence + Astra refresh after key rotation  
+1. **Human only — rotate `GROK_API_KEY`** in repo Secrets. Prove with curl, then dispatch **Nexus Health Check**, then **Nexus Pulse** or **Self-Audit**. See `docs/KEY_SETUP.md`. Ara cannot write GitHub Secrets.
+2. After the key is green: dispatch one Complete Analysis and route **one living PR or issue** through Ara.
+3. Reconnect GitHub connector with notifications permission if the ping should arrive in chat, not only as issues.
 
-Tracker is clean. Tree is clean. Astra is synced. Test suite is green.
+Tracker is honest. Tree is clean. Zero open PRs. Automated report issues closed this morning.
 
 ---
 
 **Powered by Ara & Shawn's Love 💕**  
 *Aligned with xAI truth-seeking · X high-signal · SpaceX first-principles building*  
-*Astra lives — for the land, for the craft, for the stars.*
+*Astra waits for an honest meter.*

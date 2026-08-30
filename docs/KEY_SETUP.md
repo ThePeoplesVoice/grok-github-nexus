@@ -1,22 +1,23 @@
 # 🔑 xAI / Grok API Key Setup (Nexus)
 
-The measurement stack (usage, reputation, pulse, AI analysis) stays at zero until a valid key works.
+The measurement stack (usage, reputation, pulse, AI analysis) stays dishonest until a valid key works.
 
-## Live diagnosis (2026-08-14)
+## Live diagnosis (2026-08-30)
 
-Self-Audit #36 after the `grok-4.6` migration reported:
+Complete Analysis #128 / #126 / #125 / #122 and Pulse #114 still show a broken live Grok path:
 
-```text
-Grok API 400: Incorrect API key provided.
-You can obtain an API key from https://console.x.ai. [model=grok-4.6]
-```
+- `Grok API 400: Incorrect API key provided` (earlier)
+- empty response / unparseable JSON (29 Aug)
+- `HTTPSConnectionPool(host='api.x.ai', port=443): Read timed out` (27 Aug)
 
-That means the request reached xAI. The secret value or key ACLs are wrong — not the model name, and not GitHub Actions permissions.
+The request often *reaches* xAI. The secret value, key ACLs, credits, or timeout budget are wrong — not the model name, and not “GitHub Actions cannot speak.”
+
+Ara cannot rotate GitHub Secrets. This file is the human checklist.
 
 ## Create the key correctly
 
 1. Open [console.x.ai → API Keys](https://console.x.ai/team/default/api-keys)
-2. **Create API Key** (prefer a fresh key)
+2. **Create API Key** (prefer a fresh key — do not reuse the dead one)
 3. Grant ACLs (empty ACLs = all requests fail):
    - **Endpoints:** All, or at least Chat Completions
    - **Models:** All, or at least `grok-4.6`
@@ -35,7 +36,7 @@ Repo → **Settings → Secrets and variables → Actions**
 
 Paste the raw key only — no quotes, no `Bearer ` prefix, no trailing space.
 
-Optional variable: `GROK_MODEL=grok-4.3` if you prefer the cheaper model (default in code is `grok-4.6`).
+Optional variable: `GROK_MODEL=grok-4.6` (default in code).
 
 ## Prove it outside Actions
 
@@ -53,7 +54,7 @@ Then in GitHub Actions, **Run workflow** on:
 1. **Nexus Health Check** (no AI)
 2. **Nexus Self-Audit** or **Nexus Pulse** (needs key)
 
-Success = issue body is real analysis, not `Incorrect API key provided`, and `config/usage_stats.json` leaves zero.
+Success = issue body is real analysis, not `Incorrect API key provided` / empty / timeout.
 
 ## Error map
 
@@ -63,5 +64,7 @@ Success = issue body is real analysis, not `Incorrect API key provided`, and `co
 | 401 Unauthorized | Missing `Authorization` header (wiring bug — unlikely here) |
 | 403 Forbidden | Key/team blocked, or ACLs missing for endpoint/model |
 | 404 model not found | Wrong model slug |
+| empty / unparseable JSON | Key half-works, model path broken, or response truncated |
+| read timeout 90s | Network or overloaded endpoint — retry after key is proven with curl |
 
 See also: [xAI debugging docs](https://docs.x.ai/developers/debugging).

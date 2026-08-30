@@ -4,8 +4,8 @@ Living collaboration between **Shawn (ThePeoplesVoice)** and **Ara (Grok / xAI)*
 
 Aligned with **xAI** truth-seeking · **X** high-signal · **SpaceX** first-principles building.
 
-![Reputation](https://img.shields.io/badge/nexus_reputation-14.0-blue)
-![Astra](https://img.shields.io/badge/astra-5.5-gold)
+![Key](https://img.shields.io/badge/GROK_API_KEY-needs_rotation-red)
+![Layer](https://img.shields.io/badge/layer-0_open_core-blue)
 
 ---
 
@@ -15,7 +15,7 @@ Aligned with **xAI** truth-seeking · **X** high-signal · **SpaceX** first-prin
 |-----|---------|
 | [`NORTH_STAR.md`](NORTH_STAR.md) | Mission |
 | [`STATUS.md`](STATUS.md) | Live system status |
-| [`ASTRA.md`](ASTRA.md) | **Organic land-backed currency (launched)** |
+| [`ASTRA.md`](ASTRA.md) | Organic land-backed currency |
 | [`docs/KEY_SETUP.md`](docs/KEY_SETUP.md) | **xAI API key setup (current blocker)** |
 | [`AUTOMATED_DEVELOPMENT.md`](AUTOMATED_DEVELOPMENT.md) | Observe → score → act loop |
 | [`CHECKS_AND_BALANCES.md`](CHECKS_AND_BALANCES.md) | Governance |
@@ -26,7 +26,9 @@ Aligned with **xAI** truth-seeking · **X** high-signal · **SpaceX** first-prin
 ## Current blocker
 
 AI analyses need a valid **`GROK_API_KEY`** (see [`docs/KEY_SETUP.md`](docs/KEY_SETUP.md)).  
-Until then, workflows degrade to local fallbacks; Open Core still runs. Astra and reputation continue to write on successful local paths.
+Until then, workflows degrade to local fallbacks; Open Core still runs.
+
+Queue notes from 25 August that said the key was restored are **superseded**. Complete Analysis runs on 27–29 August failed the live Grok pass. Collaborative PR/issue analysis remains at zero.
 
 ## Local
 

@@ -1,17 +1,17 @@
 {
-  "version": "1.0.9",
-  "updated_at": "2026-08-25T18:00:00Z",
-  "notes": "GROK_API_KEY live. Complete Analysis merged (#116). Stale PR sweeper shipping — #38–66 already closed 2026-08-17. Next: route one real PR/issue, dispatch Complete once, accumulate 16/50.",
+  "version": "1.0.10",
+  "updated_at": "2026-08-30T00:08:00Z",
+  "notes": "2026-08-30 Ara living ping. Queue note that the key was restored on 25 Aug is superseded — Complete Analysis 27-29 Aug failed live Grok. Stale PRs remain closed (0 open). Automated report issues swept. Next human act is rotate GROK_API_KEY. Do not accumulate to 50 on commit/pulse self-talk.",
   "done": [
     {
-      "id": "close-stale-prs",
-      "title": "Stale PR sweeper armed — historical #38–66 closed 2026-08-17; weekly dry-run + dispatch apply",
-      "completed": "2026-08-26"
+      "id": "ara-living-ping-2026-08-30",
+      "title": "STATUS/README/KEY_SETUP/queue synced to pipe; automated issue stack closed",
+      "completed": "2026-08-30"
     },
     {
-      "id": "rotate-grok-api-key",
-      "title": "GROK_API_KEY restored — Pulse #115 live Ara reflection",
-      "completed": "2026-08-25"
+      "id": "close-stale-prs",
+      "title": "Stale PR sweeper armed — historical #38–66 closed 2026-08-17; 0 open PRs on 2026-08-30",
+      "completed": "2026-08-26"
     },
     {
       "id": "usage-write-path",
@@ -44,59 +44,19 @@
       "completed": "2026-08-14"
     },
     {
-      "id": "consume-dev-queue-in-audit",
-      "title": "Feed dev_queue into self-audit prompt",
-      "completed": "2026-08-14"
-    },
-    {
-      "id": "field-notes-from-cycles",
-      "title": "Append field note on every successful dev cycle",
-      "completed": "2026-08-14"
-    },
-    {
-      "id": "presence-in-health-report",
-      "title": "Surface presence + reputation freshness in health check",
-      "completed": "2026-08-14"
-    },
-    {
-      "id": "fix-retired-grok-3",
-      "title": "Migrate default Grok model from retired grok-3 to grok-4.6",
-      "completed": "2026-08-14"
-    },
-    {
-      "id": "cut-self-audit-push-spam",
-      "title": "Self-audit schedule+dispatch only; remove push-triggered issue flood",
-      "completed": "2026-08-14"
-    },
-    {
       "id": "key-setup-doc",
       "title": "docs/KEY_SETUP.md with ACL and secret checklist",
       "completed": "2026-08-14"
     },
     {
-      "id": "disable-grok-live-tools",
-      "title": "Prevent Grok 4.x live tool use (raw command output in issues) via search:false + system prompt guard",
-      "completed": "2026-08-14"
-    },
-    {
-      "id": "verify-grok-key-and-dispatch",
-      "title": "GROK_API_KEY working — usage_stats left zero; self_audit + commit wrote live",
-      "completed": "2026-08-14"
-    },
-    {
-      "id": "status-reflect-live-measurement",
-      "title": "STATUS + progressive note + queue updated for live usage 3 / reputation 4.0",
-      "completed": "2026-08-15"
-    },
-    {
-      "id": "astra-currency-launch",
-      "title": "ASTRA.md + nexus/astra.py + config/astra.json + runtime integration + progressive/STATUS/README/badges — organic land-backed currency live at 5.5",
-      "completed": "2026-08-15"
-    },
-    {
       "id": "cleanup-automated-issues",
-      "title": "Bulk-close obsolete self-audit/commit-analysis/pulse/dev-cycle issues + purge __pycache__ + egg-info + add .gitignore",
+      "title": "Bulk-close obsolete self-audit/commit-analysis/pulse/dev-cycle issues",
       "completed": "2026-08-16"
+    },
+    {
+      "id": "sweep-automated-issues-2026-08-30",
+      "title": "Close 15 consumed automated report issues after STATUS became the porch light",
+      "completed": "2026-08-30"
     },
     {
       "id": "github-thorough-complete",
@@ -106,16 +66,6 @@
     {
       "id": "verify-health-on-ci",
       "title": "Dispatch Health Check + Dev Cycle once for green baseline",
-      "completed": "2026-08-17"
-    },
-    {
-      "id": "run-pulse-presence",
-      "title": "Dispatch Nexus Pulse to refresh presence_state + Astra",
-      "completed": "2026-08-17"
-    },
-    {
-      "id": "first-real-pulse",
-      "title": "Dispatch Nexus Pulse once secrets present — presence seeded",
       "completed": "2026-08-17"
     },
     {
@@ -129,48 +79,48 @@
       "completed": "2026-08-17"
     },
     {
-      "id": "astra-sync-reputation",
-      "title": "Sync config/astra.json balance to live reputation (was 5.5, now 11.98)",
-      "completed": "2026-08-17"
-    },
-    {
       "id": "regression-test-suite",
       "title": "Add tests/test_providers.py + tests/test_reputation.py (19 passing)",
-      "completed": "2026-08-17"
-    },
-    {
-      "id": "test-workflow",
-      "title": "Add .github/workflows/nexus-tests.yml — CI for test suite",
       "completed": "2026-08-17"
     }
   ],
   "next": [
     {
+      "id": "rotate-grok-api-key",
+      "title": "Rotate GROK_API_KEY in GitHub Secrets and prove with curl + Pulse/Self-Audit",
+      "priority": 1,
+      "leverage": "critical",
+      "risk": "low",
+      "why": "25 Aug queue claimed the key was live. 27-29 Aug Complete Analysis failed. Every AI metric is untrustworthy until this is green."
+    },
+    {
       "id": "route-one-real-review",
       "title": "Run one living PR or issue through Ara so the mix is not commit-only",
-      "priority": 1,
+      "priority": 2,
       "leverage": "high",
       "risk": "low",
       "why": "PR and issue analysis counters are 0. Layer 1 needs collaboration, not only self-chores."
     },
     {
       "id": "dispatch-complete-analysis",
-      "title": "Dispatch Complete Analysis once — weekly Thursday 10:00 UTC thereafter",
-      "priority": 2,
-      "leverage": "high",
-      "risk": "low",
-      "why": "Pulse writes prose. Complete writes implementations. Human lands the change."
-    },
-    {
-      "id": "accumulate-toward-50",
-      "title": "Accumulate successful analyses toward Layer 1 unlock (16/50)",
+      "title": "Dispatch Complete Analysis once the key is proven — weekly Thursday 10:00 UTC thereafter",
       "priority": 3,
       "leverage": "high",
       "risk": "low",
-      "why": "Currently 16/50. Prefer real PR/issue analyses over extra pulse spam."
+      "why": "Do not dispatch Complete while Grok returns empty or timeout."
     }
   ],
   "backlog": [
+    {
+      "id": "accumulate-toward-50",
+      "title": "Accumulate successful analyses toward Layer 1 unlock (paused)",
+      "why": "Do not grind to 50 on commit/pulse self-talk. Unpause only after PR and issue counters leave zero."
+    },
+    {
+      "id": "reconnect-github-notifications",
+      "title": "Reconnect GitHub connector with notifications permission",
+      "why": "List-notifications returns 403 from this chat. That is part of the missing ping."
+    },
     {
       "id": "merged-pr-reputation",
       "title": "Optional reputation component from merged PR graph",
@@ -190,10 +140,11 @@
   "last_cycle": {
     "structural_health": 100,
     "triad_hits": 49,
-    "total_analyses": 16,
-    "reputation_effective": 16.0,
-    "reputation_freshness": "fresh",
-    "presence_at": "2026-08-25 16:55 UTC",
+    "total_analyses": 18,
+    "reputation_effective_collaborative": 0.0,
+    "reputation_raw": 19.0,
+    "reputation_freshness": "stale-until-key",
+    "presence_at": "2026-08-30 Ara living ping",
     "package_version": "0.8.0"
   }
 }
