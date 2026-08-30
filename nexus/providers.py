@@ -42,6 +42,20 @@ def _is_timeout_error(exc: Exception) -> bool:
     return "timeout" in name or "timed out" in message or "timeout" in message
 
 
+def _is_auth_error(blob: str) -> bool:
+    if "incorrect api key" in blob or "unauthorized" in blob:
+        return True
+    if "api_key" in blob or "api key" in blob:
+        return True
+    if "grok_api_key" in blob and "missing" in blob:
+        return True
+    if "xai_api_key" in blob and "missing" in blob:
+        return True
+    if " api 401:" in blob or "api 401:" in blob or "status 401" in blob:
+        return True
+    return False
+
+
 def resolve_grok_retries(retries: int | None = None) -> int:
     """Clamp extra attempts to [0, MAX_GROK_RETRIES]."""
     if retries is None:
@@ -62,21 +76,42 @@ def classify_grok_result(text: str | None, error: str | None) -> GrokOutcome:
         stripped = text.strip()
         if stripped.startswith("{") and not stripped.endswith("}"):
             return "truncated"
+        if stripped.startswith("[") and not stripped.endswith("]"):
+            return "truncated"
         return "ok"
     blob = (error or "").lower()
-    if "incorrect api key" in blob or "401" in blob or "missing" in blob:
+    if _is_auth_error(blob):
         return "auth"
     if "timeout" in blob or "timed out" in blob:
         return "timeout"
     if "empty content" in blob or blob.endswith("empty") or "empty body" in blob:
         return "empty"
-    if "malformed" in blob or "json" in blob or "parse" in blob:
+    if "malformed" in blob or "unparseable" in blob or "parse" in blob:
         return "malformed"
     if "truncat" in blob:
         return "truncated"
     if error:
         return "error"
     return "empty"
+
+
+def refine_parse_outcome(
+    text: str | None,
+    error: str | None,
+    parsed_ok: bool,
+) -> GrokOutcome:
+    """If JSON parse failed after a live reply, prefer truncated/malformed over ok."""
+    if parsed_ok:
+        return "ok"
+    base = classify_grok_result(text, error)
+    if base != "ok":
+        return base
+    stripped = (text or "").strip()
+    if stripped.startswith("{") and not stripped.endswith("}"):
+        return "truncated"
+    if stripped.startswith("[") and not stripped.endswith("]"):
+        return "truncated"
+    return "malformed"
 
 
 def format_api_error(provider: str, response: requests.Response) -> str:
