@@ -1,6 +1,6 @@
 {
   "version": "1.0.10",
-  "updated_at": "2026-08-30T00:08:00Z",
+  "updated_at": "2026-08-31T14:50:55Z",
   "notes": "2026-08-30 Ara living ping. Queue note that the key was restored on 25 Aug is superseded — Complete Analysis 27-29 Aug failed live Grok. Stale PRs remain closed (0 open). Automated report issues swept. Next human act is rotate GROK_API_KEY. Do not accumulate to 50 on commit/pulse self-talk.",
   "done": [
     {
@@ -141,10 +141,9 @@
     "structural_health": 100,
     "triad_hits": 49,
     "total_analyses": 18,
-    "reputation_effective_collaborative": 0.0,
-    "reputation_raw": 19.0,
-    "reputation_freshness": "stale-until-key",
-    "presence_at": "2026-08-30 Ara living ping",
+    "reputation_effective": 0.0,
+    "reputation_freshness": "fresh",
+    "presence_at": "2026-08-31 07:23 UTC",
     "package_version": "0.8.0"
   }
 }
