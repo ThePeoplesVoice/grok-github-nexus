@@ -1,6 +1,6 @@
 {
-  "version": "0.2.0",
-  "generated_at": "2026-08-30 10:10 UTC",
+  "version": "0.3.0",
+  "generated_at": "2026-08-31 07:23 UTC",
   "phase": "Layer 0 — Open Core (Layer 1 gated on collaborative evidence)",
   "layer1_enabled": false,
   "total_successful_analyses": 18,
@@ -16,12 +16,13 @@
   "reputation_score": 0.0,
   "reputation_raw": 19.0,
   "reputation_freshness": "fresh",
+  "grok_outcome": "ok",
   "recent_commits_preview": [
-    "729f609 chore: usage + reputation after self-audit",
-    "3e5b32b chore: usage + reputation after commit analysis",
-    "cd0c70e complete: 2026-08-30 Ara ping — STATUS matches the pipe, queue honest, automated issue sweep",
-    "9929203 chore: complete analysis — implementations + usage",
-    "bef51a8 Merge pull request #127 from ThePeoplesVoice/feat/complete-grok-harden"
+    "6f80d14 chore: complete analysis — implementations + usage",
+    "39bd1d7 Merge pull request #135 from ThePeoplesVoice/feat/persist-grok-outcomes",
+    "9306dae test: env retry clamp, tighter auth, parse-refine outcomes",
+    "3bd4ecc feat: write outcome onto Complete JSON and Pulse presence",
+    "27de63c feat: persist typed Grok outcomes on Complete and Pulse"
   ],
   "notes": "Compressed context for continuity. Not a chat log. See ORGANIC_SYSTEMS.md."
 }
