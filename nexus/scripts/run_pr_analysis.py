@@ -22,7 +22,7 @@ from nexus.runtime import after_successful_analysis, log_success
 def fetch_pr(repo_name: str, pr_number: str, token: str) -> tuple[dict, str, list[str]]:
     headers = {
         "Authorization": f"token {token}",
-        "Accept": "vnd.github+json",
+        "Accept": "application/vnd.github+json",
     }
     pr_url = f"https://api.github.com/repos/{repo_name}/pulls/{pr_number}"
 
