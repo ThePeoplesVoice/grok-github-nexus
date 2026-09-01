@@ -112,12 +112,14 @@ def test_layer1_requires_collaborative_evidence(tmp_path):
     }
 
     stats = increment_usage("self_audit", path=path, persist=True)
-    assert stats["total_successful_analyses"] == 0
+    # Honest meter: internal work counts. Layer 1 still stays gated.
+    assert stats["total_successful_analyses"] == 1
+    assert stats["by_type"]["self_audit"] == 1
     assert layer1_enabled(prog=prog, usage=stats) is False
 
     collaborative = increment_usage("pr", path=path, persist=True)
     assert collaborative["by_type"]["pr"] == 1
-    assert collaborative["total_successful_analyses"] == 1
+    assert collaborative["total_successful_analyses"] == 2
     assert layer1_enabled(prog=prog, usage=collaborative) is True
 
 
