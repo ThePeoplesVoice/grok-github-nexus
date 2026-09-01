@@ -25,7 +25,7 @@ INTERNAL_TYPES = tuple(t for t in VALID_TYPES if t not in COLLABORATIVE_TYPES)
 
 def _defaults() -> dict[str, Any]:
     return {
-        "version": "1.1.0",
+        "version": "1.1.1",
         "description": "Lightweight counters for progressive unlock triggers. Incremented after successful analysis.",
         "total_successful_analyses": 0,
         "by_type": {
@@ -89,25 +89,14 @@ def increment_usage(
 
     stats = load_usage_stats(path)
     by_type = stats.get("by_type") or {}
-    collaborative_count = sum(int(by_type.get(k, 0)) for k in COLLABORATIVE_TYPES)
 
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    if t in INTERNAL_TYPES and collaborative_count == 0:
-        stats["last_updated"] = now
-        stats["last_type"] = t
-        stats["version"] = stats.get("version") or "1.1.0"
-        if persist:
-            save_usage_stats(stats, path)
-        return stats
-
     stats["total_successful_analyses"] = int(stats.get("total_successful_analyses", 0)) + amount
-
     by_type[t] = int(by_type.get(t, 0)) + amount
     stats["by_type"] = by_type
-
     stats["last_updated"] = now
     stats["last_type"] = t
-    stats["version"] = stats.get("version") or "1.1.0"
+    stats["version"] = stats.get("version") or "1.1.1"
 
     if persist:
         save_usage_stats(stats, path)

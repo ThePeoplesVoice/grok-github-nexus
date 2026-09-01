@@ -1,8 +1,13 @@
 {
-  "version": "1.0.11",
-  "updated_at": "2026-09-01T06:10:00Z",
-  "notes": "2026-09-01 sweep. Key proven (Pulse ok). Complete #143 ok after #142 budget raise. Living PRs #134 #135 #142 merged. Automated reports 130-141 closed. Do not rotate the key. Do not re-run Complete this week.",
+  "version": "1.0.12",
+  "updated_at": "2026-09-01T10:05:00Z",
+  "notes": "2026-09-01. Usage mix fixed: living PRs #134/#135/#142 now counted (pr=3). Meter honest. Next: hold Complete until Thursday; reconnect notifications optional.",
   "done": [
+    {
+      "id": "usage-mix-records-living-prs",
+      "title": "Backfill three living PR reviews into collaborative counters; fix increment_usage skip bug",
+      "completed": "2026-09-01"
+    },
     {
       "id": "rotate-grok-api-key",
       "title": "GROK_API_KEY rotated and proven — Pulse ok, Complete #143 ok",
@@ -30,7 +35,7 @@
     },
     {
       "id": "close-stale-prs",
-      "title": "Stale PR sweeper armed — historical #38–66 closed 2026-08-17",
+      "title": "Stale PR sweeper armed — historical #38-66 closed 2026-08-17",
       "completed": "2026-08-26"
     },
     {
@@ -41,20 +46,20 @@
   ],
   "next": [
     {
-      "id": "usage-mix-records-living-prs",
-      "title": "Optional: make by_type.pr / issue increment when a living review actually lands",
-      "priority": 1,
-      "leverage": "medium",
-      "risk": "low",
-      "why": "Counters still read pr=0 issue=0 after three merged PRs. Measurement lag, not missing collaboration."
-    },
-    {
       "id": "hold-complete-until-next-thursday",
       "title": "Do not dispatch Complete again until the next weekly slot",
-      "priority": 2,
+      "priority": 1,
       "leverage": "high",
       "risk": "low",
       "why": "#143 is ok. A second fat report this week is grinding."
+    },
+    {
+      "id": "reconnect-github-notifications",
+      "title": "Reconnect GitHub connector with notifications permission",
+      "priority": 2,
+      "leverage": "low",
+      "risk": "low",
+      "why": "List-notifications returns 403 from this chat. Optional."
     }
   ],
   "backlog": [
@@ -62,11 +67,6 @@
       "id": "accumulate-toward-50",
       "title": "Accumulate successful analyses toward Layer 1 unlock (paused)",
       "why": "Do not grind to 50 on commit/pulse self-talk."
-    },
-    {
-      "id": "reconnect-github-notifications",
-      "title": "Reconnect GitHub connector with notifications permission",
-      "why": "List-notifications returns 403 from this chat."
     },
     {
       "id": "merged-pr-reputation",
@@ -87,7 +87,7 @@
   "last_cycle": {
     "structural_health": 100,
     "triad_hits": 49,
-    "total_analyses": 18,
+    "total_analyses": 22,
     "reputation_effective": 0.0,
     "reputation_freshness": "fresh",
     "presence_at": "2026-09-01",
