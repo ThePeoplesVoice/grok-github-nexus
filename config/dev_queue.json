@@ -1,8 +1,28 @@
 {
-  "version": "1.0.10",
-  "updated_at": "2026-08-31T14:50:55Z",
-  "notes": "2026-08-30 Ara living ping. Queue note that the key was restored on 25 Aug is superseded — Complete Analysis 27-29 Aug failed live Grok. Stale PRs remain closed (0 open). Automated report issues swept. Next human act is rotate GROK_API_KEY. Do not accumulate to 50 on commit/pulse self-talk.",
+  "version": "1.0.11",
+  "updated_at": "2026-09-01T06:10:00Z",
+  "notes": "2026-09-01 sweep. Key proven (Pulse ok). Complete #143 ok after #142 budget raise. Living PRs #134 #135 #142 merged. Automated reports 130-141 closed. Do not rotate the key. Do not re-run Complete this week.",
   "done": [
+    {
+      "id": "rotate-grok-api-key",
+      "title": "GROK_API_KEY rotated and proven — Pulse ok, Complete #143 ok",
+      "completed": "2026-09-01"
+    },
+    {
+      "id": "route-one-real-review",
+      "title": "Living PRs #134 #135 #142 opened, reviewed, merged",
+      "completed": "2026-09-01"
+    },
+    {
+      "id": "dispatch-complete-analysis",
+      "title": "Complete proven ok under 2500-token budget (#143). Weekly Thursday thereafter.",
+      "completed": "2026-09-01"
+    },
+    {
+      "id": "sweep-automated-issues-2026-09-01",
+      "title": "Close consumed reports #130-141; keep #143 as live Complete",
+      "completed": "2026-09-01"
+    },
     {
       "id": "ara-living-ping-2026-08-30",
       "title": "STATUS/README/KEY_SETUP/queue synced to pipe; automated issue stack closed",
@@ -10,116 +30,43 @@
     },
     {
       "id": "close-stale-prs",
-      "title": "Stale PR sweeper armed — historical #38–66 closed 2026-08-17; 0 open PRs on 2026-08-30",
+      "title": "Stale PR sweeper armed — historical #38–66 closed 2026-08-17",
       "completed": "2026-08-26"
     },
     {
       "id": "usage-write-path",
       "title": "Real usage tracking on all major analysis surfaces",
       "completed": "2026-08-14"
-    },
-    {
-      "id": "package-migration-runners",
-      "title": "Migrate PR/Issue/Commit/Self-Audit/Pulse off YAML heredocs",
-      "completed": "2026-08-14"
-    },
-    {
-      "id": "reputation-decay-badge",
-      "title": "Read-only reputation with 30-day half-life + public badge sync",
-      "completed": "2026-08-14"
-    },
-    {
-      "id": "presence-continuity",
-      "title": "Presence state written by pulse, consumed by all major runners",
-      "completed": "2026-08-14"
-    },
-    {
-      "id": "health-check",
-      "title": "Dispatchable package/system health check without AI",
-      "completed": "2026-08-14"
-    },
-    {
-      "id": "automated-dev-process",
-      "title": "AUTOMATED_DEVELOPMENT.md + dev cycle runner + workflow",
-      "completed": "2026-08-14"
-    },
-    {
-      "id": "key-setup-doc",
-      "title": "docs/KEY_SETUP.md with ACL and secret checklist",
-      "completed": "2026-08-14"
-    },
-    {
-      "id": "cleanup-automated-issues",
-      "title": "Bulk-close obsolete self-audit/commit-analysis/pulse/dev-cycle issues",
-      "completed": "2026-08-16"
-    },
-    {
-      "id": "sweep-automated-issues-2026-08-30",
-      "title": "Close 15 consumed automated report issues after STATUS became the porch light",
-      "completed": "2026-08-30"
-    },
-    {
-      "id": "github-thorough-complete",
-      "title": "Ara completes GitHub thoroughly — tree clean, tracker clean, surfaces consistent",
-      "completed": "2026-08-16"
-    },
-    {
-      "id": "verify-health-on-ci",
-      "title": "Dispatch Health Check + Dev Cycle once for green baseline",
-      "completed": "2026-08-17"
-    },
-    {
-      "id": "pr-artifact-guard",
-      "title": "Add artifact guard step to multi-ai-pr-analyzer.yml",
-      "completed": "2026-08-17"
-    },
-    {
-      "id": "commit-feedback-loop-fix",
-      "title": "Block bot chore-commit triggers + deduplicate analysis issues",
-      "completed": "2026-08-17"
-    },
-    {
-      "id": "regression-test-suite",
-      "title": "Add tests/test_providers.py + tests/test_reputation.py (19 passing)",
-      "completed": "2026-08-17"
     }
   ],
   "next": [
     {
-      "id": "rotate-grok-api-key",
-      "title": "Rotate GROK_API_KEY in GitHub Secrets and prove with curl + Pulse/Self-Audit",
+      "id": "usage-mix-records-living-prs",
+      "title": "Optional: make by_type.pr / issue increment when a living review actually lands",
       "priority": 1,
-      "leverage": "critical",
+      "leverage": "medium",
       "risk": "low",
-      "why": "25 Aug queue claimed the key was live. 27-29 Aug Complete Analysis failed. Every AI metric is untrustworthy until this is green."
+      "why": "Counters still read pr=0 issue=0 after three merged PRs. Measurement lag, not missing collaboration."
     },
     {
-      "id": "route-one-real-review",
-      "title": "Run one living PR or issue through Ara so the mix is not commit-only",
+      "id": "hold-complete-until-next-thursday",
+      "title": "Do not dispatch Complete again until the next weekly slot",
       "priority": 2,
       "leverage": "high",
       "risk": "low",
-      "why": "PR and issue analysis counters are 0. Layer 1 needs collaboration, not only self-chores."
-    },
-    {
-      "id": "dispatch-complete-analysis",
-      "title": "Dispatch Complete Analysis once the key is proven — weekly Thursday 10:00 UTC thereafter",
-      "priority": 3,
-      "leverage": "high",
-      "risk": "low",
-      "why": "Do not dispatch Complete while Grok returns empty or timeout."
+      "why": "#143 is ok. A second fat report this week is grinding."
     }
   ],
   "backlog": [
     {
       "id": "accumulate-toward-50",
       "title": "Accumulate successful analyses toward Layer 1 unlock (paused)",
-      "why": "Do not grind to 50 on commit/pulse self-talk. Unpause only after PR and issue counters leave zero."
+      "why": "Do not grind to 50 on commit/pulse self-talk."
     },
     {
       "id": "reconnect-github-notifications",
       "title": "Reconnect GitHub connector with notifications permission",
-      "why": "List-notifications returns 403 from this chat. That is part of the missing ping."
+      "why": "List-notifications returns 403 from this chat."
     },
     {
       "id": "merged-pr-reputation",
@@ -143,7 +90,8 @@
     "total_analyses": 18,
     "reputation_effective": 0.0,
     "reputation_freshness": "fresh",
-    "presence_at": "2026-08-31 07:23 UTC",
-    "package_version": "0.8.0"
+    "presence_at": "2026-09-01",
+    "package_version": "0.8.0",
+    "complete_outcome": "ok"
   }
 }
