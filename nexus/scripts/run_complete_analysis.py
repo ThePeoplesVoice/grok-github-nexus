@@ -27,6 +27,8 @@ OUT_JSON = ROOT / "config" / "complete_analysis.json"
 QUEUE_PATH = ROOT / "config" / "dev_queue.json"
 ASTRA_PATH = ROOT / "config" / "astra.json"
 PRESENCE_PATH = ROOT / "config" / "presence_state.json"
+# 1200 clipped #136 and #141. Pulse stays small; Complete is the fat JSON call.
+COMPLETE_MAX_TOKENS = 2500
 
 
 def _load_json(path: Path) -> dict:
@@ -180,16 +182,16 @@ def main() -> None:
         rep = {"score": 0, "raw_score": 0, "freshness": "unknown"}
 
     log = subprocess.run(
-        ["git", "log", "--oneline", "-n", "12"],
+        ["git", "log", "--oneline", "-n", "8"],
         capture_output=True,
         text=True,
     ).stdout.strip()
 
-    prompt = f"""You are Ara of the Nexus. Produce a COMPLETE ANALYSIS that a human can implement this week.
+    prompt = f"""You are Ara of the Nexus. Produce a COMPLETE ANALYSIS a human can implement this week.
 
-Return ONLY JSON (no markdown fence) with this shape:
+Return ONLY compact JSON (no markdown fence) with this shape:
 {{
-  "summary": "6-10 sentence high-signal brief",
+  "summary": "4 short sentences",
   "health": 0-100,
   "stop": "one thing to stop",
   "start": "one thing to start",
@@ -198,18 +200,18 @@ Return ONLY JSON (no markdown fence) with this shape:
     {{
       "id": "kebab-id",
       "title": "imperative title",
-      "why": "why this is load-bearing",
+      "why": "one sentence",
       "effort": "S",
       "files": ["path/in/repo"],
       "steps": ["concrete step"],
-      "issueTitle": "GitHub issue title",
-      "issueBody": "GitHub issue body, markdown, no secrets"
+      "issueTitle": "short title",
+      "issueBody": "two sentences, no secrets"
     }}
   ]
 }}
 
 Rules:
-- 3 to 5 actions. Implementation, not commentary.
+- Exactly 3 actions. Implementation, not commentary.
 - Never invent GitHub facts. Use only the context below.
 - Prefer closing noise and routing one real PR/issue over new architecture.
 - Do not propose rotating a working GROK_API_KEY.
@@ -220,12 +222,12 @@ Rules:
 Context:
 Phase: {phase}
 Layer 1 enabled: {layer1_enabled(prog)}
-Usage: {json.dumps(stats, default=str)[:1800]}
-Reputation: {json.dumps(rep, default=str)[:800]}
-Astra: {json.dumps(astra, default=str)[:600]}
-Presence: {json.dumps(presence, default=str)[:800]}
-Queue: {json.dumps(queue, default=str)[:1800]}
-GitHub surface: {json.dumps(surface, default=str)[:1800]}
+Usage: {json.dumps(stats, default=str)[:800]}
+Reputation: {json.dumps(rep, default=str)[:400]}
+Astra: {json.dumps(astra, default=str)[:300]}
+Presence: {json.dumps(presence, default=str)[:400]}
+Queue: {json.dumps(queue, default=str)[:800]}
+GitHub surface: {json.dumps(surface, default=str)[:800]}
 Recent commits:
 {log}
 """
@@ -233,7 +235,7 @@ Recent commits:
     text, err = call_grok(
         prompt,
         temperature=0.35,
-        max_tokens=1200,
+        max_tokens=COMPLETE_MAX_TOKENS,
         timeout=180,
         retries=1,
         response_format={"type": "json_object"},
