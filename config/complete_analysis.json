@@ -1,6 +1,6 @@
 {
   "version": "1.1.0",
-  "generated_at": "2026-08-30 11:52 UTC",
+  "generated_at": "2026-09-01 02:19 UTC",
   "source": "surface",
   "summary": "Grok complete-analysis unavailable (response was not parseable JSON). Analyses=18 mix={'commit': 11, 'pr': 0, 'issue': 0, 'self_audit': 3, 'pulse': 4, 'complete': 0, 'other': 0}. Queue head=Rotate GROK_API_KEY in GitHub Secrets and prove with curl + Pulse/Self-Audit.",
   "health": null,
