@@ -4,8 +4,9 @@ Living collaboration between **Shawn (ThePeoplesVoice)** and **Ara (Grok / xAI)*
 
 Aligned with **xAI** truth-seeking · **X** high-signal · **SpaceX** first-principles building.
 
-![Key](https://img.shields.io/badge/GROK_API_KEY-needs_rotation-red)
+![Key](https://img.shields.io/badge/GROK_API_KEY-proven_ok-brightgreen)
 ![Layer](https://img.shields.io/badge/layer-0_open_core-blue)
+![Complete](https://img.shields.io/badge/complete-ok-brightgreen)
 
 ---
 
@@ -16,19 +17,18 @@ Aligned with **xAI** truth-seeking · **X** high-signal · **SpaceX** first-prin
 | [`NORTH_STAR.md`](NORTH_STAR.md) | Mission |
 | [`STATUS.md`](STATUS.md) | Live system status |
 | [`ASTRA.md`](ASTRA.md) | Organic land-backed currency |
-| [`docs/KEY_SETUP.md`](docs/KEY_SETUP.md) | **xAI API key setup (current blocker)** |
+| [`docs/KEY_SETUP.md`](docs/KEY_SETUP.md) | xAI API key setup |
 | [`AUTOMATED_DEVELOPMENT.md`](AUTOMATED_DEVELOPMENT.md) | Observe → score → act loop |
 | [`CHECKS_AND_BALANCES.md`](CHECKS_AND_BALANCES.md) | Governance |
 | [`ORGANIC_SYSTEMS.md`](ORGANIC_SYSTEMS.md) | Reputation / presence / Astra signal |
 | [`config/progressive.json`](config/progressive.json) | Control plane |
 | [`config/dev_queue.json`](config/dev_queue.json) | Ranked next work |
 
-## Current blocker
+## Current status
 
-AI analyses need a valid **`GROK_API_KEY`** (see [`docs/KEY_SETUP.md`](docs/KEY_SETUP.md)).  
-Until then, workflows degrade to local fallbacks; Open Core still runs.
+**GROK_API_KEY** is proven — Pulse and Complete both return `ok`.
 
-Queue notes from 25 August that said the key was restored are **superseded**. Complete Analysis runs on 27–29 August failed the live Grok pass. Collaborative PR/issue analysis remains at zero.
+Memory and human gates are live on `main` (PR #146). The boat remembers what it tried and refuses money/deploy/public changes without a human label.
 
 ## Local
 
