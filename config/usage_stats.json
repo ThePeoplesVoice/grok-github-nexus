@@ -11,7 +11,7 @@
     "complete": 0,
     "other": 0
   },
-  "last_updated": "2026-08-31T16:02:24Z",
-  "last_type": "pulse",
+  "last_updated": "2026-09-01T02:52:30Z",
+  "last_type": "complete",
   "notes": "Counters feed min_successful_analyses in progressive.json Layer 1. Written by nexus.usage after successful provider calls. Self-audit is the first workflow with live write path."
 }

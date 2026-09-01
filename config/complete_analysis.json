@@ -1,13 +1,62 @@
 {
   "version": "1.1.0",
-  "generated_at": "2026-09-01 02:19 UTC",
-  "source": "surface",
-  "summary": "Grok complete-analysis unavailable (response was not parseable JSON). Analyses=18 mix={'commit': 11, 'pr': 0, 'issue': 0, 'self_audit': 3, 'pulse': 4, 'complete': 0, 'other': 0}. Queue head=Rotate GROK_API_KEY in GitHub Secrets and prove with curl + Pulse/Self-Audit.",
-  "health": null,
-  "stop": "Do not invent implementations without a live Grok pass.",
-  "start": "Fix the Grok call, then re-run Complete Analysis.",
-  "keep": "Open Core, usage write path, human-owned STATUS/README.",
-  "actions": [],
-  "outcome": "truncated",
-  "diagnostic": "unparseable"
+  "generated_at": "2026-09-01 02:52 UTC",
+  "source": "grok",
+  "summary": "Open Core is healthy: 18 live analyses, zero open PRs, and #142 already landed the Complete token-budget raise. Layer 1 stays dark because usage still shows pr 0 and issue 0, so reputation.score remains 0. Ten automated report issues are open, including two pulses dated 2026-08-31. This week close that stack, keep #141 as the single routed issue, and run one Complete pass under the 2500 budget.",
+  "health": 62,
+  "stop": "Stop filing more commit and pulse self-talk issues while 130–140 are still open.",
+  "start": "Start closing the automated report stack and putting human work on issue 141.",
+  "keep": "Keep the usage write path and the Complete 2500-token budget from #142.",
+  "actions": [
+    {
+      "id": "close-automated-report-stack",
+      "title": "Close automated report issues 130-140",
+      "why": "The open GitHub surface is stacked pulse, commit, self-audit, and complete reports, not collaborative evidence.",
+      "effort": "S",
+      "files": [
+        "queue"
+      ],
+      "steps": [
+        "Close issues 130, 131, 132, 133, 136, 137, 138, 139, and 140 as automated noise.",
+        "Leave issue 141 open as the only routed Complete Analysis.",
+        "Record the sweep in queue done; do not open another pulse or commit report this week."
+      ],
+      "issueTitle": "Close stacked automated Nexus reports",
+      "issueBody": "Issues 130 through 140 are automated pulse, commit, self-audit, and complete reports and should be closed as noise. Leave 141 open as the single routed Complete Analysis so the GitHub surface can show real collaborative work."
+    },
+    {
+      "id": "route-issue-141-analysis",
+      "title": "Run one issue analysis on 141",
+      "why": "Layer 1 is gated on collaborative evidence and usage by_type.issue is still 0.",
+      "effort": "S",
+      "files": [
+        "progressive.json"
+      ],
+      "steps": [
+        "Run a single issue-type analysis against GitHub issue 141 only.",
+        "Confirm usage by_type.issue increments from 0 after a successful provider call.",
+        "Do not analyze the reports being closed and do not file a new issue to do this."
+      ],
+      "issueTitle": "Analyze issue 141 for collaborative evidence",
+      "issueBody": "Issue 141 is the current Nexus Complete Analysis and the only issue that should stay open. Run one issue-type analysis on it this week so collaborative usage can move off zero."
+    },
+    {
+      "id": "run-complete-2500-budget",
+      "title": "Run Complete once under the 2500 budget",
+      "why": "Usage complete is still 0 after #142 raised the token budget from 1200 to 2500 and shrunk the ask.",
+      "effort": "M",
+      "files": [
+        "progressive.json"
+      ],
+      "steps": [
+        "Run one Complete analysis using the merged 2500 budget from PR #142.",
+        "Confirm usage by_type.complete increments from 0 after success.",
+        "If Complete still fails, a human lands the follow-up fix; do not auto-merge."
+      ],
+      "issueTitle": "Prove Complete analysis after token budget raise",
+      "issueBody": "PR #142 already raised the Complete token budget from 1200 to 2500 and added a test that the budget sits above the old clip. Run one Complete analysis this week and confirm usage complete moves off zero."
+    }
+  ],
+  "outcome": "ok",
+  "diagnostic": null
 }
