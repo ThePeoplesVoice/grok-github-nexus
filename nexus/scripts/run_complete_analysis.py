@@ -17,6 +17,7 @@ from pathlib import Path
 
 from nexus.analyze import footer_block, utc_now_str
 from nexus.context import current_phase, layer1_enabled, load_progressive
+from nexus.memory import memory_block_for_prompt, record_memory
 from nexus.providers import call_grok, refine_parse_outcome
 from nexus.reputation import refresh_reputation, reputation_summary_md
 from nexus.runtime import after_successful_analysis, log_success
@@ -175,6 +176,7 @@ def main() -> None:
     astra = _load_json(ASTRA_PATH)
     presence = _load_json(PRESENCE_PATH)
     surface = _github_surface()
+    memory_block = memory_block_for_prompt()
     try:
         rep = refresh_reputation(persist=True)
     except Exception as e:
@@ -226,6 +228,7 @@ Usage: {json.dumps(stats, default=str)[:800]}
 Reputation: {json.dumps(rep, default=str)[:400]}
 Astra: {json.dumps(astra, default=str)[:300]}
 Presence: {json.dumps(presence, default=str)[:400]}
+Memory: {memory_block[:800]}
 Queue: {json.dumps(queue, default=str)[:800]}
 GitHub surface: {json.dumps(surface, default=str)[:800]}
 Recent commits:
@@ -248,6 +251,13 @@ Recent commits:
         try:
             result = after_successful_analysis("complete")
             log_success(result, "complete")
+            record_memory(
+                f"Complete analysis landed: outcome={outcome} health={parsed.get('health')}.",
+                kind="success",
+                source="complete",
+                tags=["complete", outcome],
+                meta={"outcome": outcome, "health": parsed.get("health")},
+            )
         except Exception as e:
             print(f"⚠️ Could not persist complete usage: {e}")
         payload = _normalize(parsed or {}, "grok")
@@ -256,6 +266,13 @@ Recent commits:
             "response was not parseable JSON" if text else "empty response"
         )
         payload = _fallback(diagnostic, stats, queue)
+        record_memory(
+            f"Complete analysis failed: {outcome} — {diagnostic[:160]}",
+            kind="failure",
+            source="complete",
+            tags=["complete", outcome],
+            meta={"outcome": outcome},
+        )
 
     payload["outcome"] = outcome
     payload["diagnostic"] = None if success else (err or "unparseable")

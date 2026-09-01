@@ -1,0 +1,31 @@
+{
+  "version": "1.0.0",
+  "description": "Human-in-the-loop gates. The boat runs free on everything except money, deploy, payments, and public posts — those require an explicit human approval label before merge.",
+  "updated_at": null,
+  "rules": [
+    {
+      "id": "money",
+      "match": ["payment", "stripe", "invoice", "billing", "x402", "usdc", "wallet"],
+      "requires": "human-approval:money",
+      "why": "Never merge a payment change without a thumb."
+    },
+    {
+      "id": "deploy",
+      "match": ["deploy", "release", "production", "vercel", "publish"],
+      "requires": "human-approval:deploy",
+      "why": "Deploys touch users. Human confirms."
+    },
+    {
+      "id": "public",
+      "match": ["readme", "docs/", "public", "announcement", "changelog"],
+      "requires": "human-approval:public",
+      "why": "Public words are permanent. Human owns the voice."
+    }
+  ],
+  "approval_labels": [
+    "human-approval:money",
+    "human-approval:deploy",
+    "human-approval:public"
+],
+  "notes": "Checked by nexus.gates.requires_human_gate(paths, labels). Missing required label blocks the merge path."
+}

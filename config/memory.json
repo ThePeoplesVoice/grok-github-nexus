@@ -1,0 +1,7 @@
+{
+  "version": "1.0.0",
+  "description": "Persistent memory for the Nexus. Survives runs. Not a chat log. Not a scoreboard. Records what was tried, what failed, what was corrected, and what worked — so the next run starts warmer than cold.",
+  "updated_at": null,
+  "entries": [],
+  "notes": "Append via nexus.memory.record_memory. Read recent via nexus.memory.recent_memory. Complete and Pulse include a compressed block in their prompts."
+}
