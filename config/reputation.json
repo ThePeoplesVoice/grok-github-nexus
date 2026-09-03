@@ -5,9 +5,9 @@
   "unlock_score": 10.5,
   "collaborative_score": 10.5,
   "internal_score": 21.0,
-  "score": 10.5,
-  "decay_factor": 1.0,
-  "days_idle": 0.0,
+  "score": 10.25,
+  "decay_factor": 0.9764,
+  "days_idle": 1.03,
   "freshness": "fresh",
   "components": {
     "pr": 9.0,
@@ -30,6 +30,6 @@
   "half_life_days": 30.0,
   "total_successful_analyses": 23,
   "last_activity": "2026-09-02T13:13:52Z",
-  "last_computed": "2026-09-02T13:13:52Z",
+  "last_computed": "2026-09-03T14:01:35Z",
   "notes": "effective score is derived from collaborative evidence (PR and issue work) only. Internal pulse/self-audit churn is tracked for visibility but does not unlock progress."
 }
