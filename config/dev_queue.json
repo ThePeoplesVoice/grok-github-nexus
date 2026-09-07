@@ -1,6 +1,6 @@
 {
   "version": "1.0.12",
-  "updated_at": "2026-09-01T10:05:00Z",
+  "updated_at": "2026-09-07T13:17:23Z",
   "notes": "2026-09-01. Usage mix fixed: living PRs #134/#135/#142 now counted (pr=3). Meter honest. Next: hold Complete until Thursday; reconnect notifications optional.",
   "done": [
     {
@@ -87,11 +87,10 @@
   "last_cycle": {
     "structural_health": 100,
     "triad_hits": 49,
-    "total_analyses": 22,
-    "reputation_effective": 0.0,
+    "total_analyses": 24,
+    "reputation_effective": 10.49,
     "reputation_freshness": "fresh",
-    "presence_at": "2026-09-01",
-    "package_version": "0.8.0",
-    "complete_outcome": "ok"
+    "presence_at": "2026-08-31 16:01 UTC",
+    "package_version": "0.8.0"
   }
 }
