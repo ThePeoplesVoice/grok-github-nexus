@@ -1,28 +1,28 @@
 {
   "version": "0.3.0",
-  "generated_at": "2026-08-31 16:01 UTC",
+  "generated_at": "2026-09-07 14:07 UTC",
   "phase": "Layer 0 — Open Core (Layer 1 gated on collaborative evidence)",
   "layer1_enabled": false,
-  "total_successful_analyses": 18,
+  "total_successful_analyses": 25,
   "by_type": {
-    "commit": 11,
-    "pr": 0,
-    "issue": 0,
-    "self_audit": 3,
-    "pulse": 4,
+    "commit": 12,
+    "pr": 3,
+    "issue": 1,
+    "self_audit": 4,
+    "pulse": 5,
     "complete": 0,
     "other": 0
   },
-  "reputation_score": 0.0,
-  "reputation_raw": 19.0,
+  "reputation_score": 10.5,
+  "reputation_raw": 33.0,
   "reputation_freshness": "fresh",
   "grok_outcome": "ok",
   "recent_commits_preview": [
-    "262127d chore: automated dev cycle — queue + field notes",
-    "fa22135 chore: usage + reputation after commit analysis",
-    "6fc0af4 chore: pulse — usage, reputation, presence_state, badges",
-    "6f80d14 chore: complete analysis — implementations + usage",
-    "39bd1d7 Merge pull request #135 from ThePeoplesVoice/feat/persist-grok-outcomes"
+    "9fdbe9d chore: automated dev cycle — queue + field notes",
+    "6d81ed5 chore: usage + reputation after commit analysis",
+    "f6368d4 chore: stale PR sweep report",
+    "03c2843 chore: complete analysis — implementations + usage",
+    "37b0d55 chore: usage + reputation after self-audit"
   ],
   "notes": "Compressed context for continuity. Not a chat log. See ORGANIC_SYSTEMS.md."
 }
