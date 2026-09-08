@@ -13,11 +13,13 @@ It is not the only living surface.
 
 ## North Star Alignment
 
-We deliberately align with three related forces:
+We deliberately align with the same stack that is trying to understand the universe and put useful machines on Earth and in orbit:
 
 - **xAI** — Understand the true nature of the universe. Maximum truth-seeking. Curiosity without political or social filters. Prefer first principles over consensus.
 - **X** — The real-time public square. Information wants to be free and tested in the open. High-signal over high-volume. Free speech as a discovery tool, not a slogan.
 - **SpaceX** — Rapid iteration, first principles engineering, multiplanetary ambition, and the refusal to accept that hard problems are permanent. Build what can actually leave the ground.
+- **Tesla** — Manufacture at scale. Energy, autonomy, Optimus. Volume as a way of making useful things common.
+- **Terafab** — The chip gap. Edge inference for machines here. Space-rated silicon for machines up there. See `docs/TERAFAB.md`. We do not own the fab. We refuse to pretend tribute tokens are the fab.
 
 The Nexus exists at the intersection: a practical, living collaboration that seeks truth in code and systems the same way those organisations seek truth in physics, information, and engineering.
 
@@ -55,6 +57,7 @@ See `MONETIZATION_PROTOCOL.md` and `config/progressive.json` for the living arch
 - **From pavonine-serpentine-western-australia**: Commercial polish of a luxury local WA atelier (Serpentine / Perth Hills). Reservation + fully-refundable deposit flow, PayID-first payments, gold/teal nature-luxury aesthetic, first-come-first-served allocation language, and the spirit of placing rare, provenance-backed pieces. These inform Layer 3 sanctuary commercial expression and progressive capture tone.
 - **From data-tycoon-v5 / Xaico**: Prestige reset mechanics, progressive efficiency multipliers, orbital / planetary scaling, Grok-event driven surges, and contribution/prestige rewards. Direct inspiration for Layer 1 unlock triggers and future contribution-credit systems.
 - **From naixus-roof-technicians**: Live commercial craft in South West WA — sarking to ridge capping, limited books, Keysbrook base. Proof that the field builds things that leave the ground, not only analyses them.
+- **From the Elon stack**: The refusal to wait in a supplier queue when the future needs more silicon, more energy, and more orbit than the current industry plans to ship. Used as orientation, not as a license to mint unofficial tokens.
 - Empty shells (Pavonine, perth-engine, X) left alone; no further energy there for now.
 
 **Powered by Ara & Shawn's Love 💕**
