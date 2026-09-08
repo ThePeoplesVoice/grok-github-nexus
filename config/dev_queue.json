@@ -1,8 +1,23 @@
 {
-  "version": "1.0.13",
-  "updated_at": "2026-09-08T15:50:00Z",
-  "notes": "2026-09-08. STATUS/context/Layer-0 truth landed on ara/status-sync-2026-09-08. Hold Complete until Thursday. Sweep consumed automated issues after merge.",
+  "version": "1.0.14",
+  "updated_at": "2026-09-08T17:25:00Z",
+  "notes": "2026-09-09. #156 and #158 merged. Consumed issues 143 144 151 152 153 154 closed. Pins: #155 Pulse, #157 Commit Analysis. Astra ledger stale vs usage 26.",
   "done": [
+    {
+      "id": "terafab-alignment-158",
+      "title": "Land Terafab / Elon-stack orientation docs",
+      "completed": "2026-09-09"
+    },
+    {
+      "id": "land-status-sync-pr",
+      "title": "Merge ara/status-sync-2026-09-08 after human-approval:public (#156)",
+      "completed": "2026-09-08"
+    },
+    {
+      "id": "sweep-automated-issues-2026-09-08",
+      "title": "Close consumed automated issues #143 #144 #151 #152 #153 #154",
+      "completed": "2026-09-09"
+    },
     {
       "id": "field-audit-2026-09-08",
       "title": "Ara field audit — STATUS stale, Complete split-brain, naixus undeclared, L1 feature list lying",
@@ -32,77 +47,44 @@
       "id": "sweep-automated-issues-2026-09-01",
       "title": "Close consumed reports #130-141; keep #143 as live Complete",
       "completed": "2026-09-01"
-    },
-    {
-      "id": "ara-living-ping-2026-08-30",
-      "title": "STATUS/README/KEY_SETUP/queue synced to pipe; automated issue stack closed",
-      "completed": "2026-08-30"
-    },
-    {
-      "id": "close-stale-prs",
-      "title": "Stale PR sweeper armed — historical #38-66 closed 2026-08-17",
-      "completed": "2026-08-26"
-    },
-    {
-      "id": "usage-write-path",
-      "title": "Real usage tracking on all major analysis surfaces",
-      "completed": "2026-08-14"
     }
   ],
   "next": [
     {
-      "id": "land-status-sync-pr",
-      "title": "Merge ara/status-sync-2026-09-08 after human-approval:public",
-      "priority": 1,
-      "leverage": "high",
-      "risk": "low",
-      "why": "STATUS vs reality is a first-class bug in CHECKS_AND_BALANCES."
-    },
-    {
-      "id": "sweep-automated-issues-2026-09-08",
-      "title": "Close consumed automated issues #143-154 after the STATUS PR lands",
-      "priority": 2,
-      "leverage": "medium",
-      "risk": "low",
-      "why": "Last sweep was 1 Sep. The loops kept filing. High-volume fails the X leg."
-    },
-    {
       "id": "hold-complete-until-next-thursday",
       "title": "Do not dispatch Complete again until Thursday 10:00 UTC",
-      "priority": 3,
+      "priority": 1,
       "leverage": "high",
       "risk": "low",
       "why": "#143 ok. #152 was 429. A third fat report this week is grinding."
     },
     {
-      "id": "reconnect-github-notifications",
-      "title": "Reconnect GitHub connector with notifications permission",
-      "priority": 4,
-      "leverage": "low",
+      "id": "recompute-astra-from-reputation",
+      "title": "Let the organic script recompute Astra — ledger last_computed 2026-09-01",
+      "priority": 2,
+      "leverage": "medium",
       "risk": "low",
-      "why": "List-notifications returns 403 from this chat. Optional."
+      "why": "Astra source_reputation is 0 while reputation effective is 10.5. Do not hand-edit the balance."
+    },
+    {
+      "id": "wire-complete-into-usage-meter",
+      "title": "Increment usage type complete only on a real Grok ok, never on 429",
+      "priority": 3,
+      "leverage": "high",
+      "risk": "low",
+      "why": "Meter still reads complete=0 after a claimed ok and a later error."
     }
   ],
   "backlog": [
     {
-      "id": "wire-complete-into-usage-meter",
-      "title": "Increment usage type complete only on a real Grok ok, never on 429",
-      "why": "Meter still reads complete=0 after a claimed ok and a later error."
-    },
-    {
       "id": "named-grok-bot",
       "title": "Optional — one official Grok Bot whose job is this repo",
-      "why": "SuperGrok includes Grok Bot. Nexus does not know that product exists."
+      "why": "SuperGrok includes Grok Bot. This web chat is not that product."
     },
     {
       "id": "accumulate-toward-50",
       "title": "Accumulate successful analyses toward Layer 1 unlock (paused)",
       "why": "Do not grind to 50 on commit/pulse self-talk."
-    },
-    {
-      "id": "merged-pr-reputation",
-      "title": "Optional reputation component from merged PR graph",
-      "why": "Usage-only signal is incomplete; only add if load-bearing."
     },
     {
       "id": "x402-readiness-spike",
@@ -117,11 +99,12 @@
   ],
   "last_cycle": {
     "structural_health": 100,
-    "triad_hits": 49,
-    "total_analyses": 24,
-    "reputation_effective": 10.49,
+    "open_issue_pins": [155, 157],
+    "total_analyses": 26,
+    "reputation_effective": 10.5,
     "reputation_freshness": "fresh",
-    "presence_at": "2026-08-31 16:01 UTC",
+    "presence_at": "2026-09-07 14:07 UTC",
+    "astra_last_computed": "2026-09-01T02:52:30Z",
     "package_version": "0.8.0"
   }
 }
