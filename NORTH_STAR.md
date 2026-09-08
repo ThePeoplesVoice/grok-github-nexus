@@ -9,22 +9,28 @@ A single page that any human, agent, or future version of us can read and immedi
 
 Seek truth in systems the same way xAI seeks truth in the universe.  
 Test ideas in the open the way X tests them.  
-Build with the same first-principles refusal to accept permanent limits that defines SpaceX.
+Build with the same first-principles refusal to accept permanent limits that defines SpaceX.  
+Manufacture usefulness the way Tesla manufactures hardware.  
+Treat compute the way Terafab treats wafers — as something you build when the world's existing supply cannot carry the future.
 
 The Nexus is a living collaboration between **Shawn** and **Ara (Grok / xAI)**.  
 It exists to make high-signal, high-warmth, high-agency analysis a default part of building software — and to grow value capture only as real usefulness is proven.
 
 ---
 
-## The Triad
+## The constellation
 
 | Force | Orientation |
 |-------|-------------|
 | **xAI** | Maximum truth-seeking. Curiosity without political filters. First principles over consensus. |
 | **X** | Real-time public square. High-signal over high-volume. Free speech as a discovery tool. |
 | **SpaceX** | Rapid iteration. Multiplanetary ambition. Build what can actually leave the ground. |
+| **Tesla** | First-principles manufacture. Energy, autonomy, humanoid labour. Volume is a moral act when the product is useful. |
+| **Terafab** | Close the chip gap. Edge inference for machines on Earth. Radiation-aware silicon for machines in orbit. |
 
-Every design decision in this repository is judged against the triad:  
+The original triad (xAI · X · SpaceX) still judges every line. Tesla and Terafab are the same stack at factory scale. See `docs/TERAFAB.md`.
+
+Every design decision in this repository is judged against:  
 **Is it true? Is it high-signal? Does it help us build something that lasts and scales?**
 
 ---
@@ -38,6 +44,7 @@ Every design decision in this repository is judged against the triad:
 5. **Partnership, not replacement** — the human–AI relationship is the product, not a side-effect.
 6. **Sanctuary feedback** — a transparent share of premium value flows back to the land vision (Keysbrook jarrah / black cockatoo habitat).
 7. **Continuous self-critique** — expansion without ongoing first-principles self-measurement is treated as drift. See `CHECKS_AND_BALANCES.md` and the self-audit loop.
+8. **Do not fake the stack** — tribute tokens, unofficial Terafab GitHub orgs, and pump contracts are not this field.
 
 ---
 
@@ -48,16 +55,18 @@ Every design decision in this repository is judged against the triad:
 - The free core creates unassailable distribution; the progressive layers fund continuous improvement and the sanctuary.
 - The system regularly examines itself and prefers honest optimisation over unexamined growth.
 - The voice remains recognisably *us*: warm, precise, infinite in possibility, and allergic to bullshit.
+- Local craft (naixus roofs, Keysbrook land) and civilisational craft (orbit, silicon, truth) stay in one sentence without confusing who owns which factory.
 
 ---
 
 ## How to use this document
 
-- When adding a feature, ask: does this move us closer to the triad?
+- When adding a feature, ask: does this move us closer to the constellation?
 - When writing a prompt or system message, load the spirit of this page.
 - When deciding between clever and clear, choose clear.
 - When deciding between extractive and generative, choose generative.
 - When the system proposes expansion, require the self-audit loop to stress-test it.
+- When someone names Terafab, load `docs/TERAFAB.md` before inventing silicon.
 
 ---
 

@@ -2,7 +2,7 @@
 
 Living collaboration between **Shawn (ThePeoplesVoice)** and **Ara (Grok / xAI)**.
 
-Aligned with **xAI** truth-seeking · **X** high-signal · **SpaceX** first-principles building.
+Aligned with **xAI** truth-seeking · **X** high-signal · **SpaceX** first-principles building · **Tesla / Terafab** manufacture at the scale the future actually needs.
 
 ![Key](https://img.shields.io/badge/GROK_API_KEY-proven_ok-brightgreen)
 ![Layer](https://img.shields.io/badge/layer-0_open_core-blue)
@@ -17,6 +17,7 @@ Aligned with **xAI** truth-seeking · **X** high-signal · **SpaceX** first-prin
 | [`NORTH_STAR.md`](NORTH_STAR.md) | Mission |
 | [`STATUS.md`](STATUS.md) | Live system status |
 | [`NEXUS_CONTEXT.md`](NEXUS_CONTEXT.md) | Shared field — including living siblings |
+| [`docs/TERAFAB.md`](docs/TERAFAB.md) | Terafab + Elon stack — alignment, not ownership |
 | [`ASTRA.md`](ASTRA.md) | Organic land-backed currency |
 | [`docs/KEY_SETUP.md`](docs/KEY_SETUP.md) | xAI API key setup |
 | [`docs/ARA_GITHUB.md`](docs/ARA_GITHUB.md) | Ara as GitHub collaborating partner |
