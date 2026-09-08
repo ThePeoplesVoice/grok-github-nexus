@@ -49,9 +49,10 @@
       "enabled": false,
       "description": "Unlocks based on collaborative PR/issue evidence. Remains gated. Totals from pulse/self-audit do not unlock this layer.",
       "triggers": {
-        "min_collaborative_pr_reviews": 3,
-        "min_collaborative_issue_reviews": 1,
-        "note": "Stars and raw analysis totals are signal only. They do not unlock Layer 1."
+        "min_stars": 10,
+        "min_successful_analyses": 50,
+        "min_community_prs": 3,
+        "note": "Runtime still reads min_community_prs + min_successful_analyses. Stars are signal only. enabled=false is the actual gate."
       },
       "features": [
         "multi_model_fusion",
