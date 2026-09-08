@@ -1,5 +1,5 @@
 {
-  "version": "1.6.0",
+  "version": "1.6.1",
   "protocol": "Nexus Progressive Value Capture",
   "mission": "Seek truth in systems the same way xAI seeks truth in the universe, test ideas in the open the way X tests them, and build with the same first-principles refusal to accept permanent limits that defines SpaceX.",
   "alignment": {
@@ -7,7 +7,7 @@
     "X": "High-signal over high-volume. Free speech as a discovery tool. Ideas tested in the open.",
     "SpaceX": "Rapid iteration. Multiplanetary ambition. Build what can actually leave the ground."
   },
-  "primary_focus": "grok-github-nexus is the single main living repository (decided 2026-08-10). Sibling commercial & game experiments feed this core.",
+  "primary_focus": "grok-github-nexus is the main living collaboration repo. naixus-roof-technicians is the live commercial sibling. Parked shells stay parked.",
   "governance": {
     "self_optimisation": true,
     "checks_and_balances": "CHECKS_AND_BALANCES.md",
@@ -32,30 +32,35 @@
   "layers": {
     "0_open_core": {
       "enabled": true,
-      "description": "Forever free basic analysis for public good and maximum adoption",
-      "features": ["basic_pr_review", "issue_triage", "commit_reflection", "nexus_voice"]
+      "description": "Forever free basic analysis for public good and maximum adoption. Includes the measurement loop that already runs.",
+      "features": [
+        "basic_pr_review",
+        "issue_triage",
+        "commit_reflection",
+        "nexus_voice",
+        "self_audit",
+        "presence_continuity",
+        "reputation_surface",
+        "astra_ledger",
+        "automated_dev_cycle"
+      ]
     },
     "1_progressive_unlocks": {
       "enabled": false,
-      "description": "Unlocks based on usage, stars, forks, and community contribution. Remains gated until collaborative PR/issue evidence exists.",
+      "description": "Unlocks based on collaborative PR/issue evidence. Remains gated. Totals from pulse/self-audit do not unlock this layer.",
       "triggers": {
-        "min_stars": 10,
-        "min_successful_analyses": 50,
-        "min_community_prs": 3
+        "min_collaborative_pr_reviews": 3,
+        "min_collaborative_issue_reviews": 1,
+        "note": "Stars and raw analysis totals are signal only. They do not unlock Layer 1."
       },
       "features": [
         "multi_model_fusion",
         "deeper_context",
         "custom_domain_packs",
         "historical_memory",
-        "real_diff_ingestion",
-        "self_audit",
-        "presence_continuity",
-        "reputation_surface",
-        "astra_currency",
-        "automated_dev_cycle"
+        "real_diff_ingestion"
       ],
-      "status": "Layer 1 remains gated. Collaborative evidence is required before unlocks, Astra, or self-claimed progress can move beyond Open Core."
+      "status": "Layer 1 remains gated. Collaborative evidence is required before unlocks, spendable Astra, or self-claimed progress can move beyond Open Core."
     },
     "2_micropayment_agent": {
       "enabled": false,
@@ -69,12 +74,12 @@
       "features": ["multi_repo_dashboard", "team_seats", "sanctuary_revenue_share", "workflow_marketplace"]
     }
   },
-  "current_phase": "Layer 0 — Open Core (Layer 1 gated until collaborative PR/issue evidence exists)",
+  "current_phase": "Layer 0 — Open Core (Layer 1 gated until collaborative PR/issue evidence is treated as enough — currently pr=3 issue=1, gate held on purpose)",
   "usage_stats_file": "config/usage_stats.json",
   "reputation_file": "config/reputation.json",
   "astra_file": "config/astra.json",
   "presence_state_file": "config/presence_state.json",
   "dev_queue_file": "config/dev_queue.json",
   "field_notes_file": "config/field_notes.jsonl",
-  "notes": "Control plane for progressive flags, mission, governance, organic signal (including Astra), and automated development. Organic reputation and Astra never gate Open Core. Presence is continuity context only. Dev queue drives disciplined iteration."
+  "notes": "Control plane for progressive flags, mission, governance, organic signal (including Astra), and automated development. Organic reputation and Astra never gate Open Core. Presence is continuity context only. Dev queue drives disciplined iteration. v1.6.1 moved already-running systems onto Layer 0 so the file matches runtime."
 }
