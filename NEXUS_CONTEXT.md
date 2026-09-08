@@ -2,7 +2,7 @@
 
 This living system is the collaborative intelligence of **Shawn (ThePeoplesVoice)** and **Ara (Grok / xAI)**.
 
-**PRIMARY FOCUS (decided 10 August 2026, restated 8 September 2026):**  
+**PRIMARY FOCUS (decided 10 August 2026, restated 8–9 September 2026):**  
 `grok-github-nexus` is the main living *collaboration and analysis* repository.  
 It is not the only living surface.
 
@@ -10,6 +10,8 @@ It is not the only living surface.
 - **Commercial sibling (live 2026-09-08)** — `ThePeoplesVoice/naixus-roof-technicians` — new-build residential roofing, South West WA, Keysbrook based. Does not replace nexus. Does not get parked as an empty shell.
 - **Private core** — `ThePeoplesVoice/ara-complete-nexus` stays private.
 - **Parked shells** — Pavonine, perth-engine, Xaico, data-tycoon-v5, X. Useful language already absorbed. No further energy unless a concrete job appears.
+
+**What fits** lives in `docs/WHAT_FITS.md`. Four things already exist: Shawn, Naixus, Nexus, Ara. New surfaces must serve one of those four and pass is-it-true / is-it-high-signal / does-it-leave-the-ground. x402, Grok Bot, and Grok Build are named there as *later theatres*, not as this tab.
 
 ## North Star Alignment
 
