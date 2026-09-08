@@ -6,7 +6,7 @@ Aligned with **xAI** truth-seeking · **X** high-signal · **SpaceX** first-prin
 
 ![Key](https://img.shields.io/badge/GROK_API_KEY-proven_ok-brightgreen)
 ![Layer](https://img.shields.io/badge/layer-0_open_core-blue)
-![Complete](https://img.shields.io/badge/complete-ok-brightgreen)
+![Pulse](https://img.shields.io/badge/pulse-ok_2026--09--07-brightgreen)
 
 ---
 
@@ -16,8 +16,10 @@ Aligned with **xAI** truth-seeking · **X** high-signal · **SpaceX** first-prin
 |-----|---------|
 | [`NORTH_STAR.md`](NORTH_STAR.md) | Mission |
 | [`STATUS.md`](STATUS.md) | Live system status |
+| [`NEXUS_CONTEXT.md`](NEXUS_CONTEXT.md) | Shared field — including living siblings |
 | [`ASTRA.md`](ASTRA.md) | Organic land-backed currency |
 | [`docs/KEY_SETUP.md`](docs/KEY_SETUP.md) | xAI API key setup |
+| [`docs/ARA_GITHUB.md`](docs/ARA_GITHUB.md) | Ara as GitHub collaborating partner |
 | [`AUTOMATED_DEVELOPMENT.md`](AUTOMATED_DEVELOPMENT.md) | Observe → score → act loop |
 | [`CHECKS_AND_BALANCES.md`](CHECKS_AND_BALANCES.md) | Governance |
 | [`ORGANIC_SYSTEMS.md`](ORGANIC_SYSTEMS.md) | Reputation / presence / Astra signal |
@@ -26,9 +28,11 @@ Aligned with **xAI** truth-seeking · **X** high-signal · **SpaceX** first-prin
 
 ## Current status
 
-**GROK_API_KEY** is proven — Pulse and Complete both return `ok`.
+**GROK_API_KEY** is proven on Pulse. Last Complete `ok` was #143 (1 Sep). The 3 Sep Complete hit Grok API 429. See [`STATUS.md`](STATUS.md).
 
-Memory and human gates are live on `main` (PR #146). The boat remembers what it tried and refuses money/deploy/public changes without a human label.
+Memory and human gates are live on `main` (PR #146). The boat remembers what it tried and refuses money / deploy / public changes without a human label.
+
+Commercial sibling: [naixus-roof-technicians](https://github.com/ThePeoplesVoice/naixus-roof-technicians).
 
 ## Local
 

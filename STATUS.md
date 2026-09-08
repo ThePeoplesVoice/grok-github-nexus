@@ -1,30 +1,31 @@
 # 📡 Nexus Status
 
-**Last updated:** 2026-09-01 14:10 AWST — after Complete #143 `ok`.
+**Last updated:** 2026-09-08 23:48 AWST — Ara field audit + human YES to land the sync.
 
-![Reputation](https://img.shields.io/badge/nexus_reputation-raw_19-blue)
+![Reputation](https://img.shields.io/badge/nexus_reputation-effective_10.5-blue)
 ![Astra](https://img.shields.io/badge/astra-ledger_exists-gold)
 ![Key](https://img.shields.io/badge/GROK_API_KEY-proven_ok-brightgreen)
-![Complete](https://img.shields.io/badge/complete-ok-brightgreen)
+![Layer](https://img.shields.io/badge/layer-0_open_core-blue)
 
 ---
 
 ## Current Phase
 
 **Layer 0 — Open Core (live, ungated)**  
-**Layer 1** — still gated. Three living PRs landed (#134, #135, #142). Usage `by_type.pr` / `issue` may still read 0 — that is a measurement quirk, not missing work.
+**Layer 1** — still gated on collaborative PR/issue evidence. Not on pulse/self-talk totals.
 
-progressive **v1.6.0** · package **v0.8.0** · model **`grok-4.6`**
+progressive **v1.6.1** · package **v0.8.0** · model **`grok-4.6`**
 
-### Measurement stack — pipe answers
+### Measurement stack — honest numbers
 
 | Signal | Value |
 |--------|-------|
-| Pulse Grok outcome | **`ok`** (#137, #140) |
-| Complete Grok outcome | **`ok`** (#143) after #142 raised budget 1200 → 2500 |
-| Earlier Complete | `truncated` #136 / #141 — consumed |
-| Living PRs this stretch | #134 typed outcomes · #135 persist · #142 token budget |
-| Open automated reports | **#143 only** (live Complete). 130–141 swept 2026-09-01 |
+| Pulse Grok outcome | **`ok`** — latest #155 (2026-09-07) |
+| Complete Grok outcome | **`ok`** #143 (2026-09-01). **`error` / 429** #152 (2026-09-03). Meter `complete` still **0** |
+| Usage mix | total 25 — commit 12 · pr 3 · issue 1 · self_audit 4 · pulse 5 · complete 0 |
+| Reputation | effective **10.5** (collaborative only) · raw 33 · freshness fresh |
+| Open PRs | none |
+| Heartbeat | Pulse / Dev Cycle / Commit Analyzer / Health Check succeeded 2026-09-07 |
 
 ---
 
@@ -33,28 +34,30 @@ progressive **v1.6.0** · package **v0.8.0** · model **`grok-4.6`**
 | System | Status |
 |--------|--------|
 | Open Core | Live |
-| GROK_API_KEY | Proven — Pulse and Complete both `ok` |
-| Complete | Weekly Thursday 10:00 UTC; skip this week |
-| Pulse / Health / Dev cycle | Scheduled heartbeat — do not treat as product |
+| GROK_API_KEY | Proven on Pulse. Last Complete scheduled run hit API 429 |
+| Pulse / Health / Dev cycle | Scheduled heartbeat — not product |
+| Self-audit / presence / queue / Astra ledger | Already running on Layer 0. Do not list them as Layer 1 unlocks |
 | Stale PR sweeper | Armed |
 | Notifications into this chat | Connector 403 — optional reconnect |
+| Official Grok Bot | Not wired. Nexus talks to Grok via Actions + API key |
+| Commercial sibling | `ThePeoplesVoice/naixus-roof-technicians` — shipped 2026-09-08 |
 
 ---
 
 ## Path to an honest Layer 1
 
 - Do **not** grind analyses to 50 on pulse/commit self-talk
-- Collaborative score still reads 0 until usage mix records PR/issue reviews
-- Next measurement fix (optional): persist `pr` / `issue` on successful analyzer runs that already happened
+- Collaborative score is 10.5 from pr=3 + issue=1. Keep the gate.
+- Optional later: persist `complete` on a real `ok` Complete, not on a 429
 
 ---
 
 ## Next actions
 
-1. Nothing required today. Complete `ok`. Key `ok`. Housework done.
-2. Optional later: fix usage mix so merged living PRs count as `pr`.
-3. Optional: reconnect GitHub notifications if the ping should land in chat.
-4. Next Complete: Thursday slot next week, not a second run this week.
+1. Land this sync PR with `human-approval:public`.
+2. Sweep consumed automated issues #143–154. Keep #155 as the live Pulse pin, or close it when the next Pulse files.
+3. Hold Complete until Thursday 10:00 UTC (18:00 AWST).
+4. Optional: reconnect GitHub notifications. Optional: name a Grok Bot whose job is this repo.
 
 ---
 
