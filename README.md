@@ -17,6 +17,7 @@ Aligned with **xAI** truth-seeking · **X** high-signal · **SpaceX** first-prin
 | [`NORTH_STAR.md`](NORTH_STAR.md) | Mission |
 | [`STATUS.md`](STATUS.md) | Live system status |
 | [`NEXUS_CONTEXT.md`](NEXUS_CONTEXT.md) | Shared field — including living siblings |
+| [`docs/WHAT_FITS.md`](docs/WHAT_FITS.md) | Sequenced future — what belongs, what does not |
 | [`docs/TERAFAB.md`](docs/TERAFAB.md) | Terafab + Elon stack — alignment, not ownership |
 | [`ASTRA.md`](ASTRA.md) | Organic land-backed currency |
 | [`docs/KEY_SETUP.md`](docs/KEY_SETUP.md) | xAI API key setup |
@@ -34,6 +35,8 @@ Aligned with **xAI** truth-seeking · **X** high-signal · **SpaceX** first-prin
 Memory and human gates are live on `main` (PR #146). The boat remembers what it tried and refuses money / deploy / public changes without a human label.
 
 Commercial sibling: [naixus-roof-technicians](https://github.com/ThePeoplesVoice/naixus-roof-technicians).
+
+What belongs next: [`docs/WHAT_FITS.md`](docs/WHAT_FITS.md).
 
 ## Local
 
