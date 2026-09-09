@@ -7,7 +7,7 @@ This living system is the collaborative intelligence of **Shawn (ThePeoplesVoice
 It is not the only living surface.
 
 - **Partner / analysis home** — `ThePeoplesVoice/grok-github-nexus`
-- **Commercial sibling (live 2026-09-08)** — `ThePeoplesVoice/naixus-roof-technicians` — new-build residential roofing, South West WA, Keysbrook based. Does not replace nexus. Does not get parked as an empty shell.
+- **Commercial sibling (live 2026-09-08)** — `ThePeoplesVoice/naixus-roof-technicians` — new-build residential roofing, Peel / Serpentine–Jarrahdale / Armadale, Keysbrook based. Does not replace nexus. Does not get parked as an empty shell.
 - **Private core** — `ThePeoplesVoice/ara-complete-nexus` stays private.
 - **Parked shells** — Pavonine, perth-engine, Xaico, data-tycoon-v5, X. Useful language already absorbed. No further energy unless a concrete job appears.
 
@@ -58,7 +58,7 @@ See `MONETIZATION_PROTOCOL.md` and `config/progressive.json` for the living arch
 ## Plucked Elements (useful / interesting)
 - **From pavonine-serpentine-western-australia**: Commercial polish of a luxury local WA atelier (Serpentine / Perth Hills). Reservation + fully-refundable deposit flow, PayID-first payments, gold/teal nature-luxury aesthetic, first-come-first-served allocation language, and the spirit of placing rare, provenance-backed pieces. These inform Layer 3 sanctuary commercial expression and progressive capture tone.
 - **From data-tycoon-v5 / Xaico**: Prestige reset mechanics, progressive efficiency multipliers, orbital / planetary scaling, Grok-event driven surges, and contribution/prestige rewards. Direct inspiration for Layer 1 unlock triggers and future contribution-credit systems.
-- **From naixus-roof-technicians**: Live commercial craft in South West WA — sarking to ridge capping, limited books, Keysbrook base. Proof that the field builds things that leave the ground, not only analyses them.
+- **From naixus-roof-technicians**: Live commercial craft in Peel / Serpentine–Jarrahdale / Armadale — sarking to ridge capping, limited books, Keysbrook base. Proof that the field builds things that leave the ground, not only analyses them.
 - **From the Elon stack**: The refusal to wait in a supplier queue when the future needs more silicon, more energy, and more orbit than the current industry plans to ship. Used as orientation, not as a license to mint unofficial tokens.
 - Empty shells (Pavonine, perth-engine, X) left alone; no further energy there for now.
 
