@@ -1,13 +1,55 @@
 {
   "version": "1.1.0",
-  "generated_at": "2026-09-03 14:01 UTC",
-  "source": "surface",
-  "summary": "Grok complete-analysis unavailable (Grok API 429: The model is currently at capacity due to high demand. Please try again in a few minutes, or use a higher service tier for priority processing: https://docs.x.ai/developers/advanced-api-usage/priority-processing [model=grok-4.6]). Analyses=23 mix={'commit': 11, 'pr': 3, 'issue': 1, 'self_audit': 4, 'pulse': 4, 'complete': 0, 'other': 0}. Queue head=Do not dispatch Complete again until the next weekly slot.",
-  "health": null,
-  "stop": "Do not invent implementations without a live Grok pass.",
-  "start": "Fix the Grok call, then re-run Complete Analysis.",
-  "keep": "Open Core, usage write path, human-owned STATUS/README.",
-  "actions": [],
-  "outcome": "error",
-  "diagnostic": "Grok API 429: The model is currently at capacity due to high demand. Please try again in a few minutes, or use a higher service tier for priority processing: https://docs.x.ai/developers/advanced-api-usage/priority-processing [model=grok-4.6]"
+  "generated_at": "2026-09-10 14:00 UTC",
+  "source": "grok",
+  "summary": "Layer 0 Open Core is stable at 29 successful analyses with fresh reputation and no open PRs. Layer 1 stays gated: collaborative score 10.5, complete 0, Astra 0. The GitHub surface is three analysis issues (#163, #162, #155) and empty PRs, so this week is close noise not new architecture. Presence (25 analyses, 2026-09-07) and queue notes (Astra vs usage 26, pin #157) lag the live meter.",
+  "health": 76,
+  "stop": "Opening new Pulse, Commit Analysis, or Self-Audit issues while #155, #162, and #163 are still open.",
+  "start": "Comment-complete consumed analysis issues and keep a single live thread on #163.",
+  "keep": "Incrementing usage and reputation after each successful analysis, including the #134/#135/#142 backfill.",
+  "actions": [
+    {
+      "id": "close-stale-pulse-155",
+      "title": "Close consumed Pulse #155",
+      "why": "Pulse #155 from 2026-09-07 is still open after later commit analyses, self-audit, merges, and usage 29.",
+      "effort": "S",
+      "files": [],
+      "steps": [
+        "Comment on #155 that presence generated 2026-09-07 is superseded by 2026-09-08/09 commit and self-audit work.",
+        "Ask the human to close #155; do not auto-close."
+      ],
+      "issueTitle": "Close consumed Pulse #155",
+      "issueBody": "Pulse #155 from 2026-09-07 is still open after usage reached 29 and later commit/self-audit chores landed. Please close it as consumed so the board is not three parallel analysis threads."
+    },
+    {
+      "id": "close-commit-analysis-162",
+      "title": "Close consumed Commit Analysis #162",
+      "why": "#162 is a 2026-09-08 commit analysis while post-analysis usage and reputation chores already landed.",
+      "effort": "S",
+      "files": [],
+      "steps": [
+        "Comment on #162 citing 3d57cec, 1eb23ba, and a29e15a as follow-through.",
+        "Note that queue pin #157 is not on the open surface.",
+        "Ask the human to close #162 if they agree it is consumed."
+      ],
+      "issueTitle": "Close consumed Commit Analysis #162",
+      "issueBody": "Commit Analysis #162 dated 2026-09-08 is still open after usage and reputation chores that already followed commit analysis. Please close it as consumed; queue pin #157 is already gone from the open surface."
+    },
+    {
+      "id": "resolve-self-audit-163",
+      "title": "Finish Self-Audit #163 as the live thread",
+      "why": "#163 matches last_type self_audit and commit 42f8bf2, so it should carry board state instead of spawning more issues.",
+      "effort": "S",
+      "files": [],
+      "steps": [
+        "Comment on #163: usage 29, reputation 10.25 fresh, Astra 0, complete 0, Layer 1 gated, open PRs none, presence lagging at 25.",
+        "State remaining human work: close #155 and #162; do not rewrite STATUS.md or README.md; do not unlock Layer 1.",
+        "Leave #163 open until the human confirms and closes it."
+      ],
+      "issueTitle": "Self-Audit #163 board closeout",
+      "issueBody": "Self-audit #163 matches last_type self_audit and commit 42f8bf2; record usage 29, collaborative score 10.5, and Layer 1 still gated. Close #155 and #162 as noise after the human confirms; no STATUS.md or README.md rewrite."
+    }
+  ],
+  "outcome": "ok",
+  "diagnostic": null
 }
