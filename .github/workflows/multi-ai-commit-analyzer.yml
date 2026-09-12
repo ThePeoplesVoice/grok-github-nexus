@@ -72,33 +72,30 @@ jobs:
           script: |
             const fs = require('fs');
             try {
+              // Deduplicate: close any open nexus-analysis issues created today before making a new one
               const today = new Date().toISOString().slice(0, 10);
-              const owner = context.repo.owner;
-              const repo = context.repo.repo;
-              const body = fs.readFileSync('/tmp/commit_analysis.md', 'utf8');
               const existing = await github.rest.issues.listForRepo({
-                owner,
-                repo,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
                 state: 'open',
                 labels: 'nexus-analysis,automated',
-                sort: 'created',
-                direction: 'asc',
-                per_page: 1,
+                per_page: 50,
               });
-              const thread = existing.data[0];
-              if (thread) {
-                await github.rest.issues.createComment({
-                  owner,
-                  repo,
-                  issue_number: thread.number,
-                  body,
-                });
-                console.log(`✅ Commit analysis posted to existing issue #${thread.number}`);
-                return;
+              for (const issue of existing.data) {
+                if (issue.title.includes(today)) {
+                  await github.rest.issues.update({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: issue.number,
+                    state: 'closed',
+                  });
+                  console.log(`🗑️ Closed duplicate analysis issue #${issue.number}`);
+                }
               }
+              const body = fs.readFileSync('/tmp/commit_analysis.md', 'utf8');
               await github.rest.issues.create({
-                owner,
-                repo,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
                 title: `🌌 Commit Analysis — ${today}`,
                 body,
                 labels: ['nexus-analysis', 'automated']
