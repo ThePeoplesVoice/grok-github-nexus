@@ -10,5 +10,6 @@ Sense Lab is live: https://quiet-willow-raven-dawn.grok.me
 | PIPELINE.md | Cell schema. |
 | SKILL.md | How Ara uses this. |
 | FIELD_INTEGRATION.md | How it sits on Elonesque / Naixus / Pulse. |
+| [voice-sense/](voice-sense/) | Spoken intent → tools. Draft prototype. Key stays on the server. |
 
 Exported 2026-09-13 to `ThePeoplesVoice/grok-github-nexus` branch `sbtfamilytrust/gro-12-sense-lab-v0-baselines-control-sector-shawn` (GRO-12). Dictionary stays in this chat. No new repo.

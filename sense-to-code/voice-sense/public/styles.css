@@ -1,0 +1,229 @@
+:root {
+  --bg: #0b0d12;
+  --panel: #141821;
+  --ink: #e8edf5;
+  --muted: #8b95a8;
+  --line: #2a3140;
+  --green: #3dcc7a;
+  --amber: #e6b84d;
+  --idle: #6b7384;
+  --accent: #6ea8ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.45 "IBM Plex Sans", "Segoe UI", sans-serif;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.eyebrow {
+  margin: 0;
+  letter-spacing: 0.12em;
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+h1 {
+  margin: 0.15rem 0;
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+.sub,
+.hint,
+.meta,
+footer {
+  color: var(--muted);
+}
+
+.chips {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.chip {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+}
+
+.chip-idle {
+  color: var(--idle);
+}
+
+.chip-live {
+  color: var(--green);
+  border-color: var(--green);
+}
+
+.chip-think {
+  color: var(--amber);
+  border-color: var(--amber);
+}
+
+.hidden {
+  display: none;
+}
+
+main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px 300px;
+  gap: 1rem;
+  padding: 1rem 1.5rem 2rem;
+}
+
+.stage-wrap {
+  position: relative;
+  background: #0e1118;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  min-height: 480px;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.legend {
+  position: absolute;
+  left: 12px;
+  bottom: 10px;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.dock,
+.log-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+}
+
+h2 {
+  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.row,
+#text-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  background: #1e2633;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.45rem 0.8rem;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+#listen:not(:disabled) {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+input {
+  flex: 1;
+  background: #0e1118;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.45rem 0.6rem;
+}
+
+ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.maps,
+.tools,
+.params {
+  padding-left: 1.1rem;
+}
+
+.transcript,
+.events {
+  min-height: 7rem;
+  max-height: 14rem;
+  overflow: auto;
+  font-size: 0.85rem;
+}
+
+.line {
+  margin: 0 0 0.35rem;
+}
+
+.line.user {
+  color: var(--accent);
+}
+
+.line.assistant {
+  color: var(--ink);
+}
+
+.line.event {
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.75rem;
+}
+
+.empty {
+  color: var(--muted);
+}
+
+footer {
+  padding: 0 1.5rem 1.25rem;
+  font-size: 0.75rem;
+}
+
+@media (max-width: 1100px) {
+  main {
+    grid-template-columns: 1fr;
+  }
+}
