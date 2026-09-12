@@ -32,6 +32,10 @@ precision: 0–1. 0 = do not let this error punch. 1 = this channel wins.
 
 Only observation + a hidden physics prior. No exported cell. Dictionary writes the cell by hand when CONTROL-01 reports.
 
+## Voice Sense (adjacent prototype)
+
+Spoken intent → tools lives in [`voice-sense/`](voice-sense/). Same mapping contract. Does not change this cell schema. Dictionary stays in chat.
+
 ## v1 (when CONTROL-01 asks)
 
 - HUD badge: SELF / WORLD

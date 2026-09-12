@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Voice Sense — Sense Lab</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="top">
+      <div>
+        <p class="eyebrow">PHYSICAL SIMULATION</p>
+        <h1>Voice Sense</h1>
+        <p class="sub">Spoken intent → Sense Lab tools. Draft prototype.</p>
+      </div>
+      <div class="chips">
+        <span id="mic-chip" class="chip chip-idle" data-state="idle">NO MIC</span>
+        <span id="link-chip" class="chip chip-idle">OFFLINE</span>
+        <span id="think-chip" class="chip chip-think hidden">THINKING</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="stage-wrap">
+        <canvas id="stage" width="720" height="480" aria-label="Sense Lab plate"></canvas>
+        <div class="legend">
+          volume → impulse · pitch → gravity / color
+        </div>
+      </section>
+
+      <aside class="dock">
+        <div class="panel">
+          <h2>Session</h2>
+          <p id="status">Set <code>XAI_API_KEY</code> on the server, then listen.</p>
+          <div class="row">
+            <button id="listen" type="button">Listen</button>
+            <button id="stop" type="button" disabled>Stop</button>
+          </div>
+          <p class="hint">Mic stays on this machine. The API key never enters the browser.</p>
+        </div>
+
+        <div class="panel">
+          <h2>Physics</h2>
+          <ul class="params">
+            <li>Gravity <strong id="p-gravity">9.8</strong></li>
+            <li>Bounciness <strong id="p-bounciness">0.34</strong></li>
+            <li>Friction <strong id="p-friction">0.62</strong></li>
+          </ul>
+          <p class="meta">Objects <strong id="object-count">0</strong></p>
+        </div>
+
+        <div class="panel">
+          <h2>Tools</h2>
+          <ul class="tools">
+            <li><code>spawn_shape</code></li>
+            <li><code>set_physics_param</code></li>
+            <li><code>note_sensation_map</code></li>
+          </ul>
+        </div>
+
+        <div class="panel">
+          <h2>Maps noted</h2>
+          <ul id="maps" class="maps">
+            <li class="empty">None yet. Spoken maps stay local. Dictionary stays in chat.</li>
+          </ul>
+        </div>
+      </aside>
+
+      <section class="log-col">
+        <div class="panel">
+          <h2>Transcript</h2>
+          <div id="transcript" class="transcript"></div>
+        </div>
+        <div class="panel">
+          <h2>Events</h2>
+          <div id="events" class="events"></div>
+        </div>
+        <div class="panel">
+          <h2>Text fallback</h2>
+          <form id="text-form">
+            <input
+              id="text-input"
+              type="text"
+              maxlength="280"
+              placeholder="Type an intent if the mic is busy"
+              autocomplete="off"
+            />
+            <button type="submit">Send</button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      GRO-12 Voice Sense · stacked on Sense Lab v0 · do not merge until CONTROL-01 lands it
+    </footer>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
