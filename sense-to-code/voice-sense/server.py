@@ -157,9 +157,9 @@ def main() -> None:
         raise SystemExit(f"missing public dir: {PUBLIC}")
     server = ThreadingHTTPServer((HOST, PORT), VoiceSenseHandler)
     has_key = bool(resolve_api_key())
-    print(f"Voice Sense  http://{HOST}:{PORT}")
-    print(f"XAI_API_KEY  {'set' if has_key else 'MISSING — POST /session will 503'}")
-    print("Browser talks to xAI over WebSocket with an ephemeral token only.")
+    print(f"Voice Sense  http://{HOST}:{PORT}", flush=True)
+    print(f"XAI_API_KEY  {'set' if has_key else 'MISSING — POST /session will 503'}", flush=True)
+    print("Browser talks to xAI over WebSocket with an ephemeral token only.", flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
