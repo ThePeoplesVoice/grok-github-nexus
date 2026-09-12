@@ -33,7 +33,8 @@ def test_complete_prefers_self_audit_live_thread():
     text = _workflow_text("nexus-complete.yml")
     assert "labels: 'self-audit,automated'" in text
     assert "labels: 'nexus-complete,automated'" in text
-    assert text.index("labels: 'self-audit,automated'") < text.index(
-        "labels: 'nexus-complete,automated'"
-    )
+    assert "const selfAuditThread" in text
+    assert "if (selfAuditThread)" in text
+    assert "Complete analysis posted to self-audit issue" in text
+    assert "const completeThread" in text
     assert "issues.createComment" in text
