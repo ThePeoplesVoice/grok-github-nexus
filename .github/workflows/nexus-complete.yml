@@ -78,9 +78,51 @@ jobs:
                 }).catch(() => {});
               }
             }
-            const title = `🧭 Nexus Complete Analysis — ${new Date().toISOString().slice(0, 10)}`;
+            const selfAuditIssues = await github.rest.issues.listForRepo({
+              owner,
+              repo,
+              state: 'open',
+              labels: 'self-audit,automated',
+              sort: 'created',
+              direction: 'asc',
+              per_page: 1,
+            });
+            const selfAuditThread = selfAuditIssues.data[0];
+            if (selfAuditThread) {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: selfAuditThread.number,
+                body,
+              });
+              console.log(`✅ Complete analysis posted to self-audit issue #${selfAuditThread.number}`);
+              return;
+            }
+            const completeIssues = await github.rest.issues.listForRepo({
+              owner,
+              repo,
+              state: 'open',
+              labels: 'nexus-complete,automated',
+              sort: 'created',
+              direction: 'asc',
+              per_page: 1,
+            });
+            const completeThread = completeIssues.data[0];
+            if (completeThread) {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: completeThread.number,
+                body,
+              });
+              console.log(`✅ Complete analysis posted to existing issue #${completeThread.number}`);
+              return;
+            }
             await github.rest.issues.create({
-              owner, repo, title, body,
+              owner,
+              repo,
+              title: `🧭 Nexus Complete Analysis — ${new Date().toISOString().slice(0, 10)}`,
+              body,
               labels: ['nexus-complete', 'automated']
             });
             console.log('✅ Complete analysis issue created');

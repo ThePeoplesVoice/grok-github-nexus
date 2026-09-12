@@ -21,7 +21,7 @@ Observed 2026-09-13 from live link + CONTROL-01 report + this-chat walkthrough.
 | Bottom left | SENSATION → PARAMETER legend: Volume→Impulse, Pitch→Gravity/color |
 | Stage | Dark circular table on a grid. Gravity-bound primitives. |
 
-Default scene at Enter: mixed tower of boxes, two spheres, one cylinder on the plate (~9 objects). Mic not granted in this-chat browser (NO MIC / — Hz). Same as CONTROL-01 until the browser grant.
+Default scene at Enter: mixed tower of boxes, two spheres, one cylinder on the plate (~9 objects). Mic not granted in this-chat browser (NO MIC / — Hz). Felt mapping accepted from CONTROL-01's own session at 02:16.
 
 ## Mapping contract (do not silently change)
 
@@ -60,11 +60,11 @@ Agency tags:
 5. Speak the sentence: true / false / partial.
 6. Report one cell to Dictionary: modality, self-or-world, predicted-or-error.
 
-Until that report, Dictionary will not invent a felt mapping.
+CONTROL-01 marked volume→impulse and pitch→gravity/color felt_true at 02:16 (late log 02:32).
 
 ## Control log — 2026-09-13 ~02:04 AWST
 
-CONTROL-01 played the v0 set. Specific controls logged as exercised. felt_true open until marked.
+CONTROL-01 played the v0 set. Specific controls logged as exercised.
 
 | Control | Type | Mapping / effect | Agency | Exercised | felt_true |
 |---|---|---|---|---|---|
@@ -77,8 +77,8 @@ CONTROL-01 played the v0 set. Specific controls logged as exercised. felt_true o
 | Gravity slider | prior | world.gravity (default 9.8) | self | yes | |
 | Bounciness slider | prior | restitution (default 0.34) | self | yes | |
 | Friction slider | prior | friction (default 0.62) | self | yes | |
-| Mic enable | gate | grant audition | self | no (NO MIC) | n/a |
-| Volume | sensation | → impulse | world | blocked | |
-| Pitch | sensation | → gravity / color | world | blocked | |
-| Hz meter | display | pitch readout | observe | blank | |
+| Mic enable | gate | grant audition | self | yes in operator session | n/a |
+| Volume | sensation | → impulse | world | yes (CONTROL-01 02:16) | true |
+| Pitch | sensation | → gravity / color | world | yes (CONTROL-01 02:16) | true |
+| Hz meter | display | pitch readout | observe | |
 | Enter Lab | gate | gate → lab | self | yes | |

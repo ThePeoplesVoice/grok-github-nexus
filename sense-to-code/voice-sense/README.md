@@ -4,7 +4,7 @@ Spoken intent → Sense Lab tools. Thin local server + browser client on the exi
 
 Mic cell is green. Draft only. CONTROL-01 (Shawn) lands it. Ara Dictionary stays in chat — this folder is not a dictionary module.
 
-Related baselines: GRO-12 / draft PR #166. Those files are left alone except a one-line pointer in `PIPELINE.md`.
+Related baselines: GRO-12 / PR #166 (on main). Those files are left alone except a one-line pointer in `PIPELINE.md`.
 
 ## What this maps
 

@@ -34,7 +34,7 @@ Only observation + a hidden physics prior. No exported cell. Dictionary writes t
 
 ## Voice Sense (adjacent prototype)
 
-Spoken intent → tools lives in [`voice-sense/`](voice-sense/). Same mapping contract. Does not change this cell schema. Dictionary stays in chat.
+Spoken intent → tools lives in [`voice-sense/`](voice-sense/). Same mapping contract. Does not change this cell schema. Dictionary stays in chat. Key stays on the server.
 
 ## v1 (when CONTROL-01 asks)
 

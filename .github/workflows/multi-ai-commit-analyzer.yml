@@ -93,12 +93,11 @@ jobs:
                 }
               }
               const body = fs.readFileSync('/tmp/commit_analysis.md', 'utf8');
-              const title = `🌌 Commit Analysis — ${today}`;
               await github.rest.issues.create({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                title: title,
-                body: body,
+                title: `🌌 Commit Analysis — ${today}`,
+                body,
                 labels: ['nexus-analysis', 'automated']
               });
               console.log('✅ Analysis issue created');
