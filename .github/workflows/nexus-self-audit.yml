@@ -62,12 +62,33 @@ jobs:
           script: |
             const fs = require('fs');
             const body = fs.readFileSync('/tmp/nexus_self_audit.md', 'utf8');
-            const title = `Nexus Self-Audit — ${new Date().toISOString().slice(0, 10)}`;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const existing = await github.rest.issues.listForRepo({
+              owner,
+              repo,
+              state: 'open',
+              labels: 'self-audit,automated',
+              sort: 'created',
+              direction: 'asc',
+              per_page: 1,
+            });
+            const thread = existing.data[0];
+            if (thread) {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: thread.number,
+                body,
+              });
+              console.log(`✅ Self-audit posted to existing issue #${thread.number}`);
+              return;
+            }
             await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: title,
-              body: body,
+              owner,
+              repo,
+              title: `Nexus Self-Audit — ${new Date().toISOString().slice(0, 10)}`,
+              body,
               labels: ['self-audit', 'nexus-optimisation', 'automated']
             });
             console.log('Self-audit issue created');

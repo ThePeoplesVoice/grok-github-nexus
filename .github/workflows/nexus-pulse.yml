@@ -64,12 +64,33 @@ jobs:
             } catch (e) {
               body = `Pulse failed before report write.\n\n${e.message}`;
             }
-            const title = `📡 Nexus Pulse — ${new Date().toISOString().slice(0, 10)}`;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const existing = await github.rest.issues.listForRepo({
+              owner,
+              repo,
+              state: 'open',
+              labels: 'nexus-pulse,automated',
+              sort: 'created',
+              direction: 'asc',
+              per_page: 1,
+            });
+            const thread = existing.data[0];
+            if (thread) {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: thread.number,
+                body,
+              });
+              console.log(`✅ Pulse posted to existing issue #${thread.number}`);
+              return;
+            }
             await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: title,
-              body: body,
+              owner,
+              repo,
+              title: `📡 Nexus Pulse — ${new Date().toISOString().slice(0, 10)}`,
+              body,
               labels: ['nexus-pulse', 'automated']
             });
             console.log('✅ Pulse issue created');
