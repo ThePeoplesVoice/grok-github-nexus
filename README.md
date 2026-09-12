@@ -6,7 +6,7 @@ Aligned with **xAI** truth-seeking · **X** high-signal · **SpaceX** first-prin
 
 ![Key](https://img.shields.io/badge/GROK_API_KEY-proven_ok-brightgreen)
 ![Layer](https://img.shields.io/badge/layer-0_open_core-blue)
-![Pulse](https://img.shields.io/badge/pulse-ok_2026--09--07-brightgreen)
+![Pulse](https://img.shields.io/badge/pulse-ok_2026--09--12-brightgreen)
 
 ---
 
@@ -30,7 +30,7 @@ Aligned with **xAI** truth-seeking · **X** high-signal · **SpaceX** first-prin
 
 ## Current status
 
-**GROK_API_KEY** is proven on Pulse. Last Complete `ok` was #143 (1 Sep). The 3 Sep Complete hit Grok API 429. See [`STATUS.md`](STATUS.md).
+**GROK_API_KEY** is proven on Pulse [#171](https://github.com/ThePeoplesVoice/grok-github-nexus/issues/171) (12 Sep, Grok `ok`). Last Complete `ok` is [#164](https://github.com/ThePeoplesVoice/grok-github-nexus/issues/164) (10 Sep). Usage meter now records complete=1. See [`STATUS.md`](STATUS.md).
 
 Memory and human gates are live on `main` (PR #146). The boat remembers what it tried and refuses money / deploy / public changes without a human label.
 

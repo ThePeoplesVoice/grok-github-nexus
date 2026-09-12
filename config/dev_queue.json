@@ -1,8 +1,14 @@
 {
-  "version": "1.0.14",
-  "updated_at": "2026-09-08T17:25:00Z",
-  "notes": "2026-09-09. #156 and #158 merged. Consumed issues 143 144 151 152 153 154 closed. Pins: #155 Pulse, #157 Commit Analysis. Astra ledger stale vs usage 26.",
+  "version": "1.0.15",
+  "updated_at": "2026-09-12T22:44:00Z",
+  "notes": "2026-09-13. Pulse pin #171. Instruments: usage 34 (complete=1), reputation 10.5/42 fresh, Astra last_computed 2026-09-10. Commit pin #170. Complete last ok #164. STATUS human pass on ara/status-sync-2026-09-13.",
   "done": [
+    {
+      "id": "wire-complete-into-usage-meter",
+      "title": "Increment usage type complete only on a real Grok ok, never on 429",
+      "completed": "2026-09-10",
+      "evidence": "#164 ok; usage_stats.by_type.complete = 1"
+    },
     {
       "id": "terafab-alignment-158",
       "title": "Land Terafab / Elon-stack orientation docs",
@@ -51,28 +57,44 @@
   ],
   "next": [
     {
-      "id": "hold-complete-until-next-thursday",
-      "title": "Do not dispatch Complete again until Thursday 10:00 UTC",
+      "id": "land-status-sync-2026-09-13",
+      "title": "Merge ara/status-sync-2026-09-13 after human-approval:public",
       "priority": 1,
       "leverage": "high",
       "risk": "low",
-      "why": "#143 ok. #152 was 429. A third fat report this week is grinding."
+      "why": "STATUS frozen 9 Sep. Pulse #171 and instruments (usage 34, complete=1) already moved."
     },
     {
-      "id": "recompute-astra-from-reputation",
-      "title": "Let the organic script recompute Astra — ledger last_computed 2026-09-01",
+      "id": "hold-complete-until-2026-09-17",
+      "title": "Do not dispatch Complete again until Thursday 2026-09-17 10:00 UTC",
       "priority": 2,
-      "leverage": "medium",
+      "leverage": "high",
       "risk": "low",
-      "why": "Astra source_reputation is 0 while reputation effective is 10.5. Do not hand-edit the balance."
+      "why": "#164 ok on 10 Sep. Extra fat reports this week are grinding."
     },
     {
-      "id": "wire-complete-into-usage-meter",
-      "title": "Increment usage type complete only on a real Grok ok, never on 429",
+      "id": "one-living-collaborative-pr",
+      "title": "Open one non-chore PR a collaborator can actually review",
       "priority": 3,
       "leverage": "high",
       "risk": "low",
-      "why": "Meter still reads complete=0 after a claimed ok and a later error."
+      "why": "Layer 1 stays gated on pr=3 + issue=1. Internal pulse/commit churn does not unlock it."
+    },
+    {
+      "id": "recompute-astra-from-reputation",
+      "title": "Let the organic script recompute Astra — ledger last_computed 2026-09-10",
+      "priority": 4,
+      "leverage": "medium",
+      "risk": "low",
+      "why": "Astra total_successful_analyses is 30 while usage is 34. Do not hand-edit the balance."
+    },
+    {
+      "id": "sweep-automated-issues-2026-09-13",
+      "title": "Close consumed Pulse #155 after #171 is the live pin",
+      "priority": 5,
+      "leverage": "low",
+      "risk": "low",
+      "why": "Prior pulse is superseded. Keep #170 as current commit pin, #163 self-audit, #162 only if still unread."
     }
   ],
   "backlog": [
@@ -99,12 +121,12 @@
   ],
   "last_cycle": {
     "structural_health": 100,
-    "open_issue_pins": [155, 157],
-    "total_analyses": 26,
+    "open_issue_pins": [171, 170],
+    "total_analyses": 34,
     "reputation_effective": 10.5,
     "reputation_freshness": "fresh",
-    "presence_at": "2026-09-07 14:07 UTC",
-    "astra_last_computed": "2026-09-01T02:52:30Z",
+    "presence_at": "2026-09-12 22:06 UTC",
+    "astra_last_computed": "2026-09-10T14:00:28Z",
     "package_version": "0.8.0"
   }
 }
