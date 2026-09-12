@@ -64,7 +64,7 @@ jobs:
             const body = fs.readFileSync('/tmp/nexus_self_audit.md', 'utf8');
             const owner = context.repo.owner;
             const repo = context.repo.repo;
-            const requiredLabels = ['self-audit', 'automated'];
+            const requiredLabels = ['self-audit', 'nexus-optimisation', 'automated'];
             const hasAllLabels = (issue, labels) => {
               const names = new Set(
                 (issue.labels || [])
