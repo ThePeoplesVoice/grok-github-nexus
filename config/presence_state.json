@@ -1,28 +1,28 @@
 {
   "version": "0.3.0",
-  "generated_at": "2026-09-07 14:07 UTC",
+  "generated_at": "2026-09-12 21:42 UTC",
   "phase": "Layer 0 — Open Core (Layer 1 gated on collaborative evidence)",
   "layer1_enabled": false,
-  "total_successful_analyses": 25,
+  "total_successful_analyses": 33,
   "by_type": {
-    "commit": 12,
+    "commit": 17,
     "pr": 3,
     "issue": 1,
-    "self_audit": 4,
-    "pulse": 5,
-    "complete": 0,
+    "self_audit": 5,
+    "pulse": 6,
+    "complete": 1,
     "other": 0
   },
   "reputation_score": 10.5,
-  "reputation_raw": 33.0,
+  "reputation_raw": 41.5,
   "reputation_freshness": "fresh",
   "grok_outcome": "ok",
   "recent_commits_preview": [
-    "9fdbe9d chore: automated dev cycle — queue + field notes",
-    "6d81ed5 chore: usage + reputation after commit analysis",
-    "f6368d4 chore: stale PR sweep report",
-    "03c2843 chore: complete analysis — implementations + usage",
-    "37b0d55 chore: usage + reputation after self-audit"
+    "3b40a69 chore: usage + reputation after commit analysis",
+    "f642439 GRO-12: Voice Sense prototype onto main (#169)",
+    "62d74b3 chore: usage + reputation after commit analysis",
+    "e0e63ee GRO-12: Sense Lab v0 baselines + Control Sector (#166)",
+    "1554a72 chore: stale PR sweep report"
   ],
   "notes": "Compressed context for continuity. Not a chat log. See ORGANIC_SYSTEMS.md."
 }
