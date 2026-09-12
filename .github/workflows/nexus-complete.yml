@@ -67,6 +67,14 @@ jobs:
             }
             const owner = context.repo.owner;
             const repo = context.repo.repo;
+            const hasAllLabels = (issue, labels) => {
+              const names = new Set(
+                (issue.labels || [])
+                  .map((label) => (typeof label === 'string' ? label : label.name || '').toLowerCase())
+                  .filter(Boolean)
+              );
+              return labels.every((label) => names.has(label));
+            };
             for (const name of ['nexus-complete', 'automated']) {
               try {
                 await github.rest.issues.getLabel({ owner, repo, name });
@@ -78,36 +86,17 @@ jobs:
                 }).catch(() => {});
               }
             }
-            const selfAuditIssues = await github.rest.issues.listForRepo({
-              owner,
-              repo,
-              state: 'open',
-              labels: 'self-audit,automated',
-              sort: 'created',
-              direction: 'asc',
-              per_page: 1,
-            });
-            const selfAuditThread = selfAuditIssues.data[0];
-            if (selfAuditThread) {
-              await github.rest.issues.createComment({
-                owner,
-                repo,
-                issue_number: selfAuditThread.number,
-                body,
-              });
-              console.log(`✅ Complete analysis posted to self-audit issue #${selfAuditThread.number}`);
-              return;
-            }
+            const requiredLabels = ['nexus-complete', 'automated'];
             const completeIssues = await github.rest.issues.listForRepo({
               owner,
               repo,
               state: 'open',
-              labels: 'nexus-complete,automated',
+              labels: requiredLabels.join(','),
               sort: 'created',
               direction: 'asc',
-              per_page: 1,
+              per_page: 100,
             });
-            const completeThread = completeIssues.data[0];
+            const completeThread = completeIssues.data.find((issue) => hasAllLabels(issue, requiredLabels));
             if (completeThread) {
               await github.rest.issues.createComment({
                 owner,
