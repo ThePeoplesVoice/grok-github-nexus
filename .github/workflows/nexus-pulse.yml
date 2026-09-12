@@ -71,9 +71,11 @@ jobs:
               repo,
               state: 'open',
               labels: 'nexus-pulse,automated',
-              per_page: 50,
+              sort: 'created',
+              direction: 'asc',
+              per_page: 1,
             });
-            const thread = [...existing.data].sort((a, b) => a.number - b.number)[0];
+            const thread = existing.data[0];
             if (thread) {
               await github.rest.issues.createComment({
                 owner,
