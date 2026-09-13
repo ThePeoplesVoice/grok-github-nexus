@@ -90,7 +90,11 @@ def _staleness(last_activity: str | None, now: datetime | None = None) -> tuple[
     return round(days, 2), round(factor, 4), label
 
 
-def compute_reputation(usage: dict[str, Any] | None = None) -> dict[str, Any]:
+def compute_reputation(
+    usage: dict[str, Any] | None = None,
+    *,
+    now: datetime | None = None,
+) -> dict[str, Any]:
     stats = usage if usage is not None else load_usage_stats()
     by_type = stats.get("by_type") or {}
     last_activity = stats.get("last_updated")
@@ -109,7 +113,7 @@ def compute_reputation(usage: dict[str, Any] | None = None) -> dict[str, Any]:
         else:
             internal_raw += part
 
-    days_idle, decay_factor, freshness = _staleness(last_activity)
+    days_idle, decay_factor, freshness = _staleness(last_activity, now=now)
     unlock_score = round(collaborative_raw, 2)
     effective = round(unlock_score * decay_factor, 2)
 

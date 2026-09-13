@@ -28,6 +28,7 @@ This is not autopilot feature spam. It is disciplined iteration.
 | `config/dev_queue.json` | Ranked work items (done / next / backlog) |
 | `config/field_notes.jsonl` | Append-only continuity notes |
 | `nexus/scripts/run_dev_cycle.py` | Cycle runner (no external AI required) |
+| `nexus/scripts/run_simulation.py` | Observe → simulate → recommend (no AI, no issues, no Astra write) |
 | `.github/workflows/nexus-dev-cycle.yml` | Schedule + dispatch |
 | Self-audit / Pulse | Deeper critique + narrative memory |
 | Health check | Fast fail on structural breakage |
@@ -49,6 +50,7 @@ This is not autopilot feature spam. It is disciplined iteration.
 
 | Cycle | When | What |
 |-------|------|------|
+| Simulation | Hourly Cursor cron + local | What-if reassessment without GitHub noise |
 | Health check | Mon 05:00 UTC + dispatch | Structural / import integrity |
 | Dev cycle | Mon 07:00 UTC + dispatch | Queue refresh from observations |
 | Pulse | Mon 08:00 UTC + dispatch | Narrative + presence_state |
@@ -62,9 +64,11 @@ This is not autopilot feature spam. It is disciplined iteration.
 ```bash
 pip install -e .
 python -m nexus.scripts.run_health_check
+python -m nexus.scripts.run_simulation
 python -m nexus.scripts.run_dev_cycle
 # Then implement top `next` items from config/dev_queue.json
 # Optionally: workflow_dispatch self-audit / pulse when secrets present
+# Do not dispatch Complete before the booked Thursday window
 ```
 
 ---
@@ -76,6 +80,7 @@ python -m nexus.scripts.run_dev_cycle
 - Letting YAML re-accumulate analysis logic
 - Treating reputation as a privilege system
 - Skipping health check after core package changes
+- Filing Pulse / Complete / self-audit issues in order to think — simulate locally first
 
 ---
 

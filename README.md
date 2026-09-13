@@ -23,6 +23,7 @@ Aligned with **xAI** truth-seeking · **X** high-signal · **SpaceX** first-prin
 | [`docs/KEY_SETUP.md`](docs/KEY_SETUP.md) | xAI API key setup |
 | [`docs/ARA_GITHUB.md`](docs/ARA_GITHUB.md) | Ara as GitHub collaborating partner |
 | [`AUTOMATED_DEVELOPMENT.md`](AUTOMATED_DEVELOPMENT.md) | Observe → score → act loop |
+| [`nexus/simulate.py`](nexus/simulate.py) | Local what-if reassessment — no Astra write, no issues |
 | [`CHECKS_AND_BALANCES.md`](CHECKS_AND_BALANCES.md) | Governance |
 | [`ORGANIC_SYSTEMS.md`](ORGANIC_SYSTEMS.md) | Reputation / presence / Astra signal |
 | [`config/progressive.json`](config/progressive.json) | Control plane |
@@ -43,6 +44,7 @@ What belongs next: [`docs/WHAT_FITS.md`](docs/WHAT_FITS.md).
 ```bash
 pip install -e .
 python -m nexus.scripts.run_health_check
+python -m nexus.scripts.run_simulation
 python -m nexus.scripts.run_dev_cycle
 ```
 
