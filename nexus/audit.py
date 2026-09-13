@@ -51,6 +51,8 @@ def structural_health() -> dict[str, Any]:
         "nexus/field_notes.py",
         "nexus/simulate.py",
         "nexus/scripts/run_simulation.py",
+        "nexus/optimise.py",
+        "nexus/scripts/run_optimise.py",
         ".github/workflows/multi-ai-pr-analyzer.yml",
         ".github/workflows/multi-ai-issue-triage.yml",
         ".github/workflows/multi-ai-commit-analyzer.yml",
