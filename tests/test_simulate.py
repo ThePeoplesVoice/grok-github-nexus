@@ -65,6 +65,11 @@ def test_living_partner_pr_raises_unlock_score():
     )
     assert counted is True
     assert projected["by_type"]["pr"] == 4
+    gh_login, gh_counted = project_review(
+        SAMPLE_USAGE, login="app/cursor", user_type="Bot", now=NOW
+    )
+    assert gh_counted is True
+    assert gh_login["by_type"]["pr"] == 4
 
 
 def test_dependabot_and_automated_pr_do_not_raise_unlock_score():

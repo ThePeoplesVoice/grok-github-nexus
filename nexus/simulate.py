@@ -246,7 +246,7 @@ def run_scenario(
             usage, login="cursor[bot]", user_type="Bot", now=now
         )
         note = (
-            "cursor[bot] living partner PR without automated labels. "
+            "cursor[bot] / app/cursor living partner PR without automated labels. "
             "This hourly loop's reviewable tools count."
             if counted
             else "cursor[bot] was treated as grind. Unlock does not move."

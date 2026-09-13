@@ -16,6 +16,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from .collab import classify_review_target, parse_label_list
 from .simulate import reassess
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -78,34 +79,213 @@ def detect_stale_next(
     return stale
 
 
-def headline(report: dict[str, Any], stale: list[dict[str, Any]] | None = None) -> str:
+def headline(
+    report: dict[str, Any],
+    stale: list[dict[str, Any]] | None = None,
+    *,
+    next_move: dict[str, Any] | None = None,
+    living_count: int | None = None,
+) -> str:
     obs = report.get("observation") or {}
     card = obs.get("scorecard") or {}
     lag = obs.get("astra_lag") or {}
     gate = report.get("expansion_gate") or {}
     actions = report.get("recommendations") or []
     top_act = next((a for a in actions if a.get("stance") == "act"), actions[0] if actions else {})
+    move_id = (next_move or {}).get("id") or top_act.get("id")
     stale_ids = ",".join(str(item.get("id")) for item in (stale or []) if item.get("id")) or "none"
+    living = "" if living_count is None else f" living_open={living_count}"
     return (
         f"gate={gate.get('recommendation')} "
         f"unlock={card.get('unlock_score')} "
         f"astra_lag={lag.get('lagging')} "
-        f"top_act={top_act.get('id')} "
-        f"stale_queue={stale_ids}"
+        f"top_act={move_id} "
+        f"stale_queue={stale_ids}{living}"
     )
+
+
+def _review_login(raw: dict[str, Any]) -> str | None:
+    if raw.get("login"):
+        return raw.get("login")
+    author = raw.get("author")
+    if isinstance(author, dict):
+        return author.get("login")
+    return None
+
+
+def observe_open_reviews(
+    reviews: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Classify an injected snapshot of open PRs. No network."""
+    living: list[dict[str, Any]] = []
+    grind: list[dict[str, Any]] = []
+    for raw in reviews or []:
+        if not isinstance(raw, dict):
+            continue
+        login = _review_login(raw)
+        user_type = raw.get("user_type") or raw.get("author_type")
+        author = raw.get("author") if isinstance(raw.get("author"), dict) else {}
+        if user_type is None and author.get("is_bot") is not None:
+            user_type = "Bot" if author.get("is_bot") else "User"
+        raw_labels = raw.get("labels")
+        if isinstance(raw_labels, list):
+            labels = [
+                str((item or {}).get("name") if isinstance(item, dict) else item)
+                for item in raw_labels
+                if str((item or {}).get("name") if isinstance(item, dict) else item).strip()
+            ]
+        else:
+            labels = parse_label_list(raw_labels)
+        kind = classify_review_target(
+            login=login,
+            user_type=user_type,
+            labels=labels,
+        )
+        row = {
+            "number": raw.get("number"),
+            "title": raw.get("title"),
+            "login": login,
+            "user_type": user_type,
+            "labels": labels,
+            "draft": bool(raw.get("draft") or raw.get("isDraft")),
+            "class": kind,
+        }
+        if kind == "living":
+            living.append(row)
+        elif kind == "grind":
+            grind.append(row)
+    return {
+        "living_count": len(living),
+        "grind_count": len(grind),
+        "living": living,
+        "grind": grind,
+        "advice": (
+            f"Land open living PR #{living[0].get('number')}. Do not open another."
+            if living
+            else "No living PR is open. One reviewable partner PR is the unlock path."
+        ),
+    }
+
+
+def choose_next_move(
+    report: dict[str, Any],
+    reviews: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Pick the single board move. An open living PR beats opening another."""
+    board = reviews if reviews is not None else observe_open_reviews([])
+    living = board.get("living") or []
+    if living:
+        pr = living[0]
+        number = pr.get("number")
+        draft = bool(pr.get("draft"))
+        title = "Ready draft living PR" if draft else "Land open living PR"
+        if number:
+            title += f" #{number}"
+        return {
+            "id": "land-open-living-pr",
+            "title": title,
+            "stance": "act",
+            "leverage": "high",
+            "why": (
+                f"Living partner PR #{number} is already open"
+                f"{' as a draft' if draft else ''}. "
+                "Opening another is grind. Review and land this one."
+            ),
+            "number": number,
+            "draft": draft,
+        }
+    actions = report.get("recommendations") or []
+    return next(
+        (item for item in actions if item.get("stance") == "act"),
+        actions[0] if actions else {
+            "id": "hold",
+            "title": "Hold",
+            "stance": "hold",
+            "leverage": "low",
+            "why": "No ranked action.",
+        },
+    )
+
+
+def discover_open_reviews() -> list[dict[str, Any]]:
+    """Optional read-only `gh pr list`. Soft-fails to empty. Never files issues."""
+    import subprocess
+
+    try:
+        proc = subprocess.run(
+            [
+                "gh",
+                "pr",
+                "list",
+                "--state",
+                "open",
+                "--json",
+                "number,title,author,labels,isDraft",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=20,
+            check=False,
+        )
+        if proc.returncode != 0:
+            return []
+        rows = json.loads(proc.stdout or "[]")
+    except Exception:
+        return []
+
+    out: list[dict[str, Any]] = []
+    for row in rows if isinstance(rows, list) else []:
+        if not isinstance(row, dict):
+            continue
+        author = row.get("author") or {}
+        labels = row.get("labels") or []
+        label_names = []
+        for lab in labels:
+            if isinstance(lab, dict):
+                label_names.append(str(lab.get("name") or ""))
+            else:
+                label_names.append(str(lab))
+        login = author.get("login") if isinstance(author, dict) else None
+        is_bot = bool(author.get("is_bot")) if isinstance(author, dict) else False
+        if str(login or "").endswith("[bot]"):
+            is_bot = True
+        out.append({
+            "number": row.get("number"),
+            "title": row.get("title"),
+            "login": login,
+            "user_type": "Bot" if is_bot else "User",
+            "labels": label_names,
+            "draft": bool(row.get("isDraft")),
+        })
+    return out
 
 
 def optimise(
     report: dict[str, Any] | None = None,
     *,
     queue: dict[str, Any] | None = None,
+    open_reviews: list[dict[str, Any]] | None = None,
     now: datetime | None = None,
 ) -> dict[str, Any]:
     """Rank simulation output and queue drift. Read-only on living meters."""
     assessed = report if report is not None else reassess(now=now)
     board = queue if queue is not None else load_queue()
     stale = detect_stale_next(board)
+    reviews = observe_open_reviews(open_reviews or [])
+    move = choose_next_move(assessed, reviews)
     actions = list(assessed.get("recommendations") or [])
+    if reviews.get("living"):
+        rewritten: list[dict[str, Any]] = []
+        replaced = False
+        for item in actions:
+            if item.get("id") == "one-living-collaborative-pr":
+                rewritten.append(move)
+                replaced = True
+            else:
+                rewritten.append(item)
+        if not replaced:
+            rewritten.insert(0, move)
+        actions = rewritten
     decisions = []
     for item in stale:
         decisions.append({
@@ -118,9 +298,16 @@ def optimise(
     decisions.extend(actions)
     return {
         "observed_at": assessed.get("observed_at"),
-        "headline": headline(assessed, stale),
+        "headline": headline(
+            assessed,
+            stale,
+            next_move=move,
+            living_count=reviews.get("living_count"),
+        ),
         "expansion_gate": assessed.get("expansion_gate"),
         "stale_queue": stale,
+        "open_reviews": reviews,
+        "next_move": move,
         "decisions": decisions,
         "persisted": {
             "astra": False,
@@ -186,6 +373,8 @@ def copy_queue(queue: dict[str, Any]) -> dict[str, Any]:
 def format_optimisation_md(optimisation: dict[str, Any]) -> str:
     gate = optimisation.get("expansion_gate") or {}
     persisted = optimisation.get("persisted") or {}
+    move = optimisation.get("next_move") or {}
+    reviews = optimisation.get("open_reviews") or {}
     stale_lines = []
     for item in optimisation.get("stale_queue") or []:
         stale_lines.append(
@@ -198,11 +387,30 @@ def format_optimisation_md(optimisation: dict[str, Any]) -> str:
             f"(leverage {item.get('leverage')}): {item.get('title')} "
             f"— {item.get('why')}"
         )
+    living_lines = []
+    for item in reviews.get("living") or []:
+        living_lines.append(
+            f"- living #{item.get('number')} `{item.get('login')}` "
+            f"{'(draft) ' if item.get('draft') else ''}— {item.get('title')}"
+        )
+    for item in reviews.get("grind") or []:
+        living_lines.append(
+            f"- grind #{item.get('number')} `{item.get('login')}` — {item.get('title')}"
+        )
     return f"""# 🔧 Nexus Optimisation / Integration
 
 **Observed:** {optimisation.get('observed_at')}  
 **Headline:** {optimisation.get('headline')}  
 **Expansion gate:** {gate.get('recommendation')} — {gate.get('reason')}
+
+## Next move
+
+- **{move.get('stance')}** `{move.get('id')}` — {move.get('title')} — {move.get('why')}
+
+## Open reviews
+
+{chr(10).join(living_lines) or '- (none injected)'}
+- {reviews.get('advice') or 'No open-review snapshot.'}
 
 ## Stale queue items
 

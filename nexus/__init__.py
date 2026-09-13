@@ -1,6 +1,6 @@
 """Nexus shared analysis core."""
 
-__version__ = "0.8.2"
+__version__ = "0.8.3"
 
 from .context import load_context, load_progressive, load_usage_stats, layer1_enabled, current_phase
 from .providers import call_grok, call_claude, format_api_error
@@ -34,7 +34,13 @@ from .presence import load_presence, format_presence_for_prompt
 from .runtime import after_successful_analysis, log_success
 from .field_notes import append_field_note, read_recent_notes, notes_summary_md
 from .simulate import format_report_md, observe, reassess
-from .optimise import format_optimisation_md, headline, optimise
+from .optimise import (
+    choose_next_move,
+    format_optimisation_md,
+    headline,
+    observe_open_reviews,
+    optimise,
+)
 
 __all__ = [
     "load_context",
@@ -76,4 +82,6 @@ __all__ = [
     "optimise",
     "headline",
     "format_optimisation_md",
+    "observe_open_reviews",
+    "choose_next_move",
 ]

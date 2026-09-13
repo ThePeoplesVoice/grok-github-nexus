@@ -9,9 +9,11 @@ from pathlib import Path
 from nexus.astra import load_astra, save_astra
 from nexus.optimise import (
     apply_queue_refresh,
+    choose_next_move,
     detect_stale_next,
     format_optimisation_md,
     headline,
+    observe_open_reviews,
     optimise,
 )
 from nexus.simulate import reassess
@@ -91,6 +93,8 @@ def test_optimise_is_dry_run_on_meters(tmp_path: Path):
     assert load_astra(astra_path)["total_successful_analyses"] == 30
     assert "gate=hold" in result["headline"]
     assert "unlock=10.5" in result["headline"]
+    assert result["next_move"]["id"] == "one-living-collaborative-pr"
+    assert result["open_reviews"]["living_count"] == 0
     ids = {item["id"] for item in result["decisions"]}
     assert "one-living-collaborative-pr" in ids
     assert "hold-complete" in ids
@@ -124,5 +128,75 @@ def test_headline_and_report_sections():
     result = optimise(report, queue=QUEUE, now=NOW)
     text = format_optimisation_md(result)
     assert "Optimisation / Integration" in text
+    assert "Next move" in text
+    assert "Open reviews" in text
     assert "Persistence" in text
     assert headline(report).startswith("gate=")
+
+
+def test_open_living_draft_becomes_next_move():
+    report = reassess(usage=SAMPLE_USAGE, progressive=GATED, astra_ledger={
+        "balance": 10.5,
+        "total_successful_analyses": 30,
+    }, now=NOW)
+    result = optimise(
+        report,
+        queue=QUEUE,
+        open_reviews=[{
+            "number": 177,
+            "title": "Collab-honest simulation + optimisation integrator",
+            "login": "app/cursor",
+            "user_type": "Bot",
+            "labels": [],
+            "draft": True,
+        }],
+        now=NOW,
+    )
+    assert result["next_move"]["id"] == "land-open-living-pr"
+    assert result["next_move"]["number"] == 177
+    assert result["next_move"]["draft"] is True
+    assert result["open_reviews"]["living_count"] == 1
+    assert "living_open=1" in result["headline"]
+    ids = {item["id"] for item in result["decisions"]}
+    assert "land-open-living-pr" in ids
+    assert "one-living-collaborative-pr" not in ids
+
+
+def test_dependabot_and_pulse_prs_are_grind_not_next_move():
+    board = observe_open_reviews([
+        {
+            "number": 12,
+            "title": "chore(deps)",
+            "login": "dependabot[bot]",
+            "user_type": "Bot",
+            "labels": [],
+        },
+        {
+            "number": 13,
+            "title": "Pulse leftover",
+            "login": "ThePeoplesVoice",
+            "user_type": "User",
+            "labels": "automated,nexus-pulse",
+        },
+    ])
+    assert board["living_count"] == 0
+    assert board["grind_count"] == 2
+    report = reassess(usage=SAMPLE_USAGE, progressive=GATED, astra_ledger={
+        "balance": 10.5,
+        "total_successful_analyses": 30,
+    }, now=NOW)
+    move = choose_next_move(report, board)
+    assert move["id"] == "one-living-collaborative-pr"
+
+
+def test_gh_style_label_objects_are_normalised():
+    board = observe_open_reviews([
+        {
+            "number": 13,
+            "title": "Pulse leftover",
+            "author": {"login": "ThePeoplesVoice", "is_bot": False},
+            "labels": [{"name": "automated"}, {"name": "nexus-pulse"}],
+        }
+    ])
+    assert board["living_count"] == 0
+    assert board["grind_count"] == 1

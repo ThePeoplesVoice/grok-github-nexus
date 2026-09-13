@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from nexus.collab import (
+    classify_review_target,
     is_bot_actor,
     is_collaborative_review_target,
     labels_are_automated,
@@ -48,6 +49,11 @@ def test_cursor_partner_bot_counts_without_automated_labels():
         user_type="Bot",
     ) is True
     assert usage_type_for_review(login="cursor[bot]", user_type="Bot") == "pr"
+    assert is_collaborative_review_target(
+        login="app/cursor",
+        user_type="Bot",
+    ) is True
+    assert classify_review_target(login="app/cursor", user_type="Bot") == "living"
 
 
 def test_cursor_partner_bot_does_not_count_pulse_labels():
@@ -62,3 +68,14 @@ def test_cursor_partner_bot_does_not_count_pulse_labels():
         labels="nexus-complete",
         kind="issue",
     ) is None
+    assert classify_review_target(
+        login="cursor[bot]",
+        user_type="Bot",
+        labels="automated,nexus-pulse",
+    ) == "grind"
+
+
+def test_classify_review_target_buckets():
+    assert classify_review_target(login="ThePeoplesVoice", user_type="User") == "living"
+    assert classify_review_target(login="dependabot[bot]", user_type="Bot") == "grind"
+    assert classify_review_target(login="", user_type="User") == "empty"

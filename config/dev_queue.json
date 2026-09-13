@@ -1,8 +1,14 @@
 {
-  "version": "1.0.17",
-  "updated_at": "2026-09-13T21:10:00Z",
-  "notes": "2026-09-13 hourly reassessment #2. Landed collab-honest simulation + optimisation integrator (package 0.8.2). cursor[bot] living PRs count; Dependabot and Pulse labels do not. Instruments: usage 35, unlock 10.5, live effective 10.28, Astra ledger still 30 / last_computed 2026-09-10. Pulse pin #171. Complete held until 2026-09-17.",
+  "version": "1.0.18",
+  "updated_at": "2026-09-13T22:10:00Z",
+  "notes": "2026-09-13 hourly reassessment #3. Package 0.8.3: board-aware next_move. Open living cursor[bot] PRs (including draft #177) become land-open-living-pr. README/WHAT_FITS left untouched so the public-voice gate does not block the tools. Instruments unchanged: usage 35, unlock 10.5, Astra ledger 30. Complete held until 2026-09-17.",
   "done": [
+    {
+      "id": "board-aware-next-move",
+      "title": "Optimise picks land-open-living-pr when a living partner PR is already open",
+      "completed": "2026-09-13",
+      "evidence": "nexus/optimise.py choose_next_move + tests/test_optimise.py"
+    },
     {
       "id": "collab-honest-optimise",
       "title": "Collab-honest simulation + optimisation integrator; cursor[bot] living PRs count",
@@ -88,7 +94,7 @@
       "priority": 2,
       "leverage": "high",
       "risk": "low",
-      "why": "Layer 1 stays gated on pr=3 + issue=1. Human and cursor[bot] living PRs move unlock; Pulse labels and Dependabot do not."
+      "why": "Draft #177 plus this refine. REST login cursor[bot]; gh login app/cursor. Both now count. Land one. Pulse labels and Dependabot still do not."
     },
     {
       "id": "recompute-astra-from-reputation",
@@ -137,7 +143,7 @@
     "reputation_freshness": "fresh",
     "presence_at": "2026-09-12 22:06 UTC",
     "astra_last_computed": "2026-09-10T14:00:28Z",
-    "package_version": "0.8.2",
-    "simulation": "observe-simulate-recommend-optimise dry-run live"
+    "package_version": "0.8.3",
+    "simulation": "observe-simulate-recommend-optimise next_move dry-run live"
   }
 }

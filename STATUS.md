@@ -1,6 +1,6 @@
 # 📡 Nexus Status
 
-**Last updated:** 2026-09-14 05:10 AWST — hourly simulate + optimise pass.
+**Last updated:** 2026-09-14 06:10 AWST — hourly next_move refine.
 
 ![Reputation](https://img.shields.io/badge/nexus_reputation-effective_10.5-blue)
 ![Astra](https://img.shields.io/badge/astra-ledger_lags_4-yellow)
@@ -14,11 +14,11 @@
 **Layer 0 — Open Core (live, ungated)**  
 **Layer 1** — gated. Collaborative evidence is still pr=3 + issue=1. Gate held on purpose.
 
-progressive **v1.6.1** · package **v0.8.2** · model **`grok-4.6`**
+progressive **v1.6.1** · package **v0.8.3** · model **`grok-4.6`**
 
 The sequenced future lives in [`docs/WHAT_FITS.md`](docs/WHAT_FITS.md). That page is the filter. This page is the board.
 
-### Measurement stack — last full read 2026-09-13 21:06 UTC
+### Measurement stack — last full read 2026-09-13 22:06 UTC
 
 Source: `config/usage_stats.json`, `config/reputation.json`, `config/presence_state.json`, `config/astra.json`, plus local `run_simulation` / `run_optimise` (ledger not written). Pulse issue [#171](https://github.com/ThePeoplesVoice/grok-github-nexus/issues/171) is the public pin.
 
@@ -30,7 +30,7 @@ Source: `config/usage_stats.json`, `config/reputation.json`, `config/presence_st
 | Pulse pin | [#171](https://github.com/ThePeoplesVoice/grok-github-nexus/issues/171) (2026-09-12, Grok `ok`) |
 | Commit pin | [#170](https://github.com/ThePeoplesVoice/grok-github-nexus/issues/170) |
 | Complete last ok | [#164](https://github.com/ThePeoplesVoice/grok-github-nexus/issues/164) (2026-09-10) |
-| Open PRs | this hourly living PR |
+| Open PRs | living draft [#177](https://github.com/ThePeoplesVoice/grok-github-nexus/pull/177); this hour refines it |
 
 Living landings since the 9 Sep STATUS pass: local simulation runner ([#176](https://github.com/ThePeoplesVoice/grok-github-nexus/pull/176)), GRO-12 Voice Sense ([#169](https://github.com/ThePeoplesVoice/grok-github-nexus/pull/169)), Sense Lab v0 + Control Sector ([#166](https://github.com/ThePeoplesVoice/grok-github-nexus/pull/166)). `#176` was cursor[bot] and did not move `pr` under the old filter.
 
@@ -39,7 +39,7 @@ Living landings since the 9 Sep STATUS pass: local simulation runner ([#176](htt
 ## Next actions
 
 1. Thursday Complete — **2026-09-17** 10:00 UTC / 18:00 AWST. Do not dispatch early.
-2. Land one living collaborative PR. Human and cursor[bot] living PRs now count; Pulse labels and Dependabot do not. Layer 1 stays gated.
+2. Land the open living PR. `run_optimise` now says `land-open-living-pr` when `cursor[bot]` / `app/cursor` already has a reviewable draft — do not grind a third. Layer 1 stays gated.
 3. Recompute Astra via the organic script (ledger 2026-09-10 vs usage 35). Dry-run first.
 4. Next booked Naixus job.
 5. Sweep consumed automated issues after this pin lands — #155 is the prior pulse.
