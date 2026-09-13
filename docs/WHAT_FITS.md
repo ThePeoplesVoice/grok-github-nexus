@@ -31,8 +31,9 @@ Fail any one and defer. Tribute tokens fail (1). Extra Pulse issues fail (2). A 
 
 - Thursday Complete at 10:00 UTC / 18:00 AWST. Not before.
 - Wire `complete` into `nexus.usage` only on a genuine Grok `ok`. The function already accepts the type. The Complete runner is not calling it honestly.
-- Let the organic script recompute Astra. Do not hand-edit `config/astra.json`.
+- Let the organic script recompute Astra. Do not hand-edit `config/astra.json`. Dry-run first: `python -m nexus.scripts.run_simulation`.
 - Next booked Naixus job beats any new document.
+- Think in `nexus.simulate` before filing another Pulse. Extra analysis issues fail the high-signal test.
 
 ### Near (when the meters stop lying)
 

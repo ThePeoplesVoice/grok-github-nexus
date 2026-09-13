@@ -1,6 +1,6 @@
 """Nexus shared analysis core."""
 
-__version__ = "0.8.0"
+__version__ = "0.8.1"
 
 from .context import load_context, load_progressive, load_usage_stats, layer1_enabled, current_phase
 from .providers import call_grok, call_claude, format_api_error
@@ -33,6 +33,7 @@ from .astra import (
 from .presence import load_presence, format_presence_for_prompt
 from .runtime import after_successful_analysis, log_success
 from .field_notes import append_field_note, read_recent_notes, notes_summary_md
+from .simulate import format_report_md, observe, reassess
 
 __all__ = [
     "load_context",
@@ -68,4 +69,7 @@ __all__ = [
     "append_field_note",
     "read_recent_notes",
     "notes_summary_md",
+    "observe",
+    "reassess",
+    "format_report_md",
 ]
