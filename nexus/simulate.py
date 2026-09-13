@@ -15,6 +15,7 @@ from typing import Any
 
 from .astra import compute_astra, load_astra
 from .audit import alignment_signals, structural_health
+from .collab import usage_type_for_review
 from .context import current_phase, layer1_enabled, load_progressive
 from .presence import load_presence
 from .reputation import compute_reputation
@@ -26,7 +27,10 @@ SCENARIO_IDS = (
     "baseline",
     "recompute_astra",
     "plus_one_pr",
+    "plus_one_living_partner_pr",
     "plus_one_issue",
+    "plus_one_bot_pr",
+    "plus_one_automated_pr",
     "plus_one_pulse",
     "plus_one_complete",
     "idle_7",
@@ -60,6 +64,27 @@ def apply_usage_delta(
     out["last_updated"] = utc_now(now).strftime("%Y-%m-%dT%H:%M:%SZ")
     out["last_type"] = kind
     return out
+
+
+def project_review(
+    stats: dict[str, Any],
+    *,
+    login: str | None,
+    user_type: str | None = None,
+    labels: str | list[str] | None = None,
+    kind: str = "pr",
+    now: datetime | None = None,
+) -> tuple[dict[str, Any], bool]:
+    """Copy usage and increment only when the collab filter would allow it."""
+    increment = usage_type_for_review(
+        login=login,
+        user_type=user_type,
+        labels=labels,
+        kind=kind,
+    )
+    if increment is None:
+        return copy.deepcopy(stats), False
+    return apply_usage_delta(stats, increment, now=now), True
 
 
 def apply_idle(
@@ -208,11 +233,55 @@ def run_scenario(
             else "Current instruments, no delta."
         )
     elif scenario_id == "plus_one_pr":
-        projected = apply_usage_delta(usage, "pr", now=now)
-        note = "One collaborative PR review. This is the unlock-score path."
+        projected, counted = project_review(
+            usage, login="ThePeoplesVoice", user_type="User", now=now
+        )
+        note = (
+            "One human-authored PR review. This is the unlock-score path."
+            if counted
+            else "Human PR unexpectedly filtered — collab rule drifted."
+        )
+    elif scenario_id == "plus_one_living_partner_pr":
+        projected, counted = project_review(
+            usage, login="cursor[bot]", user_type="Bot", now=now
+        )
+        note = (
+            "cursor[bot] living partner PR without automated labels. "
+            "This hourly loop's reviewable tools count."
+            if counted
+            else "cursor[bot] was treated as grind. Unlock does not move."
+        )
     elif scenario_id == "plus_one_issue":
-        projected = apply_usage_delta(usage, "issue", now=now)
-        note = "One collaborative issue triage. Counts toward unlock score."
+        projected, counted = project_review(
+            usage, login="ThePeoplesVoice", user_type="User", kind="issue", now=now
+        )
+        note = (
+            "One collaborative issue triage. Counts toward unlock score."
+            if counted
+            else "Human issue unexpectedly filtered — collab rule drifted."
+        )
+    elif scenario_id == "plus_one_bot_pr":
+        projected, counted = project_review(
+            usage, login="dependabot[bot]", user_type="Bot", now=now
+        )
+        note = (
+            "Dependabot PR. Analysis may post; collaborative usage does not increment."
+            if not counted
+            else "Dependabot unexpectedly counted — collab rule drifted."
+        )
+    elif scenario_id == "plus_one_automated_pr":
+        projected, counted = project_review(
+            usage,
+            login="ThePeoplesVoice",
+            user_type="User",
+            labels="automated,nexus-pulse",
+            now=now,
+        )
+        note = (
+            "Automated-label PR is Pulse/Complete residue. Not unlock evidence."
+            if not counted
+            else "Automated labels unexpectedly counted — collab rule drifted."
+        )
     elif scenario_id == "plus_one_pulse":
         projected = apply_usage_delta(usage, "pulse", now=now)
         note = "Internal pulse churn. Usage rises; collaborative unlock score does not."
@@ -257,10 +326,16 @@ def recommend(
 
     pulse = by_id.get("plus_one_pulse") or {}
     pr = by_id.get("plus_one_pr") or {}
+    partner = by_id.get("plus_one_living_partner_pr") or {}
+    bot = by_id.get("plus_one_bot_pr") or {}
+    automated = by_id.get("plus_one_automated_pr") or {}
     baseline = by_id.get("baseline") or {}
     pulse_unlock = (pulse.get("scorecard") or {}).get("unlock_score")
     baseline_unlock = (baseline.get("scorecard") or {}).get("unlock_score")
     pr_unlock = (pr.get("scorecard") or {}).get("unlock_score")
+    partner_unlock = (partner.get("scorecard") or {}).get("unlock_score")
+    bot_unlock = (bot.get("scorecard") or {}).get("unlock_score")
+    automated_unlock = (automated.get("scorecard") or {}).get("unlock_score")
 
     actions: list[dict[str, Any]] = []
 
@@ -279,10 +354,11 @@ def recommend(
         "stance": "act",
         "leverage": "high",
         "why": (
-            f"Unlock score {baseline_unlock} → {pr_unlock} on +1 PR. "
+            f"Unlock score {baseline_unlock} → {pr_unlock} on a human PR, "
+            f"{baseline_unlock} → {partner_unlock} on a cursor[bot] living partner PR. "
             f"Layer 1 still gated on purpose (flag={layer1.get('flag_enabled')}, "
             f"analyses short {layer1.get('analyses_needed')}). "
-            "Internal pulse/self-audit churn is not the evidence."
+            "Dependabot, Pulse labels, and self-audit churn are not the evidence."
         ),
     })
 
@@ -307,6 +383,19 @@ def recommend(
             "why": (
                 f"Simulated +1 pulse leaves unlock score at {pulse_unlock}. "
                 "That path is noise."
+            ),
+        })
+
+    if bot_unlock == baseline_unlock and automated_unlock == baseline_unlock:
+        actions.append({
+            "id": "refuse-bot-grind-as-evidence",
+            "title": "Dependabot and automated-label PRs do not unlock Layer 1",
+            "stance": "hold",
+            "leverage": "high",
+            "why": (
+                f"Simulated dependabot and Pulse-label PRs leave unlock at "
+                f"{baseline_unlock}. cursor[bot] without those labels is the "
+                "living partner path, not a license to grind."
             ),
         })
 
