@@ -39,7 +39,7 @@ effective     = raw_score × decay_factor
 - Spendability deliberately off at launch
 - Full protocol: `ASTRA.md`
 - Computation: `nexus/astra.py`
-- Dry-run recompute: `python -m nexus.scripts.run_simulation` (never writes the ledger)
+- Dry-run recompute: `python -m nexus.scripts.run_simulation` then `python -m nexus.scripts.run_optimise` (never writes the ledger)
 
 ### Presence continuity
 
