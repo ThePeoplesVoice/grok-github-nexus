@@ -1,6 +1,6 @@
 """Nexus shared analysis core."""
 
-__version__ = "0.8.1"
+__version__ = "0.8.5"
 
 from .context import load_context, load_progressive, load_usage_stats, layer1_enabled, current_phase
 from .providers import call_grok, call_claude, format_api_error
@@ -13,8 +13,10 @@ from .audit import (
 )
 from .usage import (
     increment_usage,
+    record_counted_review,
     record_successful_analysis,
     save_usage_stats,
+    usage_push_refspec,
 )
 from .reputation import (
     compute_reputation,
@@ -34,6 +36,15 @@ from .presence import load_presence, format_presence_for_prompt
 from .runtime import after_successful_analysis, log_success
 from .field_notes import append_field_note, read_recent_notes, notes_summary_md
 from .simulate import format_report_md, observe, reassess
+from .optimise import (
+    choose_next_move,
+    format_optimisation_md,
+    headline,
+    observe_open_reviews,
+    optimise,
+    rank_living_reviews,
+    superseded_close_actions,
+)
 
 __all__ = [
     "load_context",
@@ -50,8 +61,10 @@ __all__ = [
     "build_self_audit_prompt",
     "format_audit_footer",
     "increment_usage",
+    "record_counted_review",
     "record_successful_analysis",
     "save_usage_stats",
+    "usage_push_refspec",
     "compute_reputation",
     "refresh_reputation",
     "load_reputation",
@@ -72,4 +85,11 @@ __all__ = [
     "observe",
     "reassess",
     "format_report_md",
+    "optimise",
+    "headline",
+    "format_optimisation_md",
+    "observe_open_reviews",
+    "choose_next_move",
+    "rank_living_reviews",
+    "superseded_close_actions",
 ]

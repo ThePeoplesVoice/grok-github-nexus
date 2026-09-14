@@ -21,6 +21,7 @@ DEFAULT_PATH = ROOT / "config" / "usage_stats.json"
 VALID_TYPES = ("commit", "pr", "issue", "self_audit", "pulse", "complete", "other")
 COLLABORATIVE_TYPES = ("pr", "issue")
 INTERNAL_TYPES = tuple(t for t in VALID_TYPES if t not in COLLABORATIVE_TYPES)
+COUNTED_REVIEWS_KEY = "counted_reviews"
 
 
 def _defaults() -> dict[str, Any]:
@@ -112,3 +113,87 @@ def record_successful_analysis(
 ) -> dict[str, Any]:
     """Convenience alias used by runners after a successful Grok/Claude call."""
     return increment_usage(analysis_type, path=path, persist=persist)
+
+
+def review_count_token(kind: str, number: int | str | None) -> str | None:
+    """Stable id for one collaborative review. Rejects junk so the meter cannot double-count."""
+    kind = (kind or "").strip().lower()
+    if kind not in COLLABORATIVE_TYPES:
+        return None
+    try:
+        parsed = int(number)  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return None
+    if parsed <= 0:
+        return None
+    return f"{kind}:{parsed}"
+
+
+def counted_reviews(stats: dict[str, Any] | None) -> list[str]:
+    raw = (stats or {}).get(COUNTED_REVIEWS_KEY) or []
+    if not isinstance(raw, list):
+        return []
+    return [str(item).strip() for item in raw if str(item).strip()]
+
+
+def already_counted(
+    stats: dict[str, Any] | None,
+    kind: str,
+    number: int | str | None,
+) -> bool:
+    token = review_count_token(kind, number)
+    if not token:
+        return False
+    return token in counted_reviews(stats)
+
+
+def record_counted_review(
+    kind: str,
+    number: int | str | None,
+    *,
+    path: str | Path | None = None,
+    persist: bool = True,
+) -> tuple[dict[str, Any], bool]:
+    """Increment once per (kind, number). Returns ``(stats, applied)``.
+
+    The PR analyzer on #179 classified ``cursor[bot]`` as living and
+    incremented ``pr`` 3→4, then committed on a detached merge HEAD.
+    ``git push`` died with "not currently on a branch" and the evidence
+    evaporated. Counting the same review twice on the retry would be
+    the next lie. This function is the meter; the workflow refspec is
+    the write path.
+    """
+    stats = load_usage_stats(path)
+    token = review_count_token(kind, number)
+    if not token:
+        return stats, False
+    seen = counted_reviews(stats)
+    if token in seen:
+        return stats, False
+    stats = increment_usage(kind, path=path, persist=False)
+    seen = counted_reviews(stats)
+    if token not in seen:
+        seen.append(token)
+    stats[COUNTED_REVIEWS_KEY] = seen
+    if persist:
+        save_usage_stats(stats, path)
+    return stats, True
+
+
+def usage_push_refspec(head_ref: str | None) -> str | None:
+    """Refspec that persists a usage commit onto the PR branch.
+
+    Actions checks out the merge commit (detached HEAD). ``git push``
+    with no refspec fails. ``HEAD:refs/heads/<head_ref>`` is the honest
+    write. Rejects anything that is not a simple branch name.
+    """
+    ref = (head_ref or "").strip()
+    if not ref:
+        return None
+    if ref.startswith("-") or ref.startswith("/") or ".." in ref or ":" in ref:
+        return None
+    if any(ch in ref for ch in (" ", "\n", "\t", "\\", "@", "{")):
+        return None
+    if not all(ch.isalnum() or ch in "._/-" for ch in ref):
+        return None
+    return f"HEAD:refs/heads/{ref}"
