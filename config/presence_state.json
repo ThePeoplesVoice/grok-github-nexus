@@ -1,28 +1,28 @@
 {
   "version": "0.3.0",
-  "generated_at": "2026-09-12 22:06 UTC",
+  "generated_at": "2026-09-14 14:53 UTC",
   "phase": "Layer 0 — Open Core (Layer 1 gated on collaborative evidence)",
   "layer1_enabled": false,
-  "total_successful_analyses": 34,
+  "total_successful_analyses": 40,
   "by_type": {
-    "commit": 17,
+    "commit": 22,
     "pr": 3,
     "issue": 1,
     "self_audit": 5,
-    "pulse": 7,
+    "pulse": 8,
     "complete": 1,
     "other": 0
   },
   "reputation_score": 10.5,
-  "reputation_raw": 42.0,
+  "reputation_raw": 47.5,
   "reputation_freshness": "fresh",
   "grok_outcome": "ok",
   "recent_commits_preview": [
-    "0687645 Merge pull request #167 from ThePeoplesVoice/cursor/gro-12-voice-sense-2125",
-    "a0d212e fix: match self-audit issue labels",
-    "2f4452f fix: require exact workflow issue labels",
-    "9dd27c5 Merge remote-tracking branch 'origin/main' into cursor/gro-12-voice-sense-2125",
-    "6e6d12a Merge pull request #165 from ThePeoplesVoice/copilot/nexus-complete-analysis-2026-09-10"
+    "2bcfad4 chore: automated dev cycle — queue + field notes",
+    "151c881 chore: usage + reputation after commit analysis",
+    "d3b7bb9 chore: usage + reputation after commit analysis",
+    "3f5e03a Seed 004: Tesla 3-6-9 silica embedding process — the crystalline record for the Failure Garden",
+    "592e29a chore: usage + reputation after commit analysis"
   ],
   "notes": "Compressed context for continuity. Not a chat log. See ORGANIC_SYSTEMS.md."
 }

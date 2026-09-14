@@ -1,17 +1,17 @@
 {
   "version": "1.1.1",
   "description": "Lightweight counters for progressive unlock triggers. Incremented after successful analysis.",
-  "total_successful_analyses": 39,
+  "total_successful_analyses": 40,
   "by_type": {
     "commit": 22,
     "pr": 3,
     "issue": 1,
     "self_audit": 5,
-    "pulse": 7,
+    "pulse": 8,
     "complete": 1,
     "other": 0
   },
-  "last_updated": "2026-09-14T12:30:23Z",
-  "last_type": "commit",
+  "last_updated": "2026-09-14T14:54:14Z",
+  "last_type": "pulse",
   "notes": "Backfilled three living PR reviews (#134, #135, #142) that the meter had missed. Collaborative counters now match reality."
 }
