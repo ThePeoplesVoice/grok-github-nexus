@@ -39,6 +39,7 @@ source .venv/bin/activate
 pip install -e .
 python -m nexus.scripts.run_health_check
 python -m nexus.scripts.run_simulation
+python -m nexus.scripts.run_optimise
 python -m nexus.scripts.run_dev_cycle
 ```
 

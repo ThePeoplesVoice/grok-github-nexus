@@ -29,6 +29,7 @@ This is not autopilot feature spam. It is disciplined iteration.
 | `config/field_notes.jsonl` | Append-only continuity notes |
 | `nexus/scripts/run_dev_cycle.py` | Cycle runner (no external AI required) |
 | `nexus/scripts/run_simulation.py` | Observe → simulate → recommend (no AI, no issues, no Astra write) |
+| `nexus/scripts/run_optimise.py` | Integrate simulation into board decisions; optional queue retire (still no Astra write) |
 | `.github/workflows/nexus-dev-cycle.yml` | Schedule + dispatch |
 | Self-audit / Pulse | Deeper critique + narrative memory |
 | Health check | Fast fail on structural breakage |
@@ -65,6 +66,7 @@ This is not autopilot feature spam. It is disciplined iteration.
 pip install -e .
 python -m nexus.scripts.run_health_check
 python -m nexus.scripts.run_simulation
+python -m nexus.scripts.run_optimise
 python -m nexus.scripts.run_dev_cycle
 # Then implement top `next` items from config/dev_queue.json
 # Optionally: workflow_dispatch self-audit / pulse when secrets present

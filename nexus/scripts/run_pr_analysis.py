@@ -9,7 +9,7 @@ from pathlib import Path
 import requests
 
 from nexus.analyze import build_pr_prompt, fusion_note, footer_block, utc_now_str
-from nexus.collab import is_collaborative_review_target, parse_label_list
+from nexus.collab import parse_label_list, usage_type_for_review
 from nexus.context import load_context, load_progressive, layer1_enabled, current_phase
 from nexus.gates import gate_summary, requires_human_gate
 from nexus.memory import memory_block_for_prompt, record_memory
@@ -95,11 +95,12 @@ def main() -> None:
     author_type = author.get("type") or os.environ.get("PR_AUTHOR_TYPE", "")
     label_names = [str((label or {}).get("name") or "") for label in (pr_data.get("labels") or [])]
     label_names.extend(parse_label_list(os.environ.get("PR_LABELS", "")))
-    collaborative = bool(pr_number) and is_collaborative_review_target(
+    collaborative = bool(pr_number) and usage_type_for_review(
         login=author_login,
         user_type=author_type,
         labels=label_names,
-    )
+        kind="pr",
+    ) == "pr"
     print(f"✅ PR: {pr_title} ({pr_files} files)")
     print(f"🤝 Collaborative target: {collaborative} ({author_login or 'unknown'})")
 
