@@ -37,7 +37,7 @@ If a proposed expansion fails any leg of the triad, it is deferred or redesigned
 5. **Act or defer** — human review for high-impact changes; low-risk via normal PR.
 6. **Record** — Pulse + self-audit issues + presence_state as permanent memory.
 
-Implemented by `nexus-self-audit`, `nexus-pulse`, `nexus-health-check`, and local `run_simulation` (observe → simulate → recommend without writing Astra or filing issues).
+Implemented by `nexus-self-audit`, `nexus-pulse`, `nexus-health-check`, and local `run_simulation` / `run_optimise` (observe → simulate → recommend → integrate without writing Astra or filing issues).
 
 ---
 

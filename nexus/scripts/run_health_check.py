@@ -16,6 +16,8 @@ from nexus.reputation import compute_reputation, reputation_summary_md
 from nexus.presence import load_presence, format_presence_for_prompt
 from nexus.context import load_context, load_progressive
 from nexus.field_notes import notes_summary_md
+from nexus.optimise import headline, optimise
+from nexus.simulate import reassess
 
 
 def main() -> int:
@@ -71,6 +73,16 @@ def main() -> int:
     except Exception as e:
         print(f"⚠️ field notes: {e}")
 
+    sim_headline = ""
+    try:
+        sim_report = reassess()
+        opt = optimise(sim_report, discover=True)
+        sim_headline = opt.get("headline") or headline(sim_report)
+        print(f"✅ simulation/optimise {sim_headline}")
+    except Exception as e:
+        errors.append(f"simulation: {e}")
+        print(f"❌ simulation: {e}")
+
     health = structural_health()
     signals = alignment_signals()
     snap = progressive_snapshot()
@@ -94,6 +106,7 @@ def main() -> int:
 **Analyses:** {snap.get('total_successful_analyses')}  
 **Reputation effective:** {rep.get('score', 'n/a')} ({rep.get('freshness', 'n/a')})  
 **Presence:** {presence.get('generated_at') if 'presence' in dir() else 'n/a'}  
+**Simulation:** {sim_headline or 'n/a'}  
 **Errors:** {errors or 'none'}
 
 Missing structural items: {health['missing'] or 'none'}
