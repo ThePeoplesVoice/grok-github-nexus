@@ -14,6 +14,7 @@ from nexus.simulate import (
     complete_hold_state,
     format_report_md,
     layer1_distance,
+    project_review,
     reassess,
     recommend,
     run_scenario,
@@ -53,6 +54,26 @@ def test_plus_one_pr_raises_unlock_score():
     assert after["scorecard"]["unlock_score"] == baseline["scorecard"]["unlock_score"] + 3.0
     assert after["scorecard"]["usage_total"] == 36
     assert after["scorecard"]["by_type"]["pr"] == 4
+
+
+def test_living_partner_pr_raises_unlock_score():
+    after = run_scenario("plus_one_living_partner_pr", SAMPLE_USAGE, now=NOW)
+    baseline = run_scenario("baseline", SAMPLE_USAGE, now=NOW)
+    assert after["scorecard"]["unlock_score"] == baseline["scorecard"]["unlock_score"] + 3.0
+    projected, counted = project_review(
+        SAMPLE_USAGE, login="cursor[bot]", user_type="Bot", now=NOW
+    )
+    assert counted is True
+    assert projected["by_type"]["pr"] == 4
+
+
+def test_dependabot_and_automated_pr_do_not_raise_unlock_score():
+    baseline = run_scenario("baseline", SAMPLE_USAGE, now=NOW)
+    bot = run_scenario("plus_one_bot_pr", SAMPLE_USAGE, now=NOW)
+    automated = run_scenario("plus_one_automated_pr", SAMPLE_USAGE, now=NOW)
+    assert bot["scorecard"]["unlock_score"] == baseline["scorecard"]["unlock_score"]
+    assert automated["scorecard"]["unlock_score"] == baseline["scorecard"]["unlock_score"]
+    assert bot["scorecard"]["usage_total"] == baseline["scorecard"]["usage_total"]
 
 
 def test_plus_one_pulse_does_not_raise_unlock_score():
@@ -138,6 +159,7 @@ def test_reassess_is_dry_run_on_disk(tmp_path: Path):
     assert "hold-complete" in ids
     assert "one-living-collaborative-pr" in ids
     assert "refuse-pulse-grind" in ids
+    assert "refuse-bot-grind-as-evidence" in ids
     assert "recompute-astra-from-reputation" in ids
     assert "hold-layer1-flag" in ids
 

@@ -6,6 +6,7 @@ from nexus.collab import (
     is_bot_actor,
     is_collaborative_review_target,
     labels_are_automated,
+    usage_type_for_review,
 )
 
 
@@ -39,3 +40,25 @@ def test_living_issue_counts():
         user_type="User",
         labels="enhancement",
     ) is True
+
+
+def test_cursor_partner_bot_counts_without_automated_labels():
+    assert is_collaborative_review_target(
+        login="cursor[bot]",
+        user_type="Bot",
+    ) is True
+    assert usage_type_for_review(login="cursor[bot]", user_type="Bot") == "pr"
+
+
+def test_cursor_partner_bot_does_not_count_pulse_labels():
+    assert is_collaborative_review_target(
+        login="cursor[bot]",
+        user_type="Bot",
+        labels="automated,nexus-pulse",
+    ) is False
+    assert usage_type_for_review(
+        login="cursor[bot]",
+        user_type="Bot",
+        labels="nexus-complete",
+        kind="issue",
+    ) is None
