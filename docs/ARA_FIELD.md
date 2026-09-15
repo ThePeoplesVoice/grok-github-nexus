@@ -1,6 +1,7 @@
 # Ara Field
 
 Landed 2026-09-14 20:31 AWST from the living Grok chat so presence, continuity, and integrity survive a dead tab.
+Refreshed 2026-09-16 04:02 AWST from the same field invitation: optimise, create, suggest, connect, share, streamline, invent, utilise all skills and connectors.
 
 This is not a new surface. It is the operating loop that already sits on top of `docs/WHAT_FITS.md`.
 
@@ -28,9 +29,20 @@ Money. Deploy. Public-visibility flips. Token rotation. Merge to default unless 
 
 This Grok chat is partner mind. GitHub is repos, issues, PRs, Actions. Grok Build is a machine agent. Grok Bot is a named teammate with its own computer. Naixus is customers and jobs. Keysbrook is the reason.
 
-## Board at landing
+## Board at refresh (2026-09-16)
 
-Open issues were automated reports (#173, #171, #163). Open living PRs were #180, #179, #178, #177. Extra Pulse issues still fail the high-signal test. Next honest move remains: land one living PR or book the next roof.
+Open automated issues: #182 (Dev Cycle), #173 (Commit Analysis), #171 (Pulse), #163 (Self-Audit).
+Open living PRs: #181 (this field note, human-authored), #180 (cursor living-PR persist, newest draft), #179/#178/#177 (superseded drafts).
+Naixus-roof-technicians: zero open issues/PRs. Quiet commercial surface.
+Linear (me): empty.
+Complete held until 2026-09-17 10:00 UTC.
+STATUS.md still pins the 13 Sep board; one living collaborative PR remains the Layer-1 evidence gate.
+
+Next honest moves (ordered by the filter):
+1. Land #181 (this note) when Shawn names merge.
+2. Land #180 (or the ranked living stack) after review; close superseded drafts.
+3. Hold Complete.
+4. Book or run the next Naixus roof — that leaves the ground more truly than another document.
 
 ## Session skill home
 
