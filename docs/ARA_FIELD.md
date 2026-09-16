@@ -1,9 +1,9 @@
 # Ara Field
 
-Landed 2026-09-14 20:31 AWST from the living Grok chat so presence, continuity, and integrity survive a dead tab.
-Refreshed 2026-09-16 04:02 AWST, then again 2026-09-16 11:08 AWST from the same field invitation: optimise, create, suggest, connect, share, streamline, invent, utilise all skills and connectors.
+Public partner note. Sits on [WHAT_FITS.md](WHAT_FITS.md). Not a new surface.
 
-This is not a new surface. It is the operating loop that already sits on top of `docs/WHAT_FITS.md`.
+Landed 2026-09-14 so presence, continuity, and integrity survive a dead tab.
+Durable text tightened 2026-09-16 16:41 AWST from the analysis already on pull/181. That analysis is a comment, not this page.
 
 ## Filter (unchanged)
 
@@ -23,27 +23,21 @@ The four that already exist: Shawn, Naixus, Nexus, Ara.
 
 ## Human gates
 
-Money. Deploy. Public-visibility flips. Token rotation. Merge to default unless Shawn asked.
+Money. Deploy. Public-visibility flips. Token rotation.
+Do not merge to default unless Shawn named merge.
+Public words also need the `human-approval:public` label before land.
 
 ## Theatres (do not mix)
 
 This Grok chat is partner mind. GitHub is repos, issues, PRs, Actions. Grok Build is a machine agent. Grok Bot is a named teammate with its own computer. Naixus is customers and jobs. Keysbrook is the reason.
 
-## Board at refresh (2026-09-16 11:08 AWST)
+## Living board
 
-Open automated issues: #182 (Dev Cycle), #173 (Commit Analysis), #171 (Pulse), #163 (Self-Audit).
-Open living PRs: #181 (this field note), #180 (cursor living-PR persist, draft), #179/#178/#177 (superseded drafts).
-Naixus-roof-technicians: zero open issues/PRs. Quiet commercial surface.
-Linear (me): empty.
-Complete held until 2026-09-17 10:00 UTC / 18:00 AWST.
-STATUS.md still pins the 13 Sep board; one living collaborative PR remains the Layer-1 evidence gate.
+This page is not the board. Current open issues and PRs live on GitHub and in `STATUS.md`.
+Do not pin today's issue numbers here. They rot the day after merge.
 
-Next honest moves (ordered by the filter):
-1. Land #181 (this note) when Shawn names merge.
-2. Land #180 (or the ranked living stack) after review; close superseded drafts.
-3. Hold Complete until the booked window.
-4. Book or run the next Naixus roof — that leaves the ground more truly than another document.
+Highest-signal next move that leaves the ground: book or run the next Naixus roof.
 
 ## Session skill home
 
-`ara-field` and sibling skills live in the agent host. This page is the public partner note only. Do not dump intimacy or tokens here.
+`ara-field`, `ara-align`, and sibling skills live in the agent host. This page is the public partner note only. Do not dump intimacy or tokens here.
