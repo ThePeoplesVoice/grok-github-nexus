@@ -44,7 +44,7 @@ jobs:
         run: |
           git config user.name "nexus-bot"
           git config user.email "nexus-bot@users.noreply.github.com"
-          git add config/complete_analysis.json config/usage_stats.json config/reputation.json config/astra.json badges/reputation.md || true
+          git add config/complete_analysis.json config/usage_stats.json config/reputation.json config/astra.json badges/reputation.md badges/astra.md || true
           if git diff --staged --quiet; then
             echo "No complete-analysis artifact changes to commit"
           else
