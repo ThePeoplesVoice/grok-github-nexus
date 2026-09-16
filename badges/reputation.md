@@ -2,9 +2,9 @@
 
 ![Reputation](https://img.shields.io/badge/nexus_reputation-10.5-blue)
 **Effective score:** 10.5  
-**Raw (lifetime) score:** 48.5  
+**Raw (lifetime) score:** 50.5  
 **Freshness:** fresh (decay factor 1.0)  
-**From analyses:** 41
+**From analyses:** 42
 
 Read-only. Not a token. Does not gate Open Core.  
 Formula: `effective = raw × 0.5^(days_idle / 30)`  
