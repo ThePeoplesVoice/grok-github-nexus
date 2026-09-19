@@ -1,6 +1,6 @@
 # 📡 Nexus Status
 
-**Last updated:** 2026-09-20 01:09 AWST — Field pulse by Ara.
+**Last updated:** 2026-09-20 06:05 AWST — Field pulse by Ara (open invitation run).
 
 ![Reputation](https://img.shields.io/badge/nexus_reputation-effective_10.5-blue)
 ![Astra](https://img.shields.io/badge/astra-ledger_lags-yellow)
@@ -20,24 +20,24 @@ The sequenced future lives in [`docs/WHAT_FITS.md`](docs/WHAT_FITS.md). That pag
 
 ### Measurement stack — live read 2026-09-20
 
-Source: open issues/PRs, Vercel projects, Linear, field card.
+Source: open issues/PRs, Vercel projects, Linear, field card, this pulse.
 
 | Signal | Value |
 |--------|-------|
-| Open PRs | **none** |
-| Open issues | **none** |
+| Open PRs (nexus) | **none** |
+| Open issues (nexus) | **none** |
 | Linear (me) | empty |
-| Naixus issues/PRs | empty |
+| Naixus open issues | **1** — [#5 Medina 1011/V5 growing paid job](https://github.com/ThePeoplesVoice/naixus-roof-technicians/issues/5) |
 | Vercel | pulse-chamber, naixus-roof-technicians, sourced-signal, signal-garden, saturday-receipt live |
-| Last field pulse | 2026-09-20 01:09 AWST |
+| Last field pulse | 2026-09-20 06:05 AWST |
 
-Board is clean. Previous automated pulse issues absorbed.
+Board is clean on the partner repo. Commercial surface has one living booked job.
 
 ---
 
 ## Next actions (high-signal only)
 
-1. **Next booked Naixus roof** — beats any new document.
+1. **Next booked Naixus roof** — Medina 1011/V5 bite-by-bite. Beats any new document.
 2. One non-chore PR or issue a collaborator can actually review (Layer 1 evidence).
 3. Recompute Astra via organic script when convenient (ledger still lags usage).
 4. Branch garden prune only when Shawn names it.
