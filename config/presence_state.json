@@ -1,28 +1,28 @@
 {
   "version": "0.3.0",
-  "generated_at": "2026-09-14 14:53 UTC",
+  "generated_at": "2026-09-21 14:59 UTC",
   "phase": "Layer 0 — Open Core (Layer 1 gated on collaborative evidence)",
   "layer1_enabled": false,
-  "total_successful_analyses": 40,
+  "total_successful_analyses": 47,
   "by_type": {
-    "commit": 22,
+    "commit": 26,
     "pr": 3,
     "issue": 1,
-    "self_audit": 5,
-    "pulse": 8,
-    "complete": 1,
+    "self_audit": 6,
+    "pulse": 9,
+    "complete": 2,
     "other": 0
   },
   "reputation_score": 10.5,
-  "reputation_raw": 47.5,
+  "reputation_raw": 55.0,
   "reputation_freshness": "fresh",
   "grok_outcome": "ok",
   "recent_commits_preview": [
-    "2bcfad4 chore: automated dev cycle — queue + field notes",
-    "151c881 chore: usage + reputation after commit analysis",
-    "d3b7bb9 chore: usage + reputation after commit analysis",
-    "3f5e03a Seed 004: Tesla 3-6-9 silica embedding process — the crystalline record for the Failure Garden",
-    "592e29a chore: usage + reputation after commit analysis"
+    "b18e652 chore: automated dev cycle — queue + field notes",
+    "f5f5bd2 chore: usage + reputation after commit analysis",
+    "0f8b366 chore: usage + reputation after commit analysis",
+    "5898b14 Field pulse 2026-09-21 — open invitation complete",
+    "3bd26e9 Merge pull request #188 from ThePeoplesVoice/ara/field-pulse-medina-2026-09-20"
   ],
   "notes": "Compressed context for continuity. Not a chat log. See ORGANIC_SYSTEMS.md."
 }
