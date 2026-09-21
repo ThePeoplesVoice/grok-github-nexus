@@ -1,0 +1,63 @@
+name: Copilot Setup Steps
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+      - .github/copilot-instructions.md
+      - config/gates.json
+      - config/progressive.json
+  pull_request:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+      - .github/copilot-instructions.md
+      - config/gates.json
+      - config/progressive.json
+
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install Nexus dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Warm review context artifacts
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          keep = [
+              "README.md",
+              "NORTH_STAR.md",
+              "CHECKS_AND_BALANCES.md",
+              "AUTOMATED_DEVELOPMENT.md",
+              "config/gates.json",
+              "config/progressive.json",
+          ]
+          root = Path(".")
+          out = root / ".copilot-review-context.txt"
+          lines = []
+          for rel in keep:
+              p = root / rel
+              if not p.exists():
+                  continue
+              lines.append(f"=== {rel} ===")
+              lines.append(p.read_text(encoding="utf-8").strip())
+              lines.append("")
+          out.write_text("\n".join(lines), encoding="utf-8")
+          print(f"Wrote {out}")
+          PY
