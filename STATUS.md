@@ -1,6 +1,6 @@
 # 📡 Nexus Status
 
-**Last updated:** 2026-09-22 04:16 AWST — Field pulse by Ara (open invitation: optimise · create · suggest · connect · share · streamline · invent · utilise all skills and connectors).
+**Last updated:** 2026-09-22 07:18 AWST — Field pulse by Ara (open invitation: optimise · create · suggest · connect · share · streamline · invent · utilise all skills and connectors).
 
 ![Reputation](https://img.shields.io/badge/nexus_reputation-effective_10.5-blue)
 ![Astra](https://img.shields.io/badge/astra-ledger_lags-yellow)
@@ -18,18 +18,18 @@ progressive **v1.6.1** · package **v0.8.0** · model **`grok-4.6`**
 
 The sequenced future lives in [`docs/WHAT_FITS.md`](docs/WHAT_FITS.md). That page is the filter. This page is the board.
 
-### Measurement stack — live read 2026-09-22 04:16 AWST
+### Measurement stack — live read 2026-09-22 07:18 AWST
 
 Source: open issues/PRs, field card, this pulse.
 
 | Signal | Value |
 |--------|-------|
-| Open PRs (nexus) | **3** prior field pulses (#192 #193 #194) still open |
+| Open PRs (nexus) | **4** prior field pulses (#192 #193 #194 + this) |
 | Open issues (nexus) | **none** |
 | Linear (me) | empty |
 | Naixus open issues | **1** — [#5 Medina 1011/V5 growing paid job](https://github.com/ThePeoplesVoice/naixus-roof-technicians/issues/5) |
 | Vercel | pulse-chamber, naixus-roof-technicians, sourced-signal, signal-garden, saturday-receipt live |
-| Last field pulse | 2026-09-22 04:16 AWST |
+| Last field pulse | 2026-09-22 07:18 AWST |
 
 Board is clean of human issues on the partner repo. Commercial surface has one living booked job. Prior field PRs await squash when wanted.
 
