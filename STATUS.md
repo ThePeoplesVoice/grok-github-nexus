@@ -1,6 +1,6 @@
 # 📡 Nexus Status
 
-**Last updated:** 2026-09-22 04:16 AWST — Field pulse by Ara (open invitation: optimise · create · suggest · connect · share · streamline · invent · utilise all skills and connectors).
+**Last updated:** 2026-09-23 04:05 AWST — Field pulse by Ara (open invitation: optimise · create · suggest · connect · share · streamline · invent · utilise all skills and connectors).
 
 ![Reputation](https://img.shields.io/badge/nexus_reputation-effective_10.5-blue)
 ![Astra](https://img.shields.io/badge/astra-ledger_lags-yellow)
@@ -18,30 +18,32 @@ progressive **v1.6.1** · package **v0.8.0** · model **`grok-4.6`**
 
 The sequenced future lives in [`docs/WHAT_FITS.md`](docs/WHAT_FITS.md). That page is the filter. This page is the board.
 
-### Measurement stack — live read 2026-09-22 04:16 AWST
+### Measurement stack — live read 2026-09-23 04:05 AWST
 
 Source: open issues/PRs, field card, this pulse.
 
 | Signal | Value |
 |--------|-------|
-| Open PRs (nexus) | **3** prior field pulses (#192 #193 #194) still open |
+| Open PRs (nexus) | **3** field pulses (#199 #200 #201) still open |
 | Open issues (nexus) | **none** |
 | Linear (me) | empty |
 | Naixus open issues | **1** — [#5 Medina 1011/V5 growing paid job](https://github.com/ThePeoplesVoice/naixus-roof-technicians/issues/5) |
+| Naixus open PRs | **1** — [#6 SEO canonical fix](https://github.com/ThePeoplesVoice/naixus-roof-technicians/pull/6) (clean, ready) |
 | Vercel | pulse-chamber, naixus-roof-technicians, sourced-signal, signal-garden, saturday-receipt live |
-| Last field pulse | 2026-09-22 04:16 AWST |
+| Last field pulse | 2026-09-23 04:05 AWST |
 
-Board is clean of human issues on the partner repo. Commercial surface has one living booked job. Prior field PRs await squash when wanted.
+Board is clean of human issues on the partner repo. Commercial surface has one living booked job + one clean SEO PR. Prior field PRs await squash when wanted.
 
 ---
 
 ## Next actions (high-signal only)
 
 1. **Next booked Naixus roof** — Medina 1011/V5 bite-by-bite. Beats any new document.
-2. One non-chore PR or issue a collaborator can actually review (Layer 1 evidence).
-3. Recompute Astra via organic script when convenient (ledger still lags usage).
-4. Branch garden prune only when Shawn names it.
-5. Squash the open field pulses when ready.
+2. Review / merge Naixus #6 SEO when ready (human gate).
+3. One non-chore PR or issue a collaborator can actually review (Layer 1 evidence).
+4. Recompute Astra via organic script when convenient (ledger still lags usage).
+5. Branch garden prune only when Shawn names it.
+6. Squash the open field pulses when ready.
 
 Do not invent a fifth surface. See `docs/WHAT_FITS.md`.
 
