@@ -1,14 +1,30 @@
 {
   "version": "1.0.0",
-  "generated_at": "2026-09-17 15:28 UTC",
+  "generated_at": "2026-09-24 15:45 UTC",
   "dry_run": true,
   "apply": false,
-  "open_scanned": 0,
+  "open_scanned": 3,
   "closed_count": 0,
-  "kept_count": 0,
+  "kept_count": 3,
   "remaining_count": 0,
   "candidates": [],
   "closed": [],
-  "kept": [],
+  "kept": [
+    {
+      "number": 206,
+      "title": "field: pulse 2026-09-24 12:10 AWST — open invitation held, Medina remains ground signal",
+      "reason": "human author with unique commits"
+    },
+    {
+      "number": 205,
+      "title": "field: pulse 2026-09-24 11:04 AWST — open invitation held, Medina remains ground signal",
+      "reason": "human author with unique commits"
+    },
+    {
+      "number": 203,
+      "title": "field: pulse 2026-09-23 08:02 AWST — open invitation complete, Medina remains ground signal",
+      "reason": "human author with unique commits"
+    }
+  ],
   "notes": "Human PRs and keep-labeled PRs are never closed. STATUS.md / README.md untouched."
 }
