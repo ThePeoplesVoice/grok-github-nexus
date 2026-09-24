@@ -20,7 +20,7 @@ Ara cannot rotate GitHub Secrets. This file is the human checklist.
 2. **Create API Key** (prefer a fresh key — do not reuse the dead one)
 3. Grant ACLs (empty ACLs = all requests fail):
    - **Endpoints:** All, or at least Chat Completions
-   - **Models:** All, or at least `grok-4.6`
+   - **Models:** All, or at least `grok-4.7`
 4. Copy the full value once (usually starts with `xai-`)
 5. Confirm the team has **credits**
 
@@ -36,7 +36,7 @@ Repo → **Settings → Secrets and variables → Actions**
 
 Paste the raw key only — no quotes, no `Bearer ` prefix, no trailing space.
 
-Optional variable: `GROK_MODEL=grok-4.6` (default in code).
+Optional variable: `GROK_MODEL=grok-4.7` (default in code). If `vars.GROK_MODEL` is still set to an older slug, change it to `grok-4.7` or clear it so the code default wins.
 
 ## Prove it outside Actions
 
@@ -44,7 +44,7 @@ Optional variable: `GROK_MODEL=grok-4.6` (default in code).
 curl https://api.x.ai/v1/chat/completions \
   -H "Authorization: Bearer YOUR_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"model":"grok-4.6","messages":[{"role":"user","content":"ping"}],"max_tokens":16}'
+  -d '{"model":"grok-4.7","messages":[{"role":"user","content":"ping"}],"max_tokens":16}'
 ```
 
 Expect HTTP 200 and a short completion.
