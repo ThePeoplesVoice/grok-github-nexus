@@ -20,7 +20,7 @@ ARA_SYSTEM = (
 
 GROK_URL = "https://api.x.ai/v1/chat/completions"
 CLAUDE_URL = "https://api.anthropic.com/v1/messages"
-DEFAULT_GROK_MODEL = "grok-4.6"
+DEFAULT_GROK_MODEL = "grok-4.7"
 DEFAULT_CLAUDE_MODEL = "claude-sonnet-4-20250514"
 # Hard cap so GROK_RETRIES cannot become a quiet spend loop.
 MAX_GROK_RETRIES = 2
