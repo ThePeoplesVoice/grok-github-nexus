@@ -1,10 +1,10 @@
 {
   "version": "0.2.0",
   "description": "Read-only contribution reputation derived from usage_stats. Not a currency.",
-  "raw_score": 57.0,
+  "raw_score": 58.0,
   "unlock_score": 10.5,
   "collaborative_score": 10.5,
-  "internal_score": 46.5,
+  "internal_score": 47.5,
   "score": 10.5,
   "decay_factor": 1.0,
   "days_idle": 0.0,
@@ -15,7 +15,7 @@
     "commit": 26.0,
     "self_audit": 14.0,
     "pulse": 4.5,
-    "complete": 2.0,
+    "complete": 3.0,
     "other": 0.0
   },
   "weights": {
@@ -28,8 +28,8 @@
     "other": 0.5
   },
   "half_life_days": 30.0,
-  "total_successful_analyses": 48,
-  "last_activity": "2026-09-23T14:05:07Z",
-  "last_computed": "2026-09-23T14:05:07Z",
+  "total_successful_analyses": 49,
+  "last_activity": "2026-09-24T14:34:09Z",
+  "last_computed": "2026-09-24T14:34:09Z",
   "notes": "effective score is derived from collaborative evidence (PR and issue work) only. Internal pulse/self-audit churn is tracked for visibility but does not unlock progress."
 }

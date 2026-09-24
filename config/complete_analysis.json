@@ -1,54 +1,54 @@
 {
   "version": "1.1.0",
-  "generated_at": "2026-09-17 14:35 UTC",
+  "generated_at": "2026-09-24 14:34 UTC",
   "source": "grok",
-  "summary": "Layer 0 is stable: usage 42, fresh reputation 10.26, Astra 10.5, and no open PRs. Layer 1 stays gated on thin collaborative evidence (3 PR analyses, 1 issue). Board noise is the blocker: #182, #173, and pinned #171 are still open after #183 merged. This week close superseded cycle issues, keep #171 as the single pulse pin, and let a human land any leftover #182 work.",
-  "health": 73,
-  "stop": "Opening new Dev Cycle, Commit Analysis, or Pulse issues while #182, #173, and #171 remain open.",
-  "start": "Closing superseded analysis issues and routing leftover cycle work into one human-landed change.",
-  "keep": "Honest usage and reputation backfills that match living PR reviews.",
+  "summary": "Layer 0 Open Core is stable: 48 successful analyses, fresh reputation, and Astra 10.5 with Layer 1 still gated. Collaborative evidence is thin while three overlapping field-pulse PRs (#203, #205, #206) sit open. This week is GitHub hygiene, not new architecture. Land the completed pulse with a human merge and close same-day duplicate noise.",
+  "health": 72,
+  "stop": "Stop opening more field-pulse PRs while #203, #205, and #206 are already open.",
+  "start": "Start human-landing the completed pulse (#203) and closing same-day duplicate #205.",
+  "keep": "Keep usage and reputation increments only after successful analysis, including living-PR backfill.",
   "actions": [
     {
-      "id": "close-stale-173",
-      "title": "Close superseded commit analysis #173",
-      "why": "Issue #173 is a 2026-09-12 commit analysis still open after later commit chores and merged self-audit #183.",
+      "id": "close-duplicate-pulse-205",
+      "title": "Close duplicate field-pulse PR #205",
+      "why": "PR #205 is a same-day Medina pulse with the same held-invitation title as #206 and only adds review noise.",
       "effort": "S",
       "files": [],
       "steps": [
-        "Comment on #173 that later commit analyses and merged #183 superseded it.",
-        "Close #173 as completed noise.",
-        "Do not open a replacement commit-analysis issue."
+        "Comment on #205 that #206 supersedes it as the 2026-09-24 held invitation.",
+        "Close #205 without merging.",
+        "Do not open a replacement pulse."
       ],
-      "issueTitle": "Close superseded commit analysis #173",
-      "issueBody": "Issue #173 is leftover 2026-09-12 commit-analysis noise after later commit work and merged #183. Close it and keep the board on live items only."
+      "issueTitle": "Close superseded pulse #205",
+      "issueBody": "PR #205 duplicates the 2026-09-24 held field pulse already opened as #206. Close it without merge so one invitation remains."
     },
     {
-      "id": "resolve-dev-cycle-182",
-      "title": "Resolve open Dev Cycle #182",
-      "why": "There are no open PRs and 2bcfad4 already landed an automated dev cycle, so #182 is likely leftover board noise.",
+      "id": "human-land-pulse-203",
+      "title": "Human-land completed field-pulse PR #203",
+      "why": "PR #203 is the newest completed open-invitation pulse still unmerged and is the one real change to route.",
       "effort": "S",
       "files": [],
       "steps": [
-        "Diff #182 against commit 2bcfad4 and queue 1.0.16 done items.",
-        "If the 2026-09-14 cycle already landed, comment that evidence and close #182.",
-        "If one checklist item remains, land it in a single human PR linked to #182; do not auto-merge."
+        "Review the #203 diff for field-only pulse changes.",
+        "Human-merge #203 if the 2026-09-23 complete pulse is accurate.",
+        "Do not auto-merge and do not rotate any API keys."
       ],
-      "issueTitle": "Resolve Dev Cycle #182",
-      "issueBody": "Dev Cycle #182 is still open with an empty PR list after the 2026-09-14 cycle commit. Confirm remaining work, close it if done, or land one human PR for the leftover item."
+      "issueTitle": "Land completed pulse #203",
+      "issueBody": "PR #203 is the 2026-09-23 field pulse marked open invitation complete. A human should review and land it; do not auto-merge."
     },
     {
-      "id": "route-complete-through-171",
-      "title": "Route the held complete pass through #171",
-      "why": "Queue already pins pulse #171 and holds complete until 2026-09-17; another analysis issue would add noise.",
-      "effort": "M",
+      "id": "hold-single-pulse-206",
+      "title": "Keep PR #206 as the sole open invitation",
+      "why": "After closing #205 and landing #203, #206 is the only held invitation and should not be stacked or auto-merged.",
+      "effort": "S",
       "files": [],
       "steps": [
-        "Wait until 2026-09-17 per the queue hold.",
-        "Run one complete analysis and comment the outcome on #171.",
-        "Leave #171 open as the pulse pin; do not open a new pulse or complete issue."
+        "Comment on #206 that it is the single open held invitation.",
+        "Leave #206 open until a human decides to land or close it.",
+        "File no new architecture issues; open issues is already empty."
       ],
-      "issueTitle": "Complete pass on pinned pulse #171",
-      "issueBody": "Queue held complete until 2026-09-17 and pinned pulse #171. Post the complete outcome on #171 instead of opening a fourth cycle issue."
+      "issueTitle": "Single held pulse #206",
+      "issueBody": "PR #206 remains the 2026-09-24 held invitation after duplicate #205 is closed. A human decides when to land or close it."
     }
   ],
   "outcome": "ok",

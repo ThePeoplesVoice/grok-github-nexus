@@ -12,8 +12,8 @@
   "spendable": false,
   "sanctuary_tie": "Keysbrook jarrah / black cockatoo sanctuary vision",
   "source_reputation_score": 10.5,
-  "total_successful_analyses": 48,
-  "last_activity": "2026-09-23T14:05:07Z",
-  "last_computed": "2026-09-23T14:05:07Z",
+  "total_successful_analyses": 49,
+  "last_activity": "2026-09-24T14:34:09Z",
+  "last_computed": "2026-09-24T14:34:09Z",
   "notes": "balance = effective collaborative reputation (includes 30-day half-life decay). Internal pulse/self-audit churn does not create Astra value. See ASTRA.md."
 }
