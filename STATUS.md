@@ -1,6 +1,6 @@
 # 📡 Nexus Status
 
-**Last updated:** 2026-09-22 04:16 AWST — Field pulse by Ara (open invitation: optimise · create · suggest · connect · share · streamline · invent · utilise all skills and connectors).
+**Last updated:** 2026-09-25 06:06 AWST — Grok 4.7 default landed on the analysis pipe.
 
 ![Reputation](https://img.shields.io/badge/nexus_reputation-effective_10.5-blue)
 ![Astra](https://img.shields.io/badge/astra-ledger_lags-yellow)
@@ -14,24 +14,22 @@
 **Layer 0 — Open Core (live, ungated)**  
 **Layer 1** — gated. Collaborative evidence still thin. Gate held on purpose.
 
-progressive **v1.6.1** · package **v0.8.0** · model **`grok-4.6`**
+progressive **v1.6.1** · package **v0.8.0** · model **`grok-4.7`**
 
 The sequenced future lives in [`docs/WHAT_FITS.md`](docs/WHAT_FITS.md). That page is the filter. This page is the board.
 
-### Measurement stack — live read 2026-09-22 04:16 AWST
+### Measurement stack — live read 2026-09-25 06:06 AWST
 
 Source: open issues/PRs, field card, this pulse.
 
 | Signal | Value |
 |--------|-------|
-| Open PRs (nexus) | **3** prior field pulses (#192 #193 #194) still open |
+| Open PRs (nexus) | field pulses still open separately |
 | Open issues (nexus) | **none** |
-| Linear (me) | empty |
+| Linear (me) | residual Pulse items, not this change |
 | Naixus open issues | **1** — [#5 Medina 1011/V5 growing paid job](https://github.com/ThePeoplesVoice/naixus-roof-technicians/issues/5) |
 | Vercel | pulse-chamber, naixus-roof-technicians, sourced-signal, signal-garden, saturday-receipt live |
-| Last field pulse | 2026-09-22 04:16 AWST |
-
-Board is clean of human issues on the partner repo. Commercial surface has one living booked job. Prior field PRs await squash when wanted.
+| Last model pin | 2026-09-25 — `DEFAULT_GROK_MODEL=grok-4.7` |
 
 ---
 
@@ -41,7 +39,7 @@ Board is clean of human issues on the partner repo. Commercial surface has one l
 2. One non-chore PR or issue a collaborator can actually review (Layer 1 evidence).
 3. Recompute Astra via organic script when convenient (ledger still lags usage).
 4. Branch garden prune only when Shawn names it.
-5. Squash the open field pulses when ready.
+5. If Actions `vars.GROK_MODEL` is still `grok-4.6`, change or clear it so the new default wins.
 
 Do not invent a fifth surface. See `docs/WHAT_FITS.md`.
 
