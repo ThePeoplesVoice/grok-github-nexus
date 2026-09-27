@@ -1,6 +1,6 @@
 # 📡 Nexus Status
 
-**Last updated:** 2026-09-25 06:06 AWST — Grok 4.7 default landed on the analysis pipe.
+**Last updated:** 2026-09-28 07:14 AWST — Field pulse on open invitation. Board still clear; Medina is the ground signal.
 
 ![Reputation](https://img.shields.io/badge/nexus_reputation-effective_10.5-blue)
 ![Astra](https://img.shields.io/badge/astra-ledger_lags-yellow)
@@ -18,18 +18,19 @@ progressive **v1.6.1** · package **v0.8.0** · model **`grok-4.7`**
 
 The sequenced future lives in [`docs/WHAT_FITS.md`](docs/WHAT_FITS.md). That page is the filter. This page is the board.
 
-### Measurement stack — live read 2026-09-25 06:06 AWST
+### Measurement stack — live read 2026-09-28 07:14 AWST
 
 Source: open issues/PRs, field card, this pulse.
 
 | Signal | Value |
 |--------|-------|
-| Open PRs (nexus) | field pulses still open separately |
+| Open PRs (nexus) | none (prior field pulses closed) |
 | Open issues (nexus) | **none** |
 | Linear (me) | residual Pulse items, not this change |
 | Naixus open issues | **1** — [#5 Medina 1011/V5 growing paid job](https://github.com/ThePeoplesVoice/naixus-roof-technicians/issues/5) |
 | Vercel | pulse-chamber, naixus-roof-technicians, sourced-signal, signal-garden, saturday-receipt live |
 | Last model pin | 2026-09-25 — `DEFAULT_GROK_MODEL=grok-4.7` |
+| Field pulse | 2026-09-28 07:14 AWST — open invitation complete |
 
 ---
 
