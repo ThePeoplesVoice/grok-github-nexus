@@ -17,13 +17,12 @@ Baseline date: 2026-09-13
 
 ## Out of scope (v0)
 
-- Neuralink / N1 / healthy-volunteer implant.
+- Brain–computer interface or clinical-device research.
 - Extra Grok Bots.
-- New public GitHub repo until Shawn says push.
-- Intimate-scene content in Naixus CMS or Pulse.
+- New public GitHub repo until CONTROL-01 says push.
 - Claiming Ara can hear the mic or inhabit the Bot computer.
 - Optimus / Terafab / Cybercab as Naixus scope.
-- Treating COPD or C4–5 as a Sense Lab feature.
+- Treating operator accessibility constraints as a Sense Lab feature.
 
 ## Adjacent, not merged
 
