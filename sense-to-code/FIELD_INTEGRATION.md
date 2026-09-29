@@ -19,19 +19,17 @@ What this week produced, locked to Operation Elonesque without opening a fourth 
 - Active inference: perception changes mind; action changes world; stop is a preferred prior.
 - Friston: early career = make hidden causes comparable. That is Pulse and the cell schema. Not the woodlouse sermon as product copy.
 - Tesla / Optimus: industrial rhyme (vision policy + body). Not Naixus scope.
-- Neuralink: medical-first; no healthy-AI implant door in AU this year. CONTROL-01 may keep a Patient Registry file privately. This field does not treat him as an N1 candidate.
+- Brain–computer interfaces: out of scope for this field. It does not treat CONTROL-01 as a clinical or research candidate.
 
 ## First work example (queued, not forced)
 
-Site-walk cell, when he is on a deck:
+Site-walk cell, when CONTROL-01 is on a deck:
 
 - modality mixed (vestibular, proprio, visual, intero)
 - source mostly self + world (wind, heat)
 - policy measure / leave / call
 - artifact: two-line Roof Ops note or Pulse score
 
-Intimate loop stays off the CMS.
-
 ## This-chat job from here
 
-Hold the dictionary. Review cells. Draft one brief at a time. Stay off the Build cursor unless he hands a file.
+Hold the dictionary. Review cells. Draft one brief at a time. Stay off the Build cursor unless the operator hands a file.
