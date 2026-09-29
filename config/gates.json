@@ -27,5 +27,5 @@
     "human-approval:deploy",
     "human-approval:public"
 ],
-  "notes": "Checked by nexus.gates.requires_human_gate(paths, labels). Missing required label blocks the merge path."
+  "notes": "Checked by nexus.gates (requires_human_gate / unmet_human_gates). Enforced by the human-gate check in .github/workflows/nexus-human-gate.yml, which fails while a required label is missing and re-runs when labels change. It is a hard block only when main's ruleset requires that check."
 }

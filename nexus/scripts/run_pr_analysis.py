@@ -201,7 +201,8 @@ def main() -> None:
     if gate:
         sections.append(
             f"### 🚧 Human gate\n\n{gate_summary(gate)}\n\n"
-            "Add the required approval label before merging."
+            "Add the required approval label before merging. "
+            "The `human-gate` check stays red until it is present."
         )
     if not sections:
         err = grok_err or claude_err or "No analysis generated. Check secrets and logs."
