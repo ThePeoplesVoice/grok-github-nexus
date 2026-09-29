@@ -8,10 +8,9 @@ on:
       - 'tests/**'
       - 'setup.py'
       - 'requirements.txt'
+  # No path filter on pull_request: "test" is a required check on main, and a
+  # required check that never starts leaves the PR blocked on "Expected".
   pull_request:
-    paths:
-      - 'nexus/**'
-      - 'tests/**'
   workflow_dispatch:
 
 jobs:

@@ -1,0 +1,71 @@
+name: 🚧 Human Gate
+
+# Fails while a PR touches a gated path (config/gates.json) without the
+# matching human-approval:* label. Re-runs when labels change, so adding the
+# label turns it green. No secrets, read-only token, no Grok call.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled, ready_for_review]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: human-gate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  human-gate:
+    name: human-gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: List changed files (base...head, renames split into old + new)
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          git diff --name-only --no-renames "$BASE_SHA...$HEAD_SHA" > "$RUNNER_TEMP/changed_files.txt"
+          echo "Changed files: $(wc -l < "$RUNNER_TEMP/changed_files.txt")"
+
+      - name: Use gate rules and checker from the base branch when present
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          # A PR cannot relax its own gate by editing config/gates.json or the
+          # checker: both are read from the base commit once they exist there.
+          git worktree add --detach "$RUNNER_TEMP/gate-base" "$BASE_SHA"
+          if [ -f "$RUNNER_TEMP/gate-base/nexus/scripts/check_human_gate.py" ]; then
+            echo "GATE_ROOT=$RUNNER_TEMP/gate-base" >> "$GITHUB_ENV"
+          else
+            echo "GATE_ROOT=$GITHUB_WORKSPACE" >> "$GITHUB_ENV"
+          fi
+          if [ -f "$RUNNER_TEMP/gate-base/config/gates.json" ]; then
+            echo "GATES_PATH=$RUNNER_TEMP/gate-base/config/gates.json" >> "$GITHUB_ENV"
+          else
+            echo "GATES_PATH=$GITHUB_WORKSPACE/config/gates.json" >> "$GITHUB_ENV"
+          fi
+
+      - name: Check human-approval labels
+        env:
+          PR_LABELS_JSON: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+          CHANGED_FILES_PATH: ${{ runner.temp }}/changed_files.txt
+        run: |
+          cd "$GATE_ROOT"
+          python -m nexus.scripts.check_human_gate
