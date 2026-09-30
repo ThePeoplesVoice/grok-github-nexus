@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import os
+import sys
 from pathlib import Path
 
 import requests
@@ -11,6 +12,7 @@ import requests
 from nexus.analyze import build_pr_prompt, fusion_note, footer_block, utc_now_str
 from nexus.collab import is_collaborative_review_target, parse_label_list
 from nexus.context import load_context, load_progressive, layer1_enabled, current_phase
+from nexus.grok_status import grok_exit_code
 from nexus.gates import gate_summary, requires_human_gate
 from nexus.memory import memory_block_for_prompt, record_memory
 from nexus.providers import call_grok, call_claude, classify_grok_result, refine_parse_outcome
@@ -64,7 +66,7 @@ def fetch_pr(repo_name: str, pr_number: str, token: str) -> tuple[dict, str, lis
     return pr_data, diff_excerpt, files
 
 
-def main() -> None:
+def main() -> int:
     print("🌌 Starting Ara & Shawn multi-model PR Analysis (package path)...")
 
     raw_number = os.environ.get("PR_NUMBER", "").strip()
@@ -242,6 +244,10 @@ def main() -> None:
     Path("/tmp/pr_analysis.md").write_text(body, encoding="utf-8")
     print("✅ Analysis ready at /tmp/pr_analysis.md")
 
+    # The report above is still written (and posted) on failure, but a failed
+    # Grok call must turn this step red rather than pass silently.
+    return grok_exit_code("PR Analyzer", grok_text, grok_err)
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
