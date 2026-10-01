@@ -13,7 +13,7 @@ from typing import Any
 
 from nexus.analyze import build_commit_prompt, fusion_note, footer_block, utc_now_str
 from nexus.context import load_context, load_progressive, layer1_enabled, current_phase
-from nexus.grok_status import grok_exit_code
+from nexus.grok_status import grok_exit_code, report_claude
 from nexus.providers import call_grok, call_claude
 from nexus.usage import load_usage_stats
 from nexus.presence import load_presence, format_presence_for_prompt
@@ -178,6 +178,7 @@ def main() -> int:
     # Grok call must turn this step red rather than pass silently.
     if not commit_details:
         grok_err = grok_err or "no commits to analyze, Grok was not called"
+    report_claude("Commit Analyzer", claude_text, claude_err, attempted=bool(commit_details and l1))
     return grok_exit_code("Commit Analyzer", grok_text, grok_err)
 
 

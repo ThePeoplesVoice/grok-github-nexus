@@ -10,6 +10,11 @@ on:
         required: true
         type: string
 
+# A new push to the same PR supersedes the review in flight.
+concurrency:
+  group: pr-analyzer-${{ github.event.pull_request.number || inputs.pr_number }}
+  cancel-in-progress: true
+
 jobs:
   analyze-with-ara:
     # Fork PRs and Dependabot PRs get no repository secrets, so the Grok call
@@ -45,11 +50,13 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: |
+            requirements.txt
+            setup.py
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install requests
           pip install -e .
 
       - name: Run Ara + Claude PR Analysis
@@ -67,7 +74,7 @@ jobs:
         run: python -m nexus.scripts.run_pr_analysis
 
       - name: Commit usage + reputation artifacts (if changed)
-        if: success()
+        if: ${{ !cancelled() }}
         continue-on-error: true
         run: |
           git config user.name "nexus-bot"

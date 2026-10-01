@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import os
 import subprocess
+import sys
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -18,6 +19,7 @@ from pathlib import Path
 from nexus.analyze import footer_block, utc_now_str
 from nexus.context import current_phase, layer1_enabled, load_progressive
 from nexus.memory import memory_block_for_prompt, record_memory
+from nexus.grok_status import grok_exit_code
 from nexus.providers import call_grok, refine_parse_outcome
 from nexus.reputation import refresh_reputation, reputation_summary_md
 from nexus.runtime import after_successful_analysis, log_success
@@ -167,7 +169,7 @@ def _fallback(err: str, stats: dict, queue: dict) -> dict:
     )
 
 
-def main() -> None:
+def main() -> int:
     print("🧭 Generating Nexus Complete Analysis…")
     prog = load_progressive()
     phase = current_phase(prog)
@@ -242,6 +244,7 @@ Recent commits:
         timeout=180,
         retries=1,
         response_format={"type": "json_object"},
+        reasoning_effort="medium",
     )
     parsed = _extract_json(text) if text else None
     success = bool(parsed and (parsed.get("summary") or parsed.get("actions")))
@@ -334,6 +337,12 @@ Machine-readable copy: `config/complete_analysis.json`.
     print(body[:1000])
     print("✅ Complete report ready at /tmp/nexus_complete.md")
 
+    # The fallback plan is still written (and pinned), but a failed or
+    # unparseable Grok reply must turn this step red rather than pass silently.
+    if success:
+        return grok_exit_code("Complete Analysis", text, None)
+    return grok_exit_code("Complete Analysis", None, payload["diagnostic"])
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
