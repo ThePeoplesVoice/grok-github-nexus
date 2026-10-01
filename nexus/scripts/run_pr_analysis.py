@@ -12,13 +12,17 @@ import requests
 from nexus.analyze import build_pr_prompt, fusion_note, footer_block, utc_now_str
 from nexus.collab import is_collaborative_review_target, parse_label_list
 from nexus.context import load_context, load_progressive, layer1_enabled, current_phase
-from nexus.grok_status import grok_exit_code
+from nexus.grok_status import grok_exit_code, report_claude
 from nexus.gates import gate_summary, requires_human_gate
 from nexus.memory import memory_block_for_prompt, record_memory
 from nexus.providers import call_grok, call_claude, classify_grok_result, refine_parse_outcome
 from nexus.usage import load_usage_stats
 from nexus.presence import load_presence, format_presence_for_prompt
 from nexus.runtime import after_successful_analysis, log_success
+
+# Diff budget sent to Grok. Larger diffs are trimmed; the PR file list and
+# description still go in full.
+PR_DIFF_CHARS = 8000
 
 
 def fetch_pr(repo_name: str, pr_number: str, token: str) -> tuple[dict, str, list[str]]:
@@ -45,8 +49,8 @@ def fetch_pr(repo_name: str, pr_number: str, token: str) -> tuple[dict, str, lis
         diff_resp = requests.get(pr_url, headers=diff_headers, timeout=25)
         if diff_resp.status_code == 200 and diff_resp.text:
             raw = diff_resp.text
-            diff_excerpt = raw[:14000]
-            if len(raw) > 14000:
+            diff_excerpt = raw[:PR_DIFF_CHARS]
+            if len(raw) > PR_DIFF_CHARS:
                 diff_excerpt += "\n\n… [diff truncated for analysis budget]"
             print(f"✅ Diff ingested ({len(raw)} chars, using {len(diff_excerpt)})")
         else:
@@ -133,7 +137,7 @@ def main() -> int:
             "before merge. Flag it clearly in your review."
         )
 
-    grok_text, grok_err = call_grok(prompt, temperature=0.55, max_tokens=1100, timeout=120)
+    grok_text, grok_err = call_grok(prompt, temperature=0.55, max_tokens=1100)
     grok_outcome = classify_grok_result(grok_text, grok_err)
     if grok_text:
         print("✅ Ara (Grok) analysis complete")
@@ -246,6 +250,7 @@ def main() -> int:
 
     # The report above is still written (and posted) on failure, but a failed
     # Grok call must turn this step red rather than pass silently.
+    report_claude("PR Analyzer", claude_text, claude_err, attempted=bool(claude_key))
     return grok_exit_code("PR Analyzer", grok_text, grok_err)
 
 
