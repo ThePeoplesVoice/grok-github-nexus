@@ -19,13 +19,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          cache: 'pip'
-          cache-dependency-path: |
-            requirements.txt
-            setup.py
 
       - name: Install dependencies
         run: |
+          python -m pip install --upgrade pip
+          pip install requests
           pip install -e .
 
       - name: Ara + Claude Issue Analysis
@@ -45,7 +43,7 @@ jobs:
         run: python -m nexus.scripts.run_issue_triage
 
       - name: Commit usage + reputation artifacts (if changed)
-        if: ${{ !cancelled() && steps.analyze.outputs.post == 'true' }}
+        if: success() && steps.analyze.outputs.post == 'true'
         continue-on-error: true
         run: |
           git config user.name "nexus-bot"
@@ -59,8 +57,7 @@ jobs:
           fi
 
       - name: Post Full Analysis Comment
-        # always(): the comment (with the error) still posts when Grok fails.
-        if: always() && steps.analyze.outputs.post == 'true'
+        if: steps.analyze.outputs.post == 'true'
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}

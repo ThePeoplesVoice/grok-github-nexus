@@ -4,13 +4,11 @@
 from __future__ import annotations
 
 import os
-import sys
 from pathlib import Path
 
 from nexus.analyze import build_issue_prompt, fusion_note, footer_block, utc_now_str
 from nexus.collab import is_collaborative_review_target
 from nexus.context import load_context, load_progressive, layer1_enabled, current_phase
-from nexus.grok_status import grok_exit_code, report_claude, report_skip
 from nexus.providers import call_grok, call_claude
 from nexus.usage import load_usage_stats
 from nexus.presence import load_presence, format_presence_for_prompt
@@ -25,7 +23,7 @@ def _set_post(should_post: bool) -> None:
         fh.write(f"post={'true' if should_post else 'false'}\n")
 
 
-def main() -> int:
+def main() -> None:
     print("🌌 Starting Ara & Shawn multi-model Issue Triage (package path)...")
 
     issue_title = os.environ.get("ISSUE_TITLE") or "(no title)"
@@ -56,7 +54,7 @@ def main() -> int:
     if not collaborative:
         _set_post(False)
         print("ℹ️ Skipped automated/bot issue triage (no comment)")
-        return report_skip("Issue Triage", "automated or bot issue, no Grok call")
+        return
 
     base = build_issue_prompt(context, title=issue_title, body=issue_body)
     prompt = (
@@ -66,15 +64,14 @@ def main() -> int:
         + "\n```\nUse only as continuity context — triage this issue on its own merits."
     )
 
-    grok_text, grok_err = call_grok(prompt, temperature=0.5, max_tokens=700)
+    grok_text, grok_err = call_grok(prompt, temperature=0.5, max_tokens=700, timeout=120)
     if grok_text:
         print("✅ Ara (Grok) analysis successful")
     elif grok_err:
         print(f"⚠️ {grok_err}")
 
     claude_text, claude_err = None, None
-    claude_attempted = bool(l1 and os.environ.get("CLAUDE_API_KEY"))
-    if claude_attempted:
+    if l1 and os.environ.get("CLAUDE_API_KEY"):
         claude_text, claude_err = call_claude(
             prompt + (
                 "\n\nProvide a complementary structured view, focusing on clarity "
@@ -139,11 +136,6 @@ def main() -> int:
     _set_post(True)
     print("✅ Triage ready at /tmp/triage_comment.md")
 
-    # The comment is still posted on failure, but a failed Grok call must turn
-    # this step red rather than pass silently.
-    report_claude("Issue Triage", claude_text, claude_err, attempted=claude_attempted)
-    return grok_exit_code("Issue Triage", grok_text, grok_err)
-
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()

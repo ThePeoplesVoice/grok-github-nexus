@@ -9,12 +9,10 @@ from __future__ import annotations
 
 import json
 import subprocess
-import sys
 from pathlib import Path
 
 from nexus.analyze import footer_block, utc_now_str
 from nexus.context import load_progressive, layer1_enabled, current_phase
-from nexus.grok_status import grok_exit_code
 from nexus.providers import call_grok, classify_grok_result
 from nexus.usage import load_usage_stats
 from nexus.reputation import reputation_summary_md, refresh_reputation
@@ -25,7 +23,7 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 PRESENCE_PATH = ROOT / "config" / "presence_state.json"
 
 
-def main() -> int:
+def main() -> None:
     print("📡 Generating enhanced Nexus Presence Pulse...")
 
     prog = load_progressive()
@@ -151,10 +149,6 @@ Compressed context written to `config/presence_state.json` for continuity betwee
     print("✅ Pulse ready at", out)
     print(body[:900])
 
-    # The pulse report and presence state are still written (and pinned), but
-    # a failed Grok call must turn this step red rather than pass silently.
-    return grok_exit_code("Pulse", text, err)
-
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()

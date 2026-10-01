@@ -25,13 +25,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          cache: 'pip'
-          cache-dependency-path: |
-            requirements.txt
-            setup.py
 
       - name: Install deps
         run: |
+          python -m pip install --upgrade pip
+          pip install requests
           pip install -e .
 
       - name: Run Self-Audit
@@ -44,7 +42,7 @@ jobs:
         run: python -m nexus.scripts.run_self_audit
 
       - name: Commit usage + reputation + astra artifacts (if changed)
-        if: ${{ !cancelled() }}
+        if: success()
         continue-on-error: true
         run: |
           git config user.name "nexus-bot"

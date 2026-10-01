@@ -142,3 +142,4 @@ def test_pr_analyzer_workflow_has_no_swallowing():
     step = body.split("Run Ara + Claude PR Analysis", 1)[1].split("- name:", 1)[0]
     assert "continue-on-error" not in step and "|| true" not in step
     assert "head.repo.full_name == github.repository" in body
+    assert "github.event.pull_request.user.login != 'dependabot[bot]'" in body

@@ -8,16 +8,10 @@ on:
       - 'tests/**'
       - 'setup.py'
       - 'requirements.txt'
-      - '.github/workflows/**'
   # No path filter on pull_request: "test" is a required check on main, and a
   # required check that never starts leaves the PR blocked on "Expected".
   pull_request:
   workflow_dispatch:
-
-# Cancel superseded PR runs; never cancel runs on main/develop/master pushes.
-concurrency:
-  group: nexus-tests-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   test:
@@ -32,14 +26,12 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          cache: 'pip'
-          cache-dependency-path: |
-            requirements.txt
-            setup.py
 
       - name: Install package + pytest
         run: |
-          pip install pytest pyyaml -e .
+          python -m pip install --upgrade pip
+          pip install pytest requests
+          pip install -e .
 
       - name: Run tests
         run: python -m pytest tests/ -v --tb=short

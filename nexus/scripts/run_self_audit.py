@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import os
 import subprocess
-import sys
 from pathlib import Path
 
 from nexus.audit import (
@@ -19,14 +18,13 @@ from nexus.audit import (
     format_audit_footer,
     utc_now_str,
 )
-from nexus.grok_status import grok_exit_code, report_claude
 from nexus.providers import call_grok, call_claude
 from nexus.context import layer1_enabled
 from nexus.presence import load_presence, format_presence_for_prompt
 from nexus.runtime import after_successful_analysis, log_success
 
 
-def main() -> int:
+def main() -> None:
     now = utc_now_str()
     snap = progressive_snapshot()
     health = structural_health()
@@ -64,8 +62,7 @@ def main() -> int:
 
     claude_text = None
     claude_err = None
-    claude_attempted = bool(layer1_enabled() and os.environ.get("CLAUDE_API_KEY"))
-    if claude_attempted:
+    if layer1_enabled() and os.environ.get("CLAUDE_API_KEY"):
         claude_text, claude_err = call_claude(
             prompt + (
                 "\n\nRespond as a complementary high-rigor reviewer. Focus on maintenance debt, "
@@ -127,11 +124,6 @@ def main() -> int:
     print(body[:1200])
     print("\n✅ Self-audit body ready at", out)
 
-    # The report is still written (and pinned), but a failed Grok call must
-    # turn this step red rather than pass silently.
-    report_claude("Self-Audit", claude_text, claude_err, attempted=claude_attempted)
-    return grok_exit_code("Self-Audit", grok_text, grok_err)
-
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()

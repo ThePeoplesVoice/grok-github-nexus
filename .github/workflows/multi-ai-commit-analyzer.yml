@@ -10,11 +10,6 @@ on:
   schedule:
     - cron: '0 6 * * 1'
 
-# Each run reviews the latest commits, so a newer push supersedes an older run.
-concurrency:
-  group: commit-analyzer-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   analyze-commits:
     if: |
@@ -39,13 +34,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          cache: 'pip'
-          cache-dependency-path: |
-            requirements.txt
-            setup.py
 
       - name: 📦 Install dependencies
         run: |
+          python -m pip install --upgrade pip
+          pip install requests
           pip install -e .
 
       - name: 🌌 Ara + Claude Commit Analysis
@@ -58,7 +51,7 @@ jobs:
         run: python -m nexus.scripts.run_commit_analysis
 
       - name: Commit usage + reputation artifacts (if changed)
-        if: ${{ !cancelled() }}
+        if: success()
         continue-on-error: true
         run: |
           git config user.name "nexus-bot"

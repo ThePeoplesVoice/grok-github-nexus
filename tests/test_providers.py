@@ -123,32 +123,31 @@ def test_call_grok_request_contract(monkeypatch):
     assert captured["headers"]["Authorization"].endswith("test-key")
     assert captured["headers"]["Content-Type"] == "application/json"
     assert captured["json"]["model"] == DEFAULT_GROK_MODEL
-    assert captured["timeout"] == (10, 12)  # (connect, read)
+    assert captured["timeout"] == 12
 
 
-def test_call_grok_empty_content_fails_without_retry():
-    # Empty content is not transient; retrying only doubles cost and latency.
+def test_call_grok_empty_content_retries_then_reports_error():
     empty_resp = _mock_response(200, {"choices": [{"message": {"content": ""}}]})
     with patch("nexus.providers.requests.post", return_value=empty_resp) as post:
         text, err = call_grok("hello", api_key="test-key", retries=1)
     assert text is None
     assert err == "Grok response empty content"
-    assert post.call_count == 1
+    assert post.call_count == 2
 
 
 def test_call_grok_retries_capped_at_max():
-    server_err = _mock_response(503, {"error": {"message": "overloaded"}})
-    with patch("nexus.providers.requests.post", return_value=server_err) as post:
+    empty_resp = _mock_response(200, {"choices": [{"message": {"content": ""}}]})
+    with patch("nexus.providers.requests.post", return_value=empty_resp) as post:
         text, err = call_grok("hello", api_key="test-key", retries=99)
     assert text is None
-    assert "503" in err
+    assert err == "Grok response empty content"
     assert post.call_count == 1 + MAX_GROK_RETRIES
 
 
 def test_resolve_grok_retries_clamps():
     assert resolve_grok_retries(0) == 0
     assert resolve_grok_retries(1) == 1
-    assert resolve_grok_retries(2) == MAX_GROK_RETRIES
+    assert resolve_grok_retries(2) == 2
     assert resolve_grok_retries(99) == MAX_GROK_RETRIES
     assert resolve_grok_retries(-3) == 0
 

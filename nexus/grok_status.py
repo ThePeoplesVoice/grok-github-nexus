@@ -52,35 +52,3 @@ def grok_exit_code(analyzer: str, grok_text: str | None, grok_err: str | None) -
     print(f"::error title={analyzer}::Grok call failed ({outcome}): {reason}")
     _write_summary(f"❌ **{analyzer}:** Grok call failed ({outcome}): {reason}")
     return 1
-
-
-def report_skip(analyzer: str, reason: str) -> int:
-    """An intended skip: say so in the log and summary, then exit 0."""
-    print(f"⏭️ {analyzer}: skipped: {reason}")
-    _write_summary(f"⏭️ **{analyzer}:** skipped: {reason}")
-    return 0
-
-
-def report_claude(
-    analyzer: str,
-    claude_text: str | None,
-    claude_err: str | None,
-    *,
-    attempted: bool,
-) -> None:
-    """Report the Claude second reviewer outcome. Never changes the exit code.
-
-    Claude is a complementary reviewer, so its state is labelled (succeeded,
-    failed, skipped) as a warning but does not decide the check. Grok does.
-    """
-    if not attempted:
-        _write_summary(f"⏭️ **{analyzer}:** Claude second reviewer skipped (not configured for this run).")
-        return
-    if isinstance(claude_text, str) and claude_text.strip():
-        _write_summary(f"✅ **{analyzer}:** Claude second reviewer succeeded.")
-        return
-    reason = redact(claude_err) or "no text returned"
-    if "insufficient credits" in reason.lower() or "credit balance" in reason.lower():
-        reason = "insufficient credits on the Claude account"
-    print(f"::warning title={analyzer}::Claude second reviewer FAILED: {reason}")
-    _write_summary(f"⚠️ **{analyzer}:** Claude second reviewer FAILED: {reason}")
