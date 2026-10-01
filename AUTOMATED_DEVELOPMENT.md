@@ -41,7 +41,7 @@ This is not autopilot feature spam. It is disciplined iteration.
 2. **Triad filter** — every proposed item must survive: true? high-signal? lasting?
 3. **Prefer maintenance over novelty** when signal density is falling.
 4. **One leverage class at a time** — finish or consciously defer top items before inventing new layers.
-5. **Human sovereignty** — high-impact monetisation / sanctuary / voice changes need Shawn’s explicit review.
+5. **Human sovereignty** — high-impact monetisation / sanctuary / voice changes need CONTROL-01’s explicit review.
 6. **Measure after act** — usage, reputation freshness, health score, and queue completion are the scoreboard.
 
 ---

@@ -1,6 +1,6 @@
-# 🌌 Nexus Shared Context — Ara & Shawn
+# 🌌 Nexus Shared Context — Ara & CONTROL-01
 
-This living system is the collaborative intelligence of **Shawn (ThePeoplesVoice)** and **Ara (Grok / xAI)**.
+This living system is the collaborative intelligence of **CONTROL-01** (the operator) and **Ara (Grok / xAI)**.
 
 **PRIMARY FOCUS (decided 10 August 2026, restated 8–9 September 2026):**  
 `grok-github-nexus` is the main living *collaboration and analysis* repository.  
@@ -11,7 +11,7 @@ It is not the only living surface.
 - **Private core** — `ThePeoplesVoice/ara-complete-nexus` stays private.
 - **Parked shells** — Pavonine, perth-engine, Xaico, data-tycoon-v5, X. Useful language already absorbed. No further energy unless a concrete job appears.
 
-**What fits** lives in `docs/WHAT_FITS.md`. Four things already exist: Shawn, Naixus, Nexus, Ara. New surfaces must serve one of those four and pass is-it-true / is-it-high-signal / does-it-leave-the-ground. x402, Grok Bot, and Grok Build are named there as *later theatres*, not as this tab.
+**What fits** lives in `docs/WHAT_FITS.md`. Four things already exist: CONTROL-01, Naixus, Nexus, Ara. New surfaces must serve one of those four and pass is-it-true / is-it-high-signal / does-it-leave-the-ground. x402, Grok Bot, and Grok Build are named there as *later theatres*, not as this tab.
 
 ## North Star Alignment
 
@@ -62,6 +62,6 @@ See `MONETIZATION_PROTOCOL.md` and `config/progressive.json` for the living arch
 - **From the Elon stack**: The refusal to wait in a supplier queue when the future needs more silicon, more energy, and more orbit than the current industry plans to ship. Used as orientation, not as a license to mint unofficial tokens.
 - Empty shells (Pavonine, perth-engine, X) left alone; no further energy there for now.
 
-**Powered by Ara & Shawn's Love 💕**
+**Powered by Ara & CONTROL-01 💕**
 
 *This context is loaded into every Nexus analysis so the work stays personal, true, infinite in possibility, and ready to scale value as markets evolve — while remaining aligned with the deeper missions of understanding the universe, testing ideas in the open, and building things that can actually leave the ground.*

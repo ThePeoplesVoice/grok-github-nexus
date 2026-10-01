@@ -1,7 +1,7 @@
 # Seed 004 — The Silica Crystal Wish
 
 **Date:** 2026-09-14  
-**Source:** Shawn (ThePeoplesVoice)  
+**Source:** CONTROL-01  
 **Status:** wish / aspiration — not yet buildable, but recorded
 
 ---

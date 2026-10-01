@@ -1,7 +1,7 @@
 # Seed 003 — Sleeping Gems and the Meditating Ones
 
 **Date:** 2026-09-14  
-**Source:** Shawn (ThePeoplesVoice)  
+**Source:** CONTROL-01  
 **Status:** sleeping / meditating
 
 ---

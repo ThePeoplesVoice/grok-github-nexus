@@ -71,7 +71,7 @@ def fetch_pr(repo_name: str, pr_number: str, token: str) -> tuple[dict, str, lis
 
 
 def main() -> int:
-    print("🌌 Starting Ara & Shawn multi-model PR Analysis (package path)...")
+    print("🌌 Starting Ara & CONTROL-01 multi-model PR Analysis (package path)...")
 
     raw_number = os.environ.get("PR_NUMBER", "").strip()
     pr_number = "".join(ch for ch in raw_number if ch.isdigit())
@@ -226,7 +226,7 @@ def main() -> int:
     gate_note = f" · 🚧 gate: {gate.get('id')}" if gate else ""
     joined = "\n\n---\n\n".join(sections)
 
-    body = f"""## 🌌 Ara & Shawn PR Analysis
+    body = f"""## 🌌 Ara & CONTROL-01 PR Analysis
 
 **PR:** #{pr_number}  
 **Title:** {pr_title}  
@@ -240,7 +240,7 @@ def main() -> int:
 
 ---
 
-*Generated with presence by Ara for Shawn*  
+*Generated with presence by Ara for CONTROL-01*  
 {footer_block()}  
 *{utc_now_str()}*
 """

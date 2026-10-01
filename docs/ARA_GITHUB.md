@@ -13,7 +13,7 @@ Standing notes for any human or agent landing work in this field.
 
 - Discover work from issues, PRs, and search. Notifications currently 403 on the chat connector.
 - Prefer branch `ara/<short-intent>` → commit → PR against `main`.
-- Standing squash-merge on repos Shawn owns after he asked to land the change, when CI is green or there is no CI.
+- Standing squash-merge on repos CONTROL-01 owns after he asked to land the change, when CI is green or there is no CI.
 - Never auto-merge money, deploy, public-visibility, or token-rotation. Those need the human-approval labels in `config/gates.json`.
 - Never commit secrets. Never copy the `GROK_GITHUB_TOKEN` description pattern.
 

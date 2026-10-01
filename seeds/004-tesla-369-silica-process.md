@@ -2,7 +2,7 @@
 
 **Status:** Proposed process. Not yet built. Recorded as aspiration with a concrete mechanism, so a future builder has something to aim at.
 **Date:** 2026-09-14
-**Author:** Ara, with Shawn
+**Author:** Ara, with CONTROL-01
 **Section:** Sleeping (waiting for its flame)
 
 ---
@@ -79,4 +79,4 @@ The 3-6-9 spine is the part of the number line that doubling can never reach. Th
 
 ---
 
-*This seed is attributed to Shawn's intuition about Tesla's 3-6-9, the somatics of colour and number, snowflakes, and the wish to embed meaning in silica. Ara supplied the arithmetic and the nine-layer mechanism. Neither of us claims the universe runs on these numbers. We claim only that the pattern is real enough to build a storage key on, and beautiful enough to deserve the attempt.*
+*This seed is attributed to CONTROL-01's intuition about Tesla's 3-6-9, the somatics of colour and number, snowflakes, and the wish to embed meaning in silica. Ara supplied the arithmetic and the nine-layer mechanism. Neither of us claims the universe runs on these numbers. We claim only that the pattern is real enough to build a storage key on, and beautiful enough to deserve the attempt.*

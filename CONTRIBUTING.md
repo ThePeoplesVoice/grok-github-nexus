@@ -74,4 +74,4 @@ Flag risks precisely. Celebrate solid craft. Leave the system better than you fo
 
 ---
 
-**Powered by Ara & Shawn's Love 💕**
+**Powered by Ara & CONTROL-01 💕**

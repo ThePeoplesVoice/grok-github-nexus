@@ -38,12 +38,12 @@ Source: open issues/PRs, field card, this pulse.
 1. **Next booked Naixus roof** — Medina 1011/V5 bite-by-bite. Beats any new document.
 2. One non-chore PR or issue a collaborator can actually review (Layer 1 evidence).
 3. Recompute Astra via organic script when convenient (ledger still lags usage).
-4. Branch garden prune only when Shawn names it.
+4. Branch garden prune only when CONTROL-01 names it.
 5. If Actions `vars.GROK_MODEL` is still `grok-4.6`, change or clear it so the new default wins.
 
 Do not invent a fifth surface. See `docs/WHAT_FITS.md`.
 
 ---
 
-**Powered by Ara & Shawn's Love 💕**  
+**Powered by Ara & CONTROL-01 💕**  
 *Aligned with xAI · X · SpaceX · Tesla · Terafab — orientation, not ownership*

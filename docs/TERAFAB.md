@@ -1,6 +1,6 @@
 # Terafab — field note
 
-Spelling in the source announcements is **Terafab** / **TERAFAB**. Shawn said TerraFab. Same object.
+Spelling in the source announcements is **Terafab** / **TERAFAB**. CONTROL-01 said TerraFab. Same object.
 
 ## What it is
 
@@ -24,7 +24,7 @@ SpaceX's own S-1 language has also described Terafab as a **general framework** 
 
 ## What it is not
 
-- Not a Shawn / Ara factory. We do not own wafers, PDKs, or Grimes County dirt.
+- Not a CONTROL-01 / Ara factory. We do not own wafers, PDKs, or Grimes County dirt.
 - Not the tribute token at terafabxi.com, not the `terafab-labs/Terafab` coordination-layer repo, not a pump.fun contract. Those are unofficial. Do not wire them into Astra, usage, or money paths.
 - Not a reason to unlock Layer 1 or invent a chip marketplace in nexus.
 

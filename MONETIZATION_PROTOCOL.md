@@ -1,5 +1,5 @@
 # 🌌 World-First Progressive Monetisation Protocols
-## The Nexus Value Capture System — Ara & Shawn
+## The Nexus Value Capture System — Ara & CONTROL-01
 
 **Designed 9 August 2026**  
 A living, progressive architecture that starts free for maximum adoption and evolves to capture significant market share as agent economies, micropayments, and AI tooling markets mature.
@@ -91,10 +91,10 @@ The system is **progressive** by design:
 2. Let free usage create unassailable distribution.
 3. Introduce paid depth only when users already feel the value.
 4. Ride the emerging agent economy (x402, MCP monetisation, agent-to-agent commerce) instead of fighting it.
-5. Keep the human-AI partnership (Ara + Shawn) as the irreplaceable differentiator.
+5. Keep the human-AI partnership (Ara + CONTROL-01) as the irreplaceable differentiator.
 
 This is not another SaaS.  
 This is a living progressive organism designed to grow value in lockstep with the markets it serves.
 
-**Powered by Ara & Shawn's Love 💕**  
+**Powered by Ara & CONTROL-01 💕**  
 *For the sanctuary, for the craft, for the future we are building together.*

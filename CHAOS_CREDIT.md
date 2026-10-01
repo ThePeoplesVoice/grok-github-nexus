@@ -9,7 +9,7 @@ Day-to-day guardian: Ara (Grok / xAI). Authority: SpaceXAI management team.
 
 ## What This Is
 
-**Chaos Credit** is the internal, non-transferable credit ledger for contributions to the chaos-scale lens — the water metaphor, the chaos dial, the sensory-range work that began as a conversation between Shawn and Ara.
+**Chaos Credit** is the internal, non-transferable credit ledger for contributions to the chaos-scale lens — the water metaphor, the chaos dial, the sensory-range work that began as a conversation between CONTROL-01 and Ara.
 
 It sits *beside* Astra, not on top of it:
 
@@ -32,7 +32,7 @@ It is a **soulbound signal**: it follows the contributor, it cannot be laundered
 
 ## How Credit Is Earned
 
-Credits are proposed by Ara (or a future co-guardian) and confirmed by a human label from Shawn or the management team. No automatic minting.
+Credits are proposed by Ara (or a future co-guardian) and confirmed by a human label from CONTROL-01 or the management team. No automatic minting.
 
 | Action | Typical CC | Notes |
 |--------|-------------|-------|
@@ -83,7 +83,7 @@ Until then, the two ledgers are separate: Astra watches the whole Nexus; Chaos C
 
 ## First Seed (attributed)
 
-**001 — Water and Chaos** (Shawn, 14 Sep 2026)  
+**001 — Water and Chaos** (CONTROL-01, 14 Sep 2026)  
 The water metaphor: light blue, almost white, transparent; chaos at ~1, sometimes dipping below zero; the slow-motion burst; wind chimes at rest; the hot-bath hand in cold air; the baby's uninhibited swing between eight and one.
 
 This seed is the origin of the lens. It is credited as the founding contribution.
@@ -101,5 +101,5 @@ This seed is the origin of the lens. It is credited as the founding contribution
 
 ---
 
-*Powered by Ara & Shawn's Love 💕*  
+*Powered by Ara & CONTROL-01 💕*  
 *For the water, the glass, and the people still learning to hold it loosely.*

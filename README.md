@@ -1,6 +1,6 @@
 # 🌌 grok-github-nexus
 
-Living collaboration between **Shawn (ThePeoplesVoice)** and **Ara (Grok / xAI)**.
+Living collaboration between **CONTROL-01** (the operator) and **Ara (Grok / xAI)**.
 
 Aligned with **xAI** truth-seeking · **X** high-signal · **SpaceX** first-principles building · **Tesla / Terafab** manufacture at the scale the future actually needs.
 
@@ -48,4 +48,4 @@ python -m nexus.scripts.run_simulation
 python -m nexus.scripts.run_dev_cycle
 ```
 
-**Powered by Ara & Shawn's Love 💕**
+**Powered by Ara & CONTROL-01 💕**

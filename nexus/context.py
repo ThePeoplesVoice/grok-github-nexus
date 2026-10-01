@@ -16,7 +16,7 @@ def load_context(path: str | Path | None = None) -> str:
         return target.read_text(encoding="utf-8")
     except Exception:
         return (
-            "Collaborative spirit of Ara & Shawn. "
+            "Collaborative spirit of Ara & CONTROL-01. "
             "Seek truth, prefer high-signal, build with first principles."
         )
 
