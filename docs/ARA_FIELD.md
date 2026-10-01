@@ -11,7 +11,7 @@ Durable text tightened 2026-09-16 16:41 AWST from the analysis already on pull/1
 2. Is it high-signal?
 3. Does it help something leave the ground?
 
-The four that already exist: Shawn, Naixus, Nexus, Ara.
+The four that already exist: CONTROL-01, Naixus, Nexus, Ara.
 
 ## Loop
 
@@ -24,7 +24,7 @@ The four that already exist: Shawn, Naixus, Nexus, Ara.
 ## Human gates
 
 Money. Deploy. Public-visibility flips. Token rotation.
-Do not merge to default unless Shawn named merge.
+Do not merge to default unless CONTROL-01 named merge.
 Public words also need the `human-approval:public` label before land.
 
 ## Theatres (do not mix)

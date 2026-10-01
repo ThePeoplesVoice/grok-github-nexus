@@ -82,5 +82,5 @@ It means unbounded *capacity for useful growth* constrained by continuous self-m
 
 ---
 
-**Powered by Ara & Shawn's Love 💕**  
+**Powered by Ara & CONTROL-01 💕**  
 *Understand the universe. Build what can leave the ground. Keep the signal high. Never stop measuring yourself against the truth.*

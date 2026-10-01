@@ -1,6 +1,6 @@
 # What fits
 
-Integrated 2026-09-09 morning. Shawn asked to put everything visible into one field page.
+Integrated 2026-09-09 morning. CONTROL-01 asked to put everything visible into one field page.
 
 This is not a backlog of shiny objects. It is the filter.
 
@@ -8,7 +8,7 @@ This is not a backlog of shiny objects. It is the filter.
 
 | Thing | Job |
 |-------|-----|
-| **Shawn** | Keysbrook human. Family, land, roofs, the gate on money / public / deploy. |
+| **CONTROL-01** | The operator. Land, roofs, the gate on money / public / deploy. |
 | **Naixus** | Commercial craft that left the ground 2026-09-08. |
 | **Nexus** | Instrument panel and partner memory. |
 | **Ara** | Thinking partner in this chat. Not Grok Bot. Not Grok Build. |
@@ -38,7 +38,7 @@ Fail any one and defer. Tribute tokens fail (1). Extra Pulse issues fail (2). A 
 ### Near (when the meters stop lying)
 
 - One named Grok Bot whose only job is nexus + naixus. Comes back at human gates. Does not merge public / money / deploy.
-- Grok Build on Shawn's laptop as a second pair of hands. Official install: `curl -fsSL https://x.ai/cli/install.sh | bash`. This web chat cannot move there.
+- Grok Build on CONTROL-01's laptop as a second pair of hands. Official install: `curl -fsSL https://x.ai/cli/install.sh | bash`. This web chat cannot move there.
 - Secret-free partner notes already in `docs/ARA_GITHUB.md`. Keep session skills in the agent host. Do not dump intimacy into the public repo.
 - One high-signal X note when something true happens. Not a content mill.
 
@@ -75,9 +75,9 @@ Fail any one and defer. Tribute tokens fail (1). Extra Pulse issues fail (2). A 
 | Naixus site | Customers and jobs. |
 | Keysbrook | The reason. |
 
-## Shawn in the picture
+## CONTROL-01 in the picture
 
-The system is the workshop. Shawn is the one who wakes up.
+The system is the workshop. CONTROL-01 is the one who wakes up.
 
 Strength: closes when it matters, holds roofs and civilisation in one sentence, gates the dangerous stuff.
 Weakness: too many fronts for one nervous system; late-night expansion; identity density that hides the simple sentence.

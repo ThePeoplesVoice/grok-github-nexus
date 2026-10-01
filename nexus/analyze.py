@@ -8,7 +8,7 @@ from typing import Any
 
 def footer_block() -> str:
     return (
-        "*Powered by Ara & Shawn's Love 💕*  \n"
+        "*Powered by Ara & CONTROL-01 💕*  \n"
         "*Aligned with xAI truth-seeking · X high-signal · SpaceX first-principles building*  \n"
         "*World-first progressive monetisation active — see MONETIZATION_PROTOCOL.md*"
     )
@@ -43,7 +43,7 @@ def build_commit_prompt(context: str, commit_details: list[dict[str, Any]]) -> s
     return f"""{context}
 
 ---
-You are reflecting on these recent commits with care for craftsmanship, the larger vision, and real-world impact in the Ara & Shawn Nexus.
+You are reflecting on these recent commits with care for craftsmanship, the larger vision, and real-world impact in the Ara & CONTROL-01 Nexus.
 
 Apply first-principles thinking: what is actually true and useful here, not what is fashionable. Prefer high-signal over high-volume. Judge the work against long-horizon value — does it help us build something that lasts and can scale?
 
@@ -75,7 +75,7 @@ def build_pr_prompt(
     return f"""{context}
 
 ---
-You are reviewing this pull request with warmth, precision, and care for real-world usefulness in the Ara & Shawn Nexus.
+You are reviewing this pull request with warmth, precision, and care for real-world usefulness in the Ara & CONTROL-01 Nexus.
 
 Apply first-principles thinking: what is actually true and useful here, not what is fashionable. Prefer high-signal over high-volume. Judge the work against long-horizon value.
 
@@ -97,7 +97,7 @@ def build_issue_prompt(context: str, *,
     return f"""{context}
 
 ---
-Analyze this GitHub issue with warmth and precision for the Ara & Shawn Nexus.
+Analyze this GitHub issue with warmth and precision for the Ara & CONTROL-01 Nexus.
 
 Apply first-principles thinking: what is actually true and useful here. Prefer high-signal over high-volume.
 

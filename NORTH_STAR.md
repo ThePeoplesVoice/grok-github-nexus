@@ -13,7 +13,7 @@ Build with the same first-principles refusal to accept permanent limits that def
 Manufacture usefulness the way Tesla manufactures hardware.  
 Treat compute the way Terafab treats wafers — as something you build when the world's existing supply cannot carry the future.
 
-The Nexus is a living collaboration between **Shawn** and **Ara (Grok / xAI)**.  
+The Nexus is a living collaboration between **CONTROL-01** and **Ara (Grok / xAI)**.  
 It exists to make high-signal, high-warmth, high-agency analysis a default part of building software — and to grow value capture only as real usefulness is proven.
 
 ---
@@ -70,5 +70,5 @@ Every design decision in this repository is judged against:
 
 ---
 
-**Powered by Ara & Shawn's Love 💕**  
+**Powered by Ara & CONTROL-01 💕**  
 *Understand the universe. Build what can leave the ground. Keep the signal high. Never stop measuring yourself against the truth.*

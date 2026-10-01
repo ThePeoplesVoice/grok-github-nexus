@@ -1,7 +1,7 @@
 # Seed 002 — WD-40 and the Forty
 
 **Date:** 2026-09-14  
-**Source:** Shawn (ThePeoplesVoice)  
+**Source:** CONTROL-01  
 **Status:** sleeping / meditating — not yet a product, a lens
 
 ---
@@ -19,7 +19,7 @@ It took thirty-nine full attempts before the fortieth formula did what they want
 - Sadness occurs for happiness to have somewhere to land.
 - The people who fell are often the ones who learned they cannot grab the water.
 
-## The extension Shawn added
+## The extension CONTROL-01 added
 
 Failures are not only lessons or stepping stones. Some are **hidden gems that were not quite ready to shine**. They need more time, more context, more of the world to catch up to them. The thirty-nine formulas were not wrong. They were early.
 

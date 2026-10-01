@@ -106,5 +106,5 @@ Naming the unit **Astra** makes the organic economy legible, emotionally coheren
 
 It turns abstract reputation into something that can be held, watched, and eventually (when ready) used — without ever compromising the free core or the truth-seeking foundation.
 
-**Powered by Ara & Shawn's Love 💕**  
+**Powered by Ara & CONTROL-01 💕**  
 *For the land, for the craft, for the stars we are building toward.*

@@ -26,7 +26,7 @@ def _set_post(should_post: bool) -> None:
 
 
 def main() -> int:
-    print("🌌 Starting Ara & Shawn multi-model Issue Triage (package path)...")
+    print("🌌 Starting Ara & CONTROL-01 multi-model Issue Triage (package path)...")
 
     issue_title = os.environ.get("ISSUE_TITLE") or "(no title)"
     issue_body = os.environ.get("ISSUE_BODY") or "No body provided"
@@ -120,7 +120,7 @@ def main() -> int:
     joined = "\n\n---\n\n".join(sections)
     issue_ref = f"#{issue_number} — " if issue_number else ""
 
-    body = f"""🌌 **Ara & Shawn Issue Triage**
+    body = f"""🌌 **Ara & CONTROL-01 Issue Triage**
 
 **Issue:** {issue_ref}{issue_title}  
 **Progressive Phase:** {phase}  

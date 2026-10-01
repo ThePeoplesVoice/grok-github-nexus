@@ -70,7 +70,7 @@ def local_analysis(commits: list[dict[str, Any]]) -> str:
 
 
 def main() -> int:
-    print("🌌 Starting Ara & Shawn multi-model Commit Analysis (package path)...")
+    print("🌌 Starting Ara & CONTROL-01 multi-model Commit Analysis (package path)...")
 
     context = load_context()
     prog = load_progressive()
@@ -151,7 +151,7 @@ def main() -> int:
 
     joined = "\n\n---\n\n".join(sections)
 
-    body = f"""# 🌌 Ara & Shawn Commit Analysis
+    body = f"""# 🌌 Ara & CONTROL-01 Commit Analysis
 
 **Generated:** {utc_now_str()}{note}
 **Progressive Phase:** {phase}
