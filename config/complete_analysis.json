@@ -1,54 +1,59 @@
 {
   "version": "1.1.0",
-  "generated_at": "2026-09-24 14:34 UTC",
+  "generated_at": "2026-10-01 16:50 UTC",
   "source": "grok",
-  "summary": "Layer 0 Open Core is stable: 48 successful analyses, fresh reputation, and Astra 10.5 with Layer 1 still gated. Collaborative evidence is thin while three overlapping field-pulse PRs (#203, #205, #206) sit open. This week is GitHub hygiene, not new architecture. Land the completed pulse with a human merge and close same-day duplicate noise.",
-  "health": 72,
-  "stop": "Stop opening more field-pulse PRs while #203, #205, and #206 are already open.",
-  "start": "Start human-landing the completed pulse (#203) and closing same-day duplicate #205.",
-  "keep": "Keep usage and reputation increments only after successful analysis, including living-PR backfill.",
+  "summary": "Open Core is operating and Layer 1 stays off because the collaborative score is 10.5. Usage is fresh at 57 analyses on 2026-10-01, while presence is stuck at 52 from 2026-09-28 and the queue still quotes Astra 30 plus a hold that ended 2026-09-17. The live GitHub surface is one external PR, #234, plus analysis issues #236 and #238 that the meter already covers. Keep the fail-closed Grok checks and the human-approval gate; a human closes the noise and decides the PR.",
+  "health": 74,
+  "stop": "Filing a GitHub issue for every commit analysis and self-audit the usage meter already counts",
+  "start": "Human-close #236 and #238 and give PR #234 a land-or-close decision this week",
+  "keep": "Fail-closed Grok checks and the enforcing human-approval gate",
   "actions": [
     {
-      "id": "close-duplicate-pulse-205",
-      "title": "Close duplicate field-pulse PR #205",
-      "why": "PR #205 is a same-day Medina pulse with the same held-invitation title as #206 and only adds review noise.",
+      "id": "close-metered-analysis-issues",
+      "title": "Close issues 236 and 238",
+      "why": "Both are dated analysis tickets for runs the usage meter already recorded.",
       "effort": "S",
       "files": [],
       "steps": [
-        "Comment on #205 that #206 supersedes it as the 2026-09-24 held invitation.",
-        "Close #205 without merging.",
-        "Do not open a replacement pulse."
+        "Comment on issue #236 that by_type.commit is 32 and last_updated is 2026-10-01, then close it.",
+        "Comment on issue #238 that by_type.self_audit is already 8, then close it.",
+        "Do not open replacement analysis issues."
       ],
-      "issueTitle": "Close superseded pulse #205",
-      "issueBody": "PR #205 duplicates the 2026-09-24 held field pulse already opened as #206. Close it without merge so one invitation remains."
+      "issueTitle": "Close metered analysis issues 236 and 238",
+      "issueBody": "Issues #236 and #238 repeat commit and self-audit runs already stored in usage. Close both and do not replace them with new analysis issues."
     },
     {
-      "id": "human-land-pulse-203",
-      "title": "Human-land completed field-pulse PR #203",
-      "why": "PR #203 is the newest completed open-invitation pulse still unmerged and is the one real change to route.",
+      "id": "route-pr-234",
+      "title": "Decide PR 234 without auto-merge",
+      "why": "PR #234 is the only open pull request and has waited since 2026-09-30.",
       "effort": "S",
       "files": [],
       "steps": [
-        "Review the #203 diff for field-only pulse changes.",
-        "Human-merge #203 if the 2026-09-23 complete pulse is accurate.",
-        "Do not auto-merge and do not rotate any API keys."
+        "Read PR #234 by ThePeoplesVoice and confirm whether the diff is only the field pulse whose invitation title already says complete.",
+        "If it adds nothing beyond the pulse already counted in by_type.pulse 10, comment that and close it without merging.",
+        "If the operator wants the diff in tree, approve it and land it manually; do not enable auto-merge."
       ],
-      "issueTitle": "Land completed pulse #203",
-      "issueBody": "PR #203 is the 2026-09-23 field pulse marked open invitation complete. A human should review and land it; do not auto-merge."
+      "issueTitle": "Human land-or-close for PR 234",
+      "issueBody": "PR #234 is the only open pull request and needs an operator decision. Do not auto-merge; close it if it only repeats a counted pulse, otherwise land it by hand."
     },
     {
-      "id": "hold-single-pulse-206",
-      "title": "Keep PR #206 as the sole open invitation",
-      "why": "After closing #205 and landing #203, #206 is the only held invitation and should not be stacked or auto-merged.",
+      "id": "refresh-stale-operator-records",
+      "title": "Correct stale queue and presence figures",
+      "why": "Queue notes and the presence snapshot contradict the current usage and Astra meters.",
       "effort": "S",
-      "files": [],
-      "steps": [
-        "Comment on #206 that it is the single open held invitation.",
-        "Leave #206 open until a human decides to land or close it.",
-        "File no new architecture issues; open issues is already empty."
+      "files": [
+        "nexus/simulate.py",
+        "nexus/scripts/run_simulation.py",
+        "tests/test_simulate.py"
       ],
-      "issueTitle": "Single held pulse #206",
-      "issueBody": "PR #206 remains the 2026-09-24 held invitation after duplicate #205 is closed. A human decides when to land or close it."
+      "steps": [
+        "Do not run nexus/scripts/run_simulation.py to fix balances; that runner must not persist Astra or increment usage.",
+        "Edit the existing queue record (version 1.0.16) so it no longer says Astra is 30 or that complete is held until 2026-09-17; current Astra balance is 10.5 and by_type.complete is 3.",
+        "Regenerate presence from current usage (57 analyses, 2026-10-01) and current reputation, and leave layer1_enabled false.",
+        "Re-read tests/test_simulate.py and keep the assertion that simulation does not persist Astra."
+      ],
+      "issueTitle": "Refresh stale presence and queue notes",
+      "issueBody": "Presence still shows 52 analyses from 2026-09-28 while usage shows 57, and the queue still cites Astra 30 and a passed hold date. Correct those records from the current meters and do not enable Layer 1."
     }
   ],
   "outcome": "ok",
