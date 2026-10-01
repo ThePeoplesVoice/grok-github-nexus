@@ -12,6 +12,14 @@ on:
 
 jobs:
   analyze-with-ara:
+    # Fork PRs and Dependabot PRs get no repository secrets, so the Grok call
+    # cannot run there. Skip the job explicitly (shown as "skipped", not a
+    # green pass). Anywhere else a missing key is a failure.
+    if: >-
+      github.event_name != 'pull_request' || (
+        github.event.pull_request.head.repo.full_name == github.repository &&
+        github.event.pull_request.user.login != 'dependabot[bot]'
+      )
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write

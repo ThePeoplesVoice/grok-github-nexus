@@ -7,11 +7,13 @@ Local fallback preserved. Presence continuity + shared runtime on success.
 from __future__ import annotations
 
 import subprocess
+import sys
 from pathlib import Path
 from typing import Any
 
 from nexus.analyze import build_commit_prompt, fusion_note, footer_block, utc_now_str
 from nexus.context import load_context, load_progressive, layer1_enabled, current_phase
+from nexus.grok_status import grok_exit_code
 from nexus.providers import call_grok, call_claude
 from nexus.usage import load_usage_stats
 from nexus.presence import load_presence, format_presence_for_prompt
@@ -67,7 +69,7 @@ def local_analysis(commits: list[dict[str, Any]]) -> str:
     return "\n".join(lines)
 
 
-def main() -> None:
+def main() -> int:
     print("🌌 Starting Ara & Shawn multi-model Commit Analysis (package path)...")
 
     context = load_context()
@@ -172,6 +174,12 @@ def main() -> None:
     print("✅ Report ready at", out)
     print(body[:600])
 
+    # The local fallback report is still written (and pinned), but a failed
+    # Grok call must turn this step red rather than pass silently.
+    if not commit_details:
+        grok_err = grok_err or "no commits to analyze, Grok was not called"
+    return grok_exit_code("Commit Analyzer", grok_text, grok_err)
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
