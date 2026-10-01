@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import os
+import re
+import time
 from typing import Any, Literal
 
 import requests
@@ -22,8 +24,19 @@ GROK_URL = "https://api.x.ai/v1/chat/completions"
 CLAUDE_URL = "https://api.anthropic.com/v1/messages"
 DEFAULT_GROK_MODEL = "grok-4.7"
 DEFAULT_CLAUDE_MODEL = "claude-sonnet-4-20250514"
-# Hard cap so GROK_RETRIES cannot become a quiet spend loop.
-MAX_GROK_RETRIES = 2
+# Hard cap so GROK_RETRIES cannot become a quiet spend loop: at most one retry,
+# and only for transient failures (timeout, connection error, 5xx).
+MAX_GROK_RETRIES = 1
+GROK_CONNECT_TIMEOUT = 10
+DEFAULT_GROK_READ_TIMEOUT = 90
+GROK_RETRY_BACKOFF_SECONDS = 3.0
+# grok-4.5+ are reasoning models that default to "high" effort (docs.x.ai,
+# Reasoning). High effort on a large diff ran past the 120 s read timeout.
+DEFAULT_GROK_REASONING_EFFORT = "low"
+GROK_REASONING_EFFORTS = ("low", "medium", "high", "xhigh")
+# Upper bound on the user prompt sent to Grok; longer prompts are trimmed.
+DEFAULT_GROK_MAX_PROMPT_CHARS = 24000
+_sleep = time.sleep
 
 GrokOutcome = Literal["ok", "empty", "malformed", "truncated", "auth", "timeout", "error"]
 
@@ -34,6 +47,38 @@ def _grok_model() -> str:
 
 def _claude_model() -> str:
     return (os.environ.get("CLAUDE_MODEL") or DEFAULT_CLAUDE_MODEL).strip()
+
+
+def _grok_reasoning_effort(model: str, effort: str | None) -> str | None:
+    """Effort to send, or None when the model does not take reasoning_effort."""
+    value = (effort or os.environ.get("GROK_REASONING_EFFORT") or DEFAULT_GROK_REASONING_EFFORT)
+    value = value.strip().lower()
+    if value not in GROK_REASONING_EFFORTS:
+        value = DEFAULT_GROK_REASONING_EFFORT
+    name = model.lower()
+    if "non-reasoning" in name or "multi-agent" in name:
+        return None
+    match = re.match(r"grok-(\d+)\.(\d+)", name)
+    if not match or (int(match.group(1)), int(match.group(2))) < (4, 5):
+        return None
+    return value
+
+
+def trim_prompt(text: str, limit: int | None = None) -> str:
+    """Cap prompt length so one oversized diff cannot stall the call."""
+    if limit is None:
+        try:
+            limit = int(os.environ.get("GROK_MAX_PROMPT_CHARS") or DEFAULT_GROK_MAX_PROMPT_CHARS)
+        except ValueError:
+            limit = DEFAULT_GROK_MAX_PROMPT_CHARS
+    if limit <= 0 or len(text) <= limit:
+        return text
+    marker = f"\n\n… [prompt trimmed from {len(text)} to {limit} chars]"
+    return text[: max(0, limit - len(marker))] + marker
+
+
+def _is_transient_status(status: int) -> bool:
+    return 500 <= status <= 599
 
 
 def _is_timeout_error(exc: Exception) -> bool:
@@ -158,37 +203,50 @@ def call_grok(
     system: str = ARA_SYSTEM,
     temperature: float = 0.55,
     max_tokens: int = 1000,
-    timeout: int = 90,
+    timeout: int | None = None,
     api_key: str | None = None,
     model: str | None = None,
     retries: int | None = None,
     response_format: dict[str, Any] | None = None,
+    reasoning_effort: str | None = None,
 ) -> tuple[str | None, str | None]:
-    """Call Grok. Returns (analysis_text, error_message)."""
+    """Call Grok. Returns (analysis_text, error_message).
+
+    ``timeout`` is the read timeout in seconds; the connect timeout is fixed at
+    GROK_CONNECT_TIMEOUT. One retry with backoff happens only on a timeout,
+    connection error or 5xx. Auth errors, other 4xx and empty or malformed
+    replies fail at once, since retrying them only adds cost and latency.
+    """
     key = api_key or os.environ.get("GROK_API_KEY") or os.environ.get("XAI_API_KEY")
     if not key:
         return None, "GROK_API_KEY (or XAI_API_KEY) missing"
 
     model_name = (model or _grok_model()).strip()
     retries = resolve_grok_retries(retries)
+    read_timeout = timeout or DEFAULT_GROK_READ_TIMEOUT
+    effort = _grok_reasoning_effort(model_name, reasoning_effort)
+
+    payload: dict[str, Any] = {
+        "model": model_name,
+        "messages": [
+            {"role": "system", "content": system},
+            {"role": "user", "content": trim_prompt(user_content)},
+        ],
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+        "search": False,
+    }
+    if effort:
+        payload["reasoning_effort"] = effort
+    if response_format:
+        payload["response_format"] = response_format
 
     attempts = 1 + retries
     last_error = "Grok exception: request failed"
 
     for attempt in range(attempts):
+        transient = False
         try:
-            payload: dict[str, Any] = {
-                "model": model_name,
-                "messages": [
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": user_content},
-                ],
-                "temperature": temperature,
-                "max_tokens": max_tokens,
-                "search": False,
-            }
-            if response_format:
-                payload["response_format"] = response_format
             response = requests.post(
                 GROK_URL,
                 headers={
@@ -196,10 +254,13 @@ def call_grok(
                     "Content-Type": "application/json",
                 },
                 json=payload,
-                timeout=timeout,
+                timeout=(GROK_CONNECT_TIMEOUT, read_timeout),
             )
             if response.status_code == 200:
-                data = response.json()
+                try:
+                    data = response.json()
+                except ValueError as e:
+                    return None, f"Grok response malformed JSON: {str(e)[:120]}"
                 choices = data.get("choices") if isinstance(data, dict) else None
                 message = (
                     choices[0].get("message")
@@ -209,18 +270,23 @@ def call_grok(
                 text = message.get("content") if isinstance(message, dict) else None
                 if isinstance(text, str) and text.strip():
                     return text, None
-                last_error = "Grok response empty content"
-                if attempt + 1 < attempts:
-                    print(f"⏳ Grok empty response, retry {attempt + 2}/{attempts}")
-                    continue
+                return None, "Grok response empty content"
+            last_error = format_api_error("Grok", response) + f" [model={model_name}]"
+            transient = _is_transient_status(response.status_code)
+            if not transient:
                 return None, last_error
-            return None, format_api_error("Grok", response) + f" [model={model_name}]"
         except Exception as e:
             last_error = f"Grok exception: {str(e)[:180]}"
-            if attempt + 1 < attempts and _is_timeout_error(e):
-                print(f"⏳ Grok timeout, retry {attempt + 2}/{attempts}")
-                continue
-            return None, last_error
+            transient = _is_timeout_error(e) or isinstance(
+                e, (requests.ConnectionError, ConnectionError)
+            )
+            if not transient:
+                return None, last_error
+
+        if attempt + 1 < attempts:
+            delay = GROK_RETRY_BACKOFF_SECONDS * (2 ** attempt)
+            print(f"⏳ Grok transient failure, retry {attempt + 2}/{attempts} in {delay:.0f}s: {last_error[:120]}")
+            _sleep(delay)
 
     return None, last_error
 
@@ -253,7 +319,7 @@ def call_claude(
             "messages": [{"role": "user", "content": user_content}],
         }
         response = requests.post(
-            CLAUDE_URL, headers=headers, json=payload, timeout=timeout
+            CLAUDE_URL, headers=headers, json=payload, timeout=(GROK_CONNECT_TIMEOUT, timeout)
         )
         if response.status_code == 200:
             data = response.json()
