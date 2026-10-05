@@ -1,28 +1,28 @@
 {
   "version": "0.3.0",
-  "generated_at": "2026-09-28 16:38 UTC",
+  "generated_at": "2026-10-05 16:59 UTC",
   "phase": "Layer 0 — Open Core (Layer 1 gated on collaborative evidence)",
   "layer1_enabled": false,
-  "total_successful_analyses": 52,
+  "total_successful_analyses": 60,
   "by_type": {
-    "commit": 28,
+    "commit": 33,
     "pr": 3,
     "issue": 1,
-    "self_audit": 7,
-    "pulse": 10,
-    "complete": 3,
+    "self_audit": 8,
+    "pulse": 11,
+    "complete": 4,
     "other": 0
   },
   "reputation_score": 10.5,
-  "reputation_raw": 60.5,
+  "reputation_raw": 69.0,
   "reputation_freshness": "fresh",
   "grok_outcome": "ok",
   "recent_commits_preview": [
-    "ce5a269 chore: automated dev cycle — queue + field notes",
-    "f526093 chore: usage + reputation after commit analysis",
-    "6c505aa chore: usage + reputation after commit analysis",
-    "207f0ea feat: default analysis model to grok-4.7",
-    "7ce5e81 chore: stale PR sweep report"
+    "88537cc chore: automated dev cycle — queue + field notes",
+    "1220637 chore: usage + reputation after commit analysis",
+    "80eac6c chore: stale PR sweep report",
+    "e58f3da chore: complete analysis — implementations + usage",
+    "74d5e14 chore: use operator callsign CONTROL-01 in public code and docs (#241)"
   ],
   "notes": "Compressed context for continuity. Not a chat log. See ORGANIC_SYSTEMS.md."
 }
