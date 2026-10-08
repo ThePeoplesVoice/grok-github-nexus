@@ -1,59 +1,54 @@
 {
   "version": "1.1.0",
-  "generated_at": "2026-10-01 16:50 UTC",
+  "generated_at": "2026-10-08 17:07 UTC",
   "source": "grok",
-  "summary": "Open Core is operating and Layer 1 stays off because the collaborative score is 10.5. Usage is fresh at 57 analyses on 2026-10-01, while presence is stuck at 52 from 2026-09-28 and the queue still quotes Astra 30 plus a hold that ended 2026-09-17. The live GitHub surface is one external PR, #234, plus analysis issues #236 and #238 that the meter already covers. Keep the fail-closed Grok checks and the human-approval gate; a human closes the noise and decides the PR.",
-  "health": 74,
-  "stop": "Filing a GitHub issue for every commit analysis and self-audit the usage meter already counts",
-  "start": "Human-close #236 and #238 and give PR #234 a land-or-close decision this week",
-  "keep": "Fail-closed Grok checks and the enforcing human-approval gate",
+  "summary": "Open Core is healthy enough to keep running: 60 successful analyses, fresh reputation, and Layer 1 still correctly off at collaborative score 10.5. The live GitHub surface is two PRs and a stack of dated bot reports, not missing architecture. PR 243 is the one real change to land by hand. Stop filing another report issue while 242 and 244-246 are still open.",
+  "health": 64,
+  "stop": "Opening another pulse, dev-cycle, commit-analysis, or complete issue while #242 and #244-#246 remain open.",
+  "start": "Hand-review PR #243 and land it only if the diff is report-footer callsign text.",
+  "keep": "Fail-on-Grok-error for Grok workflows, and increment complete only on a real ok, never on 429.",
   "actions": [
     {
-      "id": "close-metered-analysis-issues",
-      "title": "Close issues 236 and 238",
-      "why": "Both are dated analysis tickets for runs the usage meter already recorded.",
+      "id": "close-superseded-report-issues",
+      "title": "Close superseded bot report issues",
+      "why": "Issues #242, #244, #245, and #246 duplicate chores already on main and crowd out the one real PR.",
       "effort": "S",
       "files": [],
       "steps": [
-        "Comment on issue #236 that by_type.commit is 32 and last_updated is 2026-10-01, then close it.",
-        "Comment on issue #238 that by_type.self_audit is already 8, then close it.",
-        "Do not open replacement analysis issues."
+        "Close #242 with a note that complete analysis already landed in e58f3da and usage by_type.complete is 4.",
+        "Close #244, #245, and #246 with notes pointing at 1220637, 88537cc, and fc5f8ac.",
+        "Leave #247 open until the 2026-10-07 self-audit date; do not open replacements this week."
       ],
-      "issueTitle": "Close metered analysis issues 236 and 238",
-      "issueBody": "Issues #236 and #238 repeat commit and self-audit runs already stored in usage. Close both and do not replace them with new analysis issues."
+      "issueTitle": "Close superseded Nexus report issues",
+      "issueBody": "Issues #242, #244, #245, and #246 repeat work already committed and should be closed by a human. Leave #247 open until its 2026-10-07 date and do not file replacement reports this week."
     },
     {
-      "id": "route-pr-234",
-      "title": "Decide PR 234 without auto-merge",
-      "why": "PR #234 is the only open pull request and has waited since 2026-09-30.",
+      "id": "land-pr-243-callsign-footers",
+      "title": "Land PR 243 footer callsign by hand",
+      "why": "PR #243 is the current code change and matches the already-landed CONTROL-01 callsign work in #241.",
       "effort": "S",
       "files": [],
       "steps": [
-        "Read PR #234 by ThePeoplesVoice and confirm whether the diff is only the field pulse whose invitation title already says complete.",
-        "If it adds nothing beyond the pulse already counted in by_type.pulse 10, comment that and close it without merging.",
-        "If the operator wants the diff in tree, approve it and land it manually; do not enable auto-merge."
+        "Open PR #243 and confirm the diff only changes report footers to callsign CONTROL-01.",
+        "If the diff does anything else, request changes and do not merge.",
+        "If it is footer-only, the operator merges it in the GitHub UI; do not auto-merge."
       ],
-      "issueTitle": "Human land-or-close for PR 234",
-      "issueBody": "PR #234 is the only open pull request and needs an operator decision. Do not auto-merge; close it if it only repeats a counted pulse, otherwise land it by hand."
+      "issueTitle": "Review and land PR 243 by hand",
+      "issueBody": "PR #243 should be merged only if it limits report footers to the CONTROL-01 callsign, consistent with #241. A human lands it; do not auto-merge."
     },
     {
-      "id": "refresh-stale-operator-records",
-      "title": "Correct stale queue and presence figures",
-      "why": "Queue notes and the presence snapshot contradict the current usage and Astra meters.",
+      "id": "decide-stale-field-pr-234",
+      "title": "Decide stale field PR 234",
+      "why": "PR #234 is a 2026-09-29 field pulse still open after later pulse commit fc5f8ac and issue #246.",
       "effort": "S",
-      "files": [
-        "nexus/simulate.py",
-        "nexus/scripts/run_simulation.py",
-        "tests/test_simulate.py"
-      ],
+      "files": [],
       "steps": [
-        "Do not run nexus/scripts/run_simulation.py to fix balances; that runner must not persist Astra or increment usage.",
-        "Edit the existing queue record (version 1.0.16) so it no longer says Astra is 30 or that complete is held until 2026-09-17; current Astra balance is 10.5 and by_type.complete is 3.",
-        "Regenerate presence from current usage (57 analyses, 2026-10-01) and current reputation, and leave layer1_enabled false.",
-        "Re-read tests/test_simulate.py and keep the assertion that simulation does not persist Astra."
+        "Read PR #234 against later pulse commit fc5f8ac and issue #246.",
+        "If the invitation is already recorded, close #234 with that pointer and do not merge.",
+        "If Medina-as-ground-signal is still an active decision, comment that on #234 and leave it open; do not auto-merge."
       ],
-      "issueTitle": "Refresh stale presence and queue notes",
-      "issueBody": "Presence still shows 52 analyses from 2026-09-28 while usage shows 57, and the queue still cites Astra 30 and a passed hold date. Correct those records from the current meters and do not enable Layer 1."
+      "issueTitle": "Resolve or close field PR 234",
+      "issueBody": "PR #234 is an older field pulse that may already be superseded by fc5f8ac and #246. A human should close it or explicitly keep it; do not auto-merge."
     }
   ],
   "outcome": "ok",
