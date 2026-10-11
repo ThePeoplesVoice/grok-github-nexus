@@ -18,6 +18,7 @@ from nexus.audit import structural_health, alignment_signals, progressive_snapsh
 from nexus.usage import load_usage_stats
 from nexus.reputation import compute_reputation, reputation_summary_md
 from nexus.presence import load_presence
+from nexus.dev_queue import retire_stale_items
 from nexus.field_notes import append_field_note, notes_summary_md
 
 # scripts/ -> nexus/ -> repo root
@@ -115,6 +116,7 @@ def main() -> None:
     rep = compute_reputation()
     presence = load_presence()
     queue = _load_queue()
+    retired = retire_stale_items(queue)
     log = _recent_commits()
 
     print(f"Structural health: {health['score']}/100")
@@ -123,6 +125,8 @@ def main() -> None:
     print(f"Analyses: {stats.get('total_successful_analyses')}")
     print(reputation_summary_md(rep))
     print(f"Presence: {presence.get('generated_at') or 'none'}")
+    for r in retired:
+        print(f"➖ Retired: {r.get('id')} — {r['retired_reason']}")
     print("Recent commits:")
     print(log or "(none)")
 
@@ -178,6 +182,9 @@ def main() -> None:
 
 ## Top next items
 {chr(10).join(f"- `{i.get('id')}` (p{i.get('priority')}): {i.get('title')}" for i in next_items[:5]) or '- (empty)'}
+
+## Retired this cycle
+{chr(10).join(f"- `{r.get('id')}`: {r['retired_reason']}" for r in retired) or '- (none)'}
 
 ## Recent field notes
 {notes_summary_md(5)}

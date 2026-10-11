@@ -9,6 +9,7 @@ from typing import Any
 
 from .context import load_context, load_progressive, load_usage_stats, layer1_enabled, current_phase
 from .presence import load_presence, format_presence_for_prompt
+from .dev_queue import retire_stale_items
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -124,6 +125,7 @@ def _dev_queue_block() -> str:
     path = ROOT / "config" / "dev_queue.json"
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
+        retire_stale_items(data)  # read-only view: finished/expired items never reach the prompt
         next_items = data.get("next") or []
         lines = []
         for item in next_items[:5]:
