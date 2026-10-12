@@ -1,6 +1,6 @@
 {
   "version": "1.0.17",
-  "updated_at": "2026-10-11T00:30:00Z",
+  "updated_at": "2026-10-12T16:29:54Z",
   "notes": "2026-10-11 queue refresh (Complete #242 item 3, Dev Cycle #245), rebased on main bf7b738. Instruments: usage 61 (complete=5, last_updated 2026-10-08T17:07Z), Astra 10.5 / 61 analyses / last_computed 2026-10-08T17:07Z. Retired from next: #172 merged, Complete hold ended 2026-09-17, Astra recomputed, Pulse #155 closed. Dev cycle now drops done/expired items automatically (nexus/dev_queue.py). 2026-09-13: landed local simulation runner (package 0.8.1).",
   "done": [
     {
@@ -120,10 +120,10 @@
   "last_cycle": {
     "structural_health": 100,
     "triad_hits": 47,
-    "total_analyses": 59,
+    "total_analyses": 64,
     "reputation_effective": 10.49,
     "reputation_freshness": "fresh",
-    "presence_at": "2026-09-28 16:38 UTC",
+    "presence_at": "2026-10-05 16:59 UTC",
     "package_version": "0.8.1"
   }
 }
