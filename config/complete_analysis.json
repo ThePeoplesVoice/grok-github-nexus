@@ -1,54 +1,63 @@
 {
   "version": "1.1.0",
-  "generated_at": "2026-10-08 17:07 UTC",
+  "generated_at": "2026-10-15 14:35 UTC",
   "source": "grok",
-  "summary": "Open Core is healthy enough to keep running: 60 successful analyses, fresh reputation, and Layer 1 still correctly off at collaborative score 10.5. The live GitHub surface is two PRs and a stack of dated bot reports, not missing architecture. PR 243 is the one real change to land by hand. Stop filing another report issue while 242 and 244-246 are still open.",
-  "health": 64,
-  "stop": "Opening another pulse, dev-cycle, commit-analysis, or complete issue while #242 and #244-#246 remain open.",
-  "start": "Hand-review PR #243 and land it only if the diff is report-footer callsign text.",
-  "keep": "Fail-on-Grok-error for Grok workflows, and increment complete only on a real ok, never on 429.",
+  "summary": "Open Core is running: 66 analyses, freshness fresh, Astra 10.5 matching the collaborative score, and no open pull requests. Queue notes still cite usage 61, and presence still shows 65 analyses from 2026-10-12, so the instruments disagree. Five report issues are open; four are older than the 2026-10-12 dev cycle. This week should close that noise and route issue 249 by hand, not add architecture.",
+  "health": 73,
+  "stop": "Stop opening new pulse, audit, and complete issues while 242, 244, 246, and 247 remain open.",
+  "start": "Close those four superseded issues and rewrite the queue instrument note to usage 66.",
+  "keep": "Keep human landing only, and keep Astra derived from collaborative reputation at 10.5.",
   "actions": [
     {
-      "id": "close-superseded-report-issues",
-      "title": "Close superseded bot report issues",
-      "why": "Issues #242, #244, #245, and #246 duplicate chores already on main and crowd out the one real PR.",
+      "id": "close-stale-reports",
+      "title": "Close superseded report issues 242, 244, 246, and 247",
+      "why": "They are older automated reports and are noise next to the 2026-10-12 dev cycle.",
       "effort": "S",
-      "files": [],
+      "files": [
+        "nexus/dev_queue.py"
+      ],
       "steps": [
-        "Close #242 with a note that complete analysis already landed in e58f3da and usage by_type.complete is 4.",
-        "Close #244, #245, and #246 with notes pointing at 1220637, 88537cc, and fc5f8ac.",
-        "Leave #247 open until the 2026-10-07 self-audit date; do not open replacements this week."
+        "Comment on issues 242, 244, 246, and 247 that later cycles superseded them, citing usage last_updated 2026-10-14T14:19:46Z.",
+        "Close those four issues by hand.",
+        "Record their numbers on the queue done list via the existing auto-retire path in nexus/dev_queue.py.",
+        "Leave issue 249 open until the next action."
       ],
       "issueTitle": "Close superseded Nexus report issues",
-      "issueBody": "Issues #242, #244, #245, and #246 repeat work already committed and should be closed by a human. Leave #247 open until its 2026-10-07 date and do not file replacement reports this week."
+      "issueBody": "Issues 242, 244, 246, and 247 are older complete, commit, pulse, and self-audit reports and should be closed as superseded. Issue 249 stays open until a human checks it against main."
     },
     {
-      "id": "land-pr-243-callsign-footers",
-      "title": "Land PR 243 footer callsign by hand",
-      "why": "PR #243 is the current code change and matches the already-landed CONTROL-01 callsign work in #241.",
+      "id": "sync-queue-usage-note",
+      "title": "Rewrite queue instrument notes to usage 66",
+      "why": "The queue still describes usage 61 and an Astra compute time that usage has already passed.",
       "effort": "S",
-      "files": [],
-      "steps": [
-        "Open PR #243 and confirm the diff only changes report footers to callsign CONTROL-01.",
-        "If the diff does anything else, request changes and do not merge.",
-        "If it is footer-only, the operator merges it in the GitHub UI; do not auto-merge."
+      "files": [
+        "nexus/dev_queue.py"
       ],
-      "issueTitle": "Review and land PR 243 by hand",
-      "issueBody": "PR #243 should be merged only if it limits report footers to the CONTROL-01 callsign, consistent with #241. A human lands it; do not auto-merge."
+      "steps": [
+        "Edit the queue notes so instruments read total_successful_analyses 66, last_type self_audit, and last_updated 2026-10-14T14:19:46Z.",
+        "Note that presence still shows 65 analyses generated 2026-10-12 and must be refreshed by the next pulse, without hand-editing an unstated path.",
+        "Do not recompute Astra; config/astra.json already shows balance 10.5.",
+        "Do not change API keys."
+      ],
+      "issueTitle": "Sync queue notes to usage 66",
+      "issueBody": "Queue notes still cite usage 61 while usage is 66 as of 2026-10-14T14:19:46Z. Update that note only, leave Astra at 10.5, and let the next pulse refresh presence from 65."
     },
     {
-      "id": "decide-stale-field-pr-234",
-      "title": "Decide stale field PR 234",
-      "why": "PR #234 is a 2026-09-29 field pulse still open after later pulse commit fc5f8ac and issue #246.",
+      "id": "route-dev-cycle-249",
+      "title": "Human-check Dev Cycle issue 249 and close it if landed",
+      "why": "It is the only current cycle issue and there is no open pull request to review.",
       "effort": "S",
-      "files": [],
-      "steps": [
-        "Read PR #234 against later pulse commit fc5f8ac and issue #246.",
-        "If the invitation is already recorded, close #234 with that pointer and do not merge.",
-        "If Medina-as-ground-signal is still an active decision, comment that on #234 and leave it open; do not auto-merge."
+      "files": [
+        "nexus/dev_queue.py"
       ],
-      "issueTitle": "Resolve or close field PR 234",
-      "issueBody": "PR #234 is an older field pulse that may already be superseded by fc5f8ac and #246. A human should close it or explicitly keep it; do not auto-merge."
+      "steps": [
+        "Compare issue 249 with commits d79e104 and 82786c5 on main.",
+        "If every item in 249 is already on main, close 249 with those SHAs and mark it done in the queue.",
+        "If any item is still open, leave 249 open and move only finished items to the queue done list.",
+        "Do not auto-merge and do not open a new architecture issue."
+      ],
+      "issueTitle": "Route Dev Cycle issue 249",
+      "issueBody": "Issue 249 is the live 2026-10-12 dev cycle and should be checked against commits d79e104 and 82786c5. A human closes it only if the work is already on main."
     }
   ],
   "outcome": "ok",
