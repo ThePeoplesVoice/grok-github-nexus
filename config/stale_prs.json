@@ -1,25 +1,14 @@
 {
   "version": "1.0.0",
-  "generated_at": "2026-10-08 17:47 UTC",
+  "generated_at": "2026-10-15 15:32 UTC",
   "dry_run": true,
   "apply": false,
-  "open_scanned": 2,
+  "open_scanned": 0,
   "closed_count": 0,
-  "kept_count": 2,
+  "kept_count": 0,
   "remaining_count": 0,
   "candidates": [],
   "closed": [],
-  "kept": [
-    {
-      "number": 243,
-      "title": "Report footers: callsign only (CONTROL-01)",
-      "reason": "human author with unique commits"
-    },
-    {
-      "number": 234,
-      "title": "field: pulse 2026-09-29 01:14 AWST — open invitation complete, Medina remains ground signal",
-      "reason": "human author with unique commits"
-    }
-  ],
+  "kept": [],
   "notes": "Human PRs and keep-labeled PRs are never closed. STATUS.md / README.md untouched."
 }
