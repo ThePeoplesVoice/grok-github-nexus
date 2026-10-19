@@ -11,7 +11,7 @@ from nexus.analyze import build_issue_prompt, fusion_note, footer_block, utc_now
 from nexus.collab import is_collaborative_review_target
 from nexus.context import load_context, load_progressive, layer1_enabled, current_phase
 from nexus.grok_status import grok_exit_code, report_claude, report_skip
-from nexus.providers import call_grok, call_claude
+from nexus.providers import call_grok, call_claude, is_claude_skipped
 from nexus.usage import load_usage_stats
 from nexus.presence import load_presence, format_presence_for_prompt
 from nexus.runtime import after_successful_analysis, log_success
@@ -84,7 +84,7 @@ def main() -> int:
         )
         if claude_text:
             print("✅ Claude complementary triage complete")
-        elif claude_err:
+        elif claude_err and not is_claude_skipped(claude_err):
             print(f"⚠️ {claude_err}")
     elif not l1:
         print("ℹ️ Layer 1 disabled — skipping Claude")

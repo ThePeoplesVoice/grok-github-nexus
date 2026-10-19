@@ -241,8 +241,6 @@ Recent commits:
         prompt,
         temperature=0.35,
         max_tokens=COMPLETE_MAX_TOKENS,
-        timeout=180,
-        retries=1,
         response_format={"type": "json_object"},
         reasoning_effort="medium",
     )

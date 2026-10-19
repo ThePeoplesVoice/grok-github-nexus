@@ -20,7 +20,7 @@ from nexus.audit import (
     utc_now_str,
 )
 from nexus.grok_status import grok_exit_code, report_claude
-from nexus.providers import call_grok, call_claude
+from nexus.providers import call_grok, call_claude, is_claude_skipped
 from nexus.context import layer1_enabled
 from nexus.presence import load_presence, format_presence_for_prompt
 from nexus.runtime import after_successful_analysis, log_success
@@ -96,6 +96,8 @@ def main() -> int:
     fusion = ""
     if grok_text and claude_text:
         fusion = "\n\n**Multi-model self-audit active (Layer 1)**"
+    elif grok_text and is_claude_skipped(claude_err):
+        fusion = "\n\n*Claude second reviewer skipped (unavailable) — Grok-only self-audit.*"
     elif grok_text and claude_err:
         fusion = "\n\n*Claude complementary unavailable — Ara primary only.*"
 
