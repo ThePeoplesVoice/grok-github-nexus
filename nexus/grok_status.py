@@ -11,7 +11,7 @@ from __future__ import annotations
 import os
 import re
 
-from nexus.providers import classify_grok_result
+from nexus.providers import CLAUDE_SKIPPED_PREFIX, classify_grok_result, is_claude_skipped
 
 _KEY_ENV_VARS = ("GROK_API_KEY", "XAI_API_KEY", "CLAUDE_API_KEY", "GITHUB_TOKEN")
 # Provider error bodies can echo a (partially masked) key back.
@@ -71,10 +71,18 @@ def report_claude(
     """Report the Claude second reviewer outcome. Never changes the exit code.
 
     Claude is a complementary reviewer, so its state is labelled (succeeded,
-    failed, skipped) as a warning but does not decide the check. Grok does.
+    failed, skipped) but does not decide the check. Grok does. "Skipped
+    (unavailable)" (no key, no credits, billing/quota, 401/402/403) is a quiet
+    info line, never a warning and never a pass.
     """
     if not attempted:
         _write_summary(f"⏭️ **{analyzer}:** Claude second reviewer skipped (not configured for this run).")
+        return
+    if is_claude_skipped(claude_err):
+        detail = redact(str(claude_err)[len(CLAUDE_SKIPPED_PREFIX):].lstrip(": ")) or "unavailable"
+        line = f"Claude second reviewer skipped (unavailable: {detail}); the check depends on Grok alone."
+        print(f"⏭️ {analyzer}: {line}")
+        _write_summary(f"⏭️ **{analyzer}:** {line}")
         return
     if isinstance(claude_text, str) and claude_text.strip():
         _write_summary(f"✅ **{analyzer}:** Claude second reviewer succeeded.")

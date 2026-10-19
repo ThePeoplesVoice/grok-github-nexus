@@ -5,6 +5,8 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Any
 
+from nexus.providers import is_claude_skipped
+
 
 def footer_block() -> str:
     return (
@@ -28,6 +30,10 @@ def fusion_note(
 ) -> str:
     if grok_ok and claude_ok:
         return "\n**Multi-model fusion active (Layer 1)** — Grok primary + Claude complementary."
+    if is_claude_skipped(claude_error):
+        if grok_ok:
+            return "\n*Claude second reviewer skipped (unavailable) — Grok-only review.*"
+        return "\n*No review produced: Grok failed and Claude was skipped (unavailable).*"
     if grok_ok and claude_error:
         return "\n*Claude complementary analysis unavailable — continuing with Ara primary only.*"
     if claude_ok and grok_error:
