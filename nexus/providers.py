@@ -24,12 +24,19 @@ GROK_URL = "https://api.x.ai/v1/chat/completions"
 CLAUDE_URL = "https://api.anthropic.com/v1/messages"
 DEFAULT_GROK_MODEL = "grok-4.7"
 DEFAULT_CLAUDE_MODEL = "claude-sonnet-4-20250514"
-# Hard cap so GROK_RETRIES cannot become a quiet spend loop: at most one retry,
-# and only for transient failures (timeout, connection error, 5xx).
-MAX_GROK_RETRIES = 1
+# Hard cap so GROK_RETRIES cannot become a quiet spend loop: at most two
+# retries (three attempts), and only for transient failures (timeout,
+# connection error, 5xx). Env overrides are clamped to these bounds.
+MAX_GROK_RETRIES = 2
+DEFAULT_GROK_RETRIES = 2
 GROK_CONNECT_TIMEOUT = 10
-DEFAULT_GROK_READ_TIMEOUT = 90
-GROK_RETRY_BACKOFF_SECONDS = 3.0
+# 90 s timed out on PR #248 (11 Oct) and the self-audit (8 Oct); 180 s gives
+# a reasoning model room on a large diff. GROK_TIMEOUT_SECONDS overrides.
+DEFAULT_GROK_READ_TIMEOUT = 180
+MAX_GROK_READ_TIMEOUT = 300
+# Backoff before retry n is base * 2**(n-1): 5 s, then 10 s by default.
+DEFAULT_GROK_RETRY_BACKOFF_SECONDS = 5.0
+MAX_GROK_RETRY_BACKOFF_SECONDS = 30.0
 # grok-4.5+ are reasoning models that default to "high" effort (docs.x.ai,
 # Reasoning). High effort on a large diff ran past the 120 s read timeout.
 DEFAULT_GROK_REASONING_EFFORT = "low"
@@ -101,15 +108,49 @@ def _is_auth_error(blob: str) -> bool:
     return False
 
 
+def _env_number(name: str, default: float) -> float:
+    raw = (os.environ.get(name) or "").strip()
+    if not raw:
+        return default
+    try:
+        return float(raw)
+    except ValueError:
+        return default
+
+
 def resolve_grok_retries(retries: int | None = None) -> int:
     """Clamp extra attempts to [0, MAX_GROK_RETRIES]."""
     if retries is None:
-        raw = (os.environ.get("GROK_RETRIES") or "1").strip()
+        raw = (os.environ.get("GROK_RETRIES") or str(DEFAULT_GROK_RETRIES)).strip()
         try:
             retries = int(raw)
         except ValueError:
-            retries = 1
+            retries = DEFAULT_GROK_RETRIES
     return max(0, min(MAX_GROK_RETRIES, retries))
+
+
+def resolve_grok_timeout(timeout: int | float | None = None) -> float:
+    """Read timeout in seconds: explicit value, else GROK_TIMEOUT_SECONDS, clamped."""
+    value = float(timeout) if timeout else _env_number("GROK_TIMEOUT_SECONDS", DEFAULT_GROK_READ_TIMEOUT)
+    if value <= 0:
+        value = DEFAULT_GROK_READ_TIMEOUT
+    return min(MAX_GROK_READ_TIMEOUT, value)
+
+
+def resolve_grok_backoff() -> float:
+    """Base backoff in seconds from GROK_RETRY_BACKOFF_SECONDS, clamped to [0, 30]."""
+    value = _env_number("GROK_RETRY_BACKOFF_SECONDS", DEFAULT_GROK_RETRY_BACKOFF_SECONDS)
+    return max(0.0, min(MAX_GROK_RETRY_BACKOFF_SECONDS, value))
+
+
+def grok_worst_case_seconds(
+    timeout: int | float | None = None, retries: int | None = None
+) -> float:
+    """Longest one call_grok can take: every attempt times out, plus backoff."""
+    attempts = 1 + resolve_grok_retries(retries)
+    per_attempt = GROK_CONNECT_TIMEOUT + resolve_grok_timeout(timeout)
+    backoff = sum(resolve_grok_backoff() * (2 ** i) for i in range(attempts - 1))
+    return attempts * per_attempt + backoff
 
 
 def classify_grok_result(text: str | None, error: str | None) -> GrokOutcome:
@@ -212,10 +253,12 @@ def call_grok(
 ) -> tuple[str | None, str | None]:
     """Call Grok. Returns (analysis_text, error_message).
 
-    ``timeout`` is the read timeout in seconds; the connect timeout is fixed at
-    GROK_CONNECT_TIMEOUT. One retry with backoff happens only on a timeout,
-    connection error or 5xx. Auth errors, other 4xx and empty or malformed
-    replies fail at once, since retrying them only adds cost and latency.
+    ``timeout`` is the read timeout in seconds (default 180, env
+    GROK_TIMEOUT_SECONDS); the connect timeout is fixed at GROK_CONNECT_TIMEOUT.
+    Up to two retries (env GROK_RETRIES) with exponential backoff (env
+    GROK_RETRY_BACKOFF_SECONDS) happen only on a timeout, connection error or 5xx.
+    Auth errors, other 4xx and empty or malformed replies fail at once, since
+    retrying them only adds cost and latency.
     """
     key = api_key or os.environ.get("GROK_API_KEY") or os.environ.get("XAI_API_KEY")
     if not key:
@@ -223,7 +266,8 @@ def call_grok(
 
     model_name = (model or _grok_model()).strip()
     retries = resolve_grok_retries(retries)
-    read_timeout = timeout or DEFAULT_GROK_READ_TIMEOUT
+    read_timeout = resolve_grok_timeout(timeout)
+    backoff = resolve_grok_backoff()
     effort = _grok_reasoning_effort(model_name, reasoning_effort)
 
     payload: dict[str, Any] = {
@@ -284,11 +328,37 @@ def call_grok(
                 return None, last_error
 
         if attempt + 1 < attempts:
-            delay = GROK_RETRY_BACKOFF_SECONDS * (2 ** attempt)
+            delay = backoff * (2 ** attempt)
             print(f"⏳ Grok transient failure, retry {attempt + 2}/{attempts} in {delay:.0f}s: {last_error[:120]}")
             _sleep(delay)
 
     return None, last_error
+
+
+# Prefix on call_claude's error when Claude cannot run at all (no key, no
+# credits, billing/quota, 401/402/403). Runners report it as "skipped", never
+# as a pass: the check result is decided by Grok alone (grok_exit_code).
+CLAUDE_SKIPPED_PREFIX = "Claude skipped (unavailable)"
+_CLAUDE_UNAVAILABLE_STATUS = {
+    401: "authentication rejected (401)",
+    402: "payment required (402)",
+    403: "access denied (403)",
+}
+_CLAUDE_UNAVAILABLE_WORDS = ("credit", "billing", "quota", "insufficient", "payment required")
+
+
+def claude_unavailable_reason(status: int, message: str) -> str | None:
+    """Why Claude cannot run on this account, or None for an ordinary error."""
+    if status in _CLAUDE_UNAVAILABLE_STATUS:
+        return _CLAUDE_UNAVAILABLE_STATUS[status]
+    blob = (message or "").lower()
+    if any(word in blob for word in _CLAUDE_UNAVAILABLE_WORDS):
+        return f"insufficient credits, billing or quota ({status})"
+    return None
+
+
+def is_claude_skipped(error: str | None) -> bool:
+    return bool(error) and str(error).startswith(CLAUDE_SKIPPED_PREFIX)
 
 
 def call_claude(
@@ -300,10 +370,14 @@ def call_claude(
     api_key: str | None = None,
     model: str | None = None,
 ) -> tuple[str | None, str | None]:
-    """Call Claude. Returns (analysis_text, error_message)."""
+    """Call Claude. Returns (analysis_text, error_message).
+
+    When Claude is unavailable (see claude_unavailable_reason) the error starts
+    with CLAUDE_SKIPPED_PREFIX; other failures keep their usual message.
+    """
     key = api_key or os.environ.get("CLAUDE_API_KEY")
     if not key:
-        return None, "CLAUDE_API_KEY missing"
+        return None, f"{CLAUDE_SKIPPED_PREFIX}: CLAUDE_API_KEY not set"
 
     model_name = (model or _claude_model()).strip()
 
@@ -327,6 +401,10 @@ def call_claude(
             if content and isinstance(content, list):
                 return content[0].get("text", str(data)), None
             return str(data), None
-        return None, format_api_error("Claude", response) + f" [model={model_name}]"
+        message = format_api_error("Claude", response)
+        reason = claude_unavailable_reason(response.status_code, message)
+        if reason:
+            return None, f"{CLAUDE_SKIPPED_PREFIX}: {reason}"
+        return None, message + f" [model={model_name}]"
     except Exception as e:
         return None, f"Claude exception: {str(e)[:180]}"
