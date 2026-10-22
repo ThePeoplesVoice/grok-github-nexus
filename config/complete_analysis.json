@@ -1,63 +1,64 @@
 {
   "version": "1.1.0",
-  "generated_at": "2026-10-15 14:35 UTC",
+  "generated_at": "2026-10-22 10:06 UTC",
   "source": "grok",
-  "summary": "Open Core is running: 66 analyses, freshness fresh, Astra 10.5 matching the collaborative score, and no open pull requests. Queue notes still cite usage 61, and presence still shows 65 analyses from 2026-10-12, so the instruments disagree. Five report issues are open; four are older than the 2026-10-12 dev cycle. This week should close that noise and route issue 249 by hand, not add architecture.",
-  "health": 73,
-  "stop": "Stop opening new pulse, audit, and complete issues while 242, 244, 246, and 247 remain open.",
-  "start": "Close those four superseded issues and rewrite the queue instrument note to usage 66.",
-  "keep": "Keep human landing only, and keep Astra derived from collaborative reputation at 10.5.",
+  "summary": "Layer 0 is runnable: 70 successful analyses, fresh reputation, and collaborative counters match the backfilled reviews of #134, #135, and #142. The open surface is mostly leftover cycle tickets, not new design work. PR 250 is the only open pull request and should be reviewed and landed by a human with fail-closed kept. Queue notes still describe usage 61 from 2026-10-08, so refresh that snapshot and stop opening more bot tickets.",
+  "health": 68,
+  "stop": "Stop opening another Pulse, Dev Cycle, or Commit Analysis issue while #249, #251, #252, and #253 remain open.",
+  "start": "Start a human review of PR 250 and land it only if the Grok timeout path stays fail-closed.",
+  "keep": "Keep the usage backfill that aligned collaborative counts with reviews #134, #135, and #142, and keep Layer 1 gated.",
   "actions": [
     {
-      "id": "close-stale-reports",
-      "title": "Close superseded report issues 242, 244, 246, and 247",
-      "why": "They are older automated reports and are noise next to the 2026-10-12 dev cycle.",
+      "id": "close-stale-cycle-issues",
+      "title": "Close superseded cycle issues 249, 251, 252, and 253",
+      "why": "Those four tickets predate landed chores and newer self-audit #254, so they are noise.",
       "effort": "S",
       "files": [
         "nexus/dev_queue.py"
       ],
       "steps": [
-        "Comment on issues 242, 244, 246, and 247 that later cycles superseded them, citing usage last_updated 2026-10-14T14:19:46Z.",
-        "Close those four issues by hand.",
-        "Record their numbers on the queue done list via the existing auto-retire path in nexus/dev_queue.py.",
-        "Leave issue 249 open until the next action."
+        "Close #249 as superseded by the 2026-10-19 dev cycle already represented by #252 and commit 0043498.",
+        "Close #251, #252, and #253 as done against chores 328b07a, 0043498, and a734300; do not claim those commits named the issues.",
+        "Leave #254 open until a human confirms the 2026-10-21 self-audit.",
+        "Let nexus/dev_queue.py drop the closed items; do not file replacement cycle issues this week."
       ],
-      "issueTitle": "Close superseded Nexus report issues",
-      "issueBody": "Issues 242, 244, 246, and 247 are older complete, commit, pulse, and self-audit reports and should be closed as superseded. Issue 249 stays open until a human checks it against main."
+      "issueTitle": "Close stale Nexus cycle tickets",
+      "issueBody": "Issues #249, #251, #252, and #253 are leftover cycle tickets after the 2026-10-19 chores landed. Close them as done or superseded and leave #254 open for human confirmation."
     },
     {
-      "id": "sync-queue-usage-note",
-      "title": "Rewrite queue instrument notes to usage 66",
-      "why": "The queue still describes usage 61 and an Astra compute time that usage has already passed.",
+      "id": "review-pr-250",
+      "title": "Human-review PR 250 and land it by hand",
+      "why": "PR 250 is the only open pull request and the only real code change on the surface.",
       "effort": "S",
       "files": [
         "nexus/dev_queue.py"
       ],
       "steps": [
-        "Edit the queue notes so instruments read total_successful_analyses 66, last_type self_audit, and last_updated 2026-10-14T14:19:46Z.",
-        "Note that presence still shows 65 analyses generated 2026-10-12 and must be refreshed by the next pulse, without hand-editing an unstated path.",
-        "Do not recompute Astra; config/astra.json already shows balance 10.5.",
-        "Do not change API keys."
+        "Read the PR 250 diff and confirm the Claude-unavailable skip is quiet without hiding a real failure.",
+        "Confirm Grok timeout/retry remains fail-closed; do not change keys or retry policy beyond what the diff already does.",
+        "Comment the review on the PR and have a human merge it; do not enable auto-merge.",
+        "After merge, record it through nexus/dev_queue.py so the next queue no longer treats it as open work."
       ],
-      "issueTitle": "Sync queue notes to usage 66",
-      "issueBody": "Queue notes still cite usage 61 while usage is 66 as of 2026-10-14T14:19:46Z. Update that note only, leave Astra at 10.5, and let the next pulse refresh presence from 65."
+      "issueTitle": "Route human review of PR 250",
+      "issueBody": "PR 250 is the only open pull request and covers a quiet Claude skip plus Grok timeout/retry. A human should confirm fail-closed behavior and land it without auto-merge."
     },
     {
-      "id": "route-dev-cycle-249",
-      "title": "Human-check Dev Cycle issue 249 and close it if landed",
-      "why": "It is the only current cycle issue and there is no open pull request to review.",
+      "id": "refresh-queue-instruments",
+      "title": "Refresh queue notes to the usage 70 snapshot",
+      "why": "Queue notes still cite 61 analyses and a 2026-10-08 Astra timestamp while usage is 70 as of 2026-10-21.",
       "effort": "S",
       "files": [
-        "nexus/dev_queue.py"
+        "nexus/dev_queue.py",
+        "config/astra.json"
       ],
       "steps": [
-        "Compare issue 249 with commits d79e104 and 82786c5 on main.",
-        "If every item in 249 is already on main, close 249 with those SHAs and mark it done in the queue.",
-        "If any item is still open, leave 249 open and move only finished items to the queue done list.",
-        "Do not auto-merge and do not open a new architecture issue."
+        "Recompute the queue with the existing dev-queue path so notes use total_successful_analyses 70, last_type self_audit, and last_updated 2026-10-21T09:11:54Z.",
+        "Check config/astra.json still shows balance 10.5 and do not use Astra to gate Open Core.",
+        "Regenerate presence from that same snapshot so it no longer shows 69 analyses, self_audit 9, or reputation_raw 78 from 2026-10-19.",
+        "Human lands the chore; do not rewrite STATUS.md or README.md."
       ],
-      "issueTitle": "Route Dev Cycle issue 249",
-      "issueBody": "Issue 249 is the live 2026-10-12 dev cycle and should be checked against commits d79e104 and 82786c5. A human closes it only if the work is already on main."
+      "issueTitle": "Refresh stale queue instrument notes",
+      "issueBody": "The queue still describes usage 61 and a 2026-10-08 Astra computation while usage is 70 as of 2026-10-21. Refresh those notes from the current meter and leave Astra non-gating."
     }
   ],
   "outcome": "ok",
