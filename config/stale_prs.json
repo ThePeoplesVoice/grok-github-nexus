@@ -1,14 +1,20 @@
 {
   "version": "1.0.0",
-  "generated_at": "2026-10-15 15:32 UTC",
+  "generated_at": "2026-10-22 11:15 UTC",
   "dry_run": true,
   "apply": false,
-  "open_scanned": 0,
+  "open_scanned": 1,
   "closed_count": 0,
-  "kept_count": 0,
+  "kept_count": 1,
   "remaining_count": 0,
   "candidates": [],
   "closed": [],
-  "kept": [],
+  "kept": [
+    {
+      "number": 250,
+      "title": "Analyzers: quiet Claude skip when unavailable + Grok timeout/retry (fail-closed kept)",
+      "reason": "human author with unique commits"
+    }
+  ],
   "notes": "Human PRs and keep-labeled PRs are never closed. STATUS.md / README.md untouched."
 }
