@@ -8,6 +8,10 @@ on:
 jobs:
   complete:
     runs-on: ubuntu-latest
+    # Complete stays at GROK_RETRIES=1 (Sense review): worst case ~6.5 min
+    # (2 x 190 s + 5 s backoff); 20 min also covers the env caps. See
+    # test_grok_jobs_outlast_worst_case_retries.
+    timeout-minutes: 20
     permissions:
       contents: write
       issues: write

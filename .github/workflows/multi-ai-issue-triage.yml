@@ -8,6 +8,9 @@ jobs:
   triage:
     if: ${{ github.event.issue.user.type != 'Bot' }}
     runs-on: ubuntu-latest
+    # call_grok worst case is ~10 min (3 x 190 s + 15 s backoff); see
+    # grok_worst_case_seconds and test_grok_jobs_outlast_worst_case_retries.
+    timeout-minutes: 20
     permissions:
       issues: write
       contents: write

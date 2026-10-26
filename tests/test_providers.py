@@ -157,9 +157,9 @@ def test_resolve_grok_retries_from_env(monkeypatch):
     monkeypatch.setenv("GROK_RETRIES", "99")
     assert resolve_grok_retries() == MAX_GROK_RETRIES
     monkeypatch.setenv("GROK_RETRIES", "nope")
-    assert resolve_grok_retries() == 1
+    assert resolve_grok_retries() == 2
     monkeypatch.delenv("GROK_RETRIES", raising=False)
-    assert resolve_grok_retries() == 1
+    assert resolve_grok_retries() == 2
 
 
 def test_classify_grok_result_types():

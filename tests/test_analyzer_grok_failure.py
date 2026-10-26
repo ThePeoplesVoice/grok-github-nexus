@@ -151,12 +151,12 @@ def test_issue_triage_bot_issue_is_labelled_skip(ci_env, monkeypatch):
     assert "skipped" in ci_env.read_text(encoding="utf-8")
 
 
-def test_transient_failure_retries_once_then_fails():
+def test_transient_failure_retries_twice_then_fails():
     from nexus.providers import call_grok
     with patch("nexus.providers.requests.post", return_value=_error_response(503)) as post:
         text, err = call_grok("hi", api_key="k")
     assert text is None and "503" in err
-    assert post.call_count == 2  # one retry, then give up
+    assert post.call_count == 3  # two retries, then give up
 
 
 def test_timeout_retry_recovers():
@@ -182,7 +182,7 @@ def test_grok_request_uses_connect_timeout_low_effort_and_trims_prompt(monkeypat
     with patch("nexus.providers.requests.post", return_value=_ok_response()) as post:
         call_grok("x" * 5000, api_key="k", model="grok-4.7")
     kwargs = post.call_args.kwargs
-    assert kwargs["timeout"] == (10, 90)
+    assert kwargs["timeout"] == (10, 180)
     assert kwargs["json"]["reasoning_effort"] == "low"
     user = kwargs["json"]["messages"][1]["content"]
     assert len(user) <= 1000 and "prompt trimmed" in user
@@ -226,14 +226,15 @@ def test_grok_exit_code_without_summary_file(monkeypatch):
     assert report_skip("X", "why") == 0
 
 
-def test_claude_out_of_credits_is_a_labelled_failure(ci_env, capsys):
-    err = ("Claude API is temporarily unavailable due to insufficient credits. "
-           "Running Grok-only path remains fully operational.")
+def test_claude_out_of_credits_is_a_quiet_skip(ci_env, capsys):
+    # Credits ran out on 11 Oct; CONTROL-01 is fine with Grok-only until further notice.
+    err = "Claude skipped (unavailable): insufficient credits, billing or quota (400)"
     report_claude("X", None, err, attempted=True)
     out = capsys.readouterr().out
     summary = ci_env.read_text(encoding="utf-8")
-    assert "::warning title=X::Claude second reviewer FAILED: insufficient credits" in out
-    assert "Claude second reviewer FAILED" in summary
+    assert "::warning" not in out and "FAILED" not in out
+    assert "Claude second reviewer skipped (unavailable: insufficient credits" in summary
+    assert "depends on Grok alone" in summary
     report_claude("X", None, None, attempted=False)
     assert "Claude second reviewer skipped" in ci_env.read_text(encoding="utf-8")
 

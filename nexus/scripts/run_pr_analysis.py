@@ -15,7 +15,7 @@ from nexus.context import load_context, load_progressive, layer1_enabled, curren
 from nexus.grok_status import grok_exit_code, report_claude
 from nexus.gates import gate_summary, requires_human_gate
 from nexus.memory import memory_block_for_prompt, record_memory
-from nexus.providers import call_grok, call_claude, classify_grok_result, refine_parse_outcome
+from nexus.providers import call_grok, call_claude, classify_grok_result, refine_parse_outcome, is_claude_skipped
 from nexus.usage import load_usage_stats
 from nexus.presence import load_presence, format_presence_for_prompt
 from nexus.runtime import after_successful_analysis, log_success
@@ -180,7 +180,7 @@ def main() -> int:
                 tags=["pr", "claude", "second-reviewer"],
                 meta={"pr": pr_number},
             )
-        elif claude_err:
+        elif claude_err and not is_claude_skipped(claude_err):
             print(f"⚠️ Claude: {claude_err}")
     elif l1:
         print("ℹ️ CLAUDE_API_KEY not present — Grok-only")
