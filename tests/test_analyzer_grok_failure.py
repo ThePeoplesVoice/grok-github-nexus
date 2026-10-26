@@ -227,7 +227,7 @@ def test_grok_exit_code_without_summary_file(monkeypatch):
 
 
 def test_claude_out_of_credits_is_a_quiet_skip(ci_env, capsys):
-    # Credits ran out on 11 Oct; Shawn is fine with Grok-only until further notice.
+    # Credits ran out on 11 Oct; CONTROL-01 is fine with Grok-only until further notice.
     err = "Claude skipped (unavailable): insufficient credits, billing or quota (400)"
     report_claude("X", None, err, attempted=True)
     out = capsys.readouterr().out
