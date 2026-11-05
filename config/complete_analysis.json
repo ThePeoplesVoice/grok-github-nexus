@@ -1,61 +1,64 @@
 {
   "version": "1.1.0",
-  "generated_at": "2026-10-29 10:06 UTC",
+  "generated_at": "2026-11-05 17:47 UTC",
   "source": "grok",
-  "summary": "Usage is internally consistent at 75 analyses, Astra balance 10.5 matches collaborative reputation, and Layer 1 stays gated. Presence is one self-audit behind (74 analyses, self_audit 10, generated 2026-10-26) after d88ad9e updated usage, reputation, and Astra only. Queue notes still describe usage 61 from 2026-10-08 even though the queue object is stamped 2026-10-26. Five report issues are open and the pull-request list is empty, so this week is cleanup on one tracker, not new architecture.",
-  "health": 70,
-  "stop": "Stop leaving superseded report issues open and stop describing the queue with the old 61-analysis snapshot.",
-  "start": "Close issues 251, 253, 254, and 255, and route the presence and queue drift onto issue 256 only.",
-  "keep": "Keep Astra non-gating and equal to collaborative reputation, with a human landing every change.",
+  "summary": "Open Core is still the right phase: 79 successful analyses, fresh reputation, and an empty PR list. Layer 1 stays off because the collaborative score is only 10.5 from three PR reviews and one issue. The real drag is six open cycle issues plus queue notes that still cite usage 61 and 2026-10-08. This week, close the five older issues, keep #257 as the only tracker, and refresh that stale queue snapshot by hand.",
+  "health": 72,
+  "stop": "Stop opening another Dev Cycle, Pulse, or Complete issue while #251–#257 are still open.",
+  "start": "Close #251, #253, #254, #255, and #256 as superseded and put the only live checklist on #257.",
+  "keep": "Keep Layer 1 disabled and keep human landing of the usage, reputation, and Astra chore loop.",
   "actions": [
     {
-      "id": "close-stale-report-issues",
-      "title": "Close superseded report issues 251, 253, 254, and 255",
-      "why": "Those four are finished analysis reports while no pull request is open to review.",
+      "id": "close-superseded-cycle-issues",
+      "title": "Close five superseded cycle issues",
+      "why": "Six open cycle tickets and zero pull requests is tracker noise, not unfinished product work.",
       "effort": "S",
       "files": [
         "nexus/dev_queue.py"
       ],
       "steps": [
-        "Comment on #251, #253, #254, and #255 that usage is 75 as of 2026-10-28T09:09:18Z and each report is superseded.",
-        "Close those four by hand; do not auto-merge and do not delete history.",
-        "Record them retired in the dev queue the same way Pulse #155 was retired, and leave #256 as the only open tracker."
+        "Comment on #251, #253, #254, #255, and #256 that each is superseded by later cycle output already on main, including usage chore bc8d4c5.",
+        "Close those five issues by hand.",
+        "Leave #257 open.",
+        "Do not add an auto-closer and do not change nexus/dev_queue.py unless it still lists one of those five as next work."
       ],
-      "issueTitle": "Close superseded Nexus report issues",
-      "issueBody": "Issues 251, 253, 254, and 255 are finished reports and the open PR list is empty. Close them by hand and keep 256 as the only dev-cycle tracker."
+      "issueTitle": "Close superseded cycle issues",
+      "issueBody": "Issues 251, 253, 254, 255, and 256 are older cycle artifacts with no open PR behind them. Close them as superseded and do not open replacements."
     },
     {
-      "id": "refresh-queue-notes",
-      "title": "Rewrite queue notes to the 75-analysis snapshot",
-      "why": "Operators still read usage 61 and an 2026-10-08 Astra compute inside a queue stamped 2026-10-26.",
+      "id": "route-dev-cycle-257",
+      "title": "Route issue 257 to queue drift only",
+      "why": "The newest open issue should name one finishable task instead of a new subsystem.",
       "effort": "S",
       "files": [
-        "nexus/dev_queue.py"
+        "nexus/dev_queue.py",
+        "config/astra.json"
       ],
       "steps": [
-        "Open the queue document already loaded by nexus/dev_queue.py (version 1.0.17).",
-        "Replace notes that cite usage 61, complete=5, and 2026-10-08T17:07Z with usage 75, current by_type counts, Astra 10.5, and last_updated 2026-10-28T09:09:18Z.",
-        "Post that same correction on issue 256 instead of opening another analysis issue, then commit the note change by hand."
+        "Comment on #257 that open_prs is empty and Layer 1 stays false.",
+        "Set the issue scope to the queue note that still cites usage 61 and last_computed 2026-10-08, against usage total_successful_analyses 79 and config/astra.json balance 10.5.",
+        "Do not file a follow-up issue and do not enable auto-merge."
       ],
-      "issueTitle": "Refresh dev queue notes to usage 75",
-      "issueBody": "Queue notes still describe 61 analyses and a 2026-10-08 Astra compute while usage is 75 as of 2026-10-28. Update the existing notes in place and land the change by hand."
+      "issueTitle": "Route Dev Cycle 257 to queue snapshot drift",
+      "issueBody": "Dev Cycle 257 is the only issue that should stay open. Its scope is the stale queue note versus usage 79 and Astra 10.5, not Layer 1."
     },
     {
-      "id": "sync-presence-to-usage",
-      "title": "Regenerate presence so it matches usage 75",
-      "why": "Presence still shows 74 analyses and self_audit 10 after the latest self-audit meter update.",
+      "id": "refresh-queue-instrument-notes",
+      "title": "Refresh queue notes to usage 79",
+      "why": "Queue notes still describe 2026-10-08 instruments, so the next cycle will re-litigate finished work.",
       "effort": "S",
       "files": [
-        "config/astra.json",
-        "nexus/dev_queue.py"
+        "nexus/dev_queue.py",
+        "config/astra.json"
       ],
       "steps": [
-        "Regenerate the existing presence_state artifact written by 53885dd so total_successful_analyses is 75, self_audit is 11, and generated_at is current; do not add a second presence store.",
-        "Confirm config/astra.json balance and raw_balance stay 10.5 and that Astra still does not gate Open Core; if that file still stores an analyses count of 61, recompute it with the existing organic script.",
-        "Note the sync on issue 256 and leave layer1_enabled false. Human lands the change."
+        "Read the queue notes that cite total_successful_analyses 61 and last_computed 2026-10-08T17:07Z.",
+        "Confirm config/astra.json balance is still 10.5 and do not recompute Astra.",
+        "Update only the stale queue snapshot to usage 79, last_updated 2026-11-04T16:50:08Z, last_type self_audit, and Astra balance 10.5.",
+        "Human commits that note refresh; leave Layer 1 gated and do not auto-merge."
       ],
-      "issueTitle": "Sync presence to usage 75",
-      "issueBody": "Presence from 2026-10-26 still shows 74 analyses and self_audit 10, one behind usage after the self-audit meter commit. Regenerate that existing artifact, confirm Astra remains 10.5, and keep Layer 1 off."
+      "issueTitle": "Refresh dev queue instrument snapshot",
+      "issueBody": "Queue notes still say usage 61 and last_computed 2026-10-08 while usage shows 79 analyses. Update that snapshot from current usage and config/astra.json and leave Layer 1 off."
     }
   ],
   "outcome": "ok",
