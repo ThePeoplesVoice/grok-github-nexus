@@ -1,28 +1,28 @@
 {
   "version": "0.3.0",
-  "generated_at": "2026-11-09 18:34 UTC",
+  "generated_at": "2026-11-16 18:12 UTC",
   "phase": "Layer 0 — Open Core (Layer 1 gated on collaborative evidence)",
   "layer1_enabled": false,
-  "total_successful_analyses": 82,
+  "total_successful_analyses": 86,
   "by_type": {
-    "commit": 41,
+    "commit": 42,
     "pr": 3,
     "issue": 1,
-    "self_audit": 12,
-    "pulse": 16,
-    "complete": 9,
+    "self_audit": 13,
+    "pulse": 17,
+    "complete": 10,
     "other": 0
   },
   "reputation_score": 10.5,
-  "reputation_raw": 92.5,
+  "reputation_raw": 97.0,
   "reputation_freshness": "fresh",
   "grok_outcome": "ok",
   "recent_commits_preview": [
-    "2918707 chore: automated dev cycle — queue + field notes",
-    "eded76e chore: usage + reputation after commit analysis",
-    "0e711ec chore: stale PR sweep report",
-    "077144d chore: complete analysis — implementations + usage",
-    "bc8d4c5 chore: usage + reputation + astra after self-audit"
+    "59cf8a5 chore: automated dev cycle — queue + field notes",
+    "a5a546a chore: usage + reputation after commit analysis",
+    "7004999 chore: stale PR sweep report",
+    "ebc23f4 chore: complete analysis — implementations + usage",
+    "9ff8fe0 chore: usage + reputation + astra after self-audit"
   ],
   "notes": "Compressed context for continuity. Not a chat log. See ORGANIC_SYSTEMS.md."
 }
