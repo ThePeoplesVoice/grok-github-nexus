@@ -1,63 +1,60 @@
 {
   "version": "1.1.0",
-  "generated_at": "2026-11-12 17:50 UTC",
+  "generated_at": "2026-11-19 18:47 UTC",
   "source": "grok",
-  "summary": "Open Core is running: 83 successful analyses, fresh reputation, and Astra balance 10.5 matching the collaborative score. Layer 1 stays disabled; this pass must not flip that gate. The live problem is noise: no open PRs and seven dated analysis issues, six already superseded by later commits. Presence still shows 82 analyses from 2026-11-09, and queue notes still cite 61 analyses from 2026-10-08.",
-  "health": 72,
-  "stop": "Stop opening another dated analysis issue while 251 and 253–257 stay open.",
-  "start": "Close those six superseded issues and land one human PR that refreshes presence and queue notes to usage 83.",
-  "keep": "Keep Astra at 10.5 derived from collaborative reputation, and keep it from gating Open Core.",
+  "summary": "Open Core is still the right phase: 87 successful analyses, fresh reputation, and Astra at 10.5 matching the collaborative score. Layer 1 stays correctly off because collaborative evidence is only 3 PRs and 1 issue. The tracker is the drag: eight cycle issues are open and the PR list is empty. Presence and the dev-queue notes lag the ledger, so this week is close noise, refresh the queue note, and file one real drift issue.",
+  "health": 66,
+  "stop": "Stop opening another Dev Cycle issue while 251 and 253-259 are still open.",
+  "start": "Close those eight issues by hand and file one issue for the presence-versus-usage drift.",
+  "keep": "Keep writing usage, reputation, and Astra only after a successful analysis.",
   "actions": [
     {
-      "id": "close-superseded-issues",
-      "title": "Close superseded analysis issues",
-      "why": "Issues 251, 253, 254, 255, 256, and 257 are dated reports overtaken by later cycles, while 258 is the only live dev cycle.",
+      "id": "close-stale-cycle-issues",
+      "title": "Close stale cycle issues 251 and 253-259",
+      "why": "All eight open issues are dated cycle echoes and open_prs is empty.",
       "effort": "S",
       "files": [
         "nexus/dev_queue.py"
       ],
       "steps": [
-        "Comment on issues 251, 253, 254, 255, 256, and 257 that later usage, pulse, and dev-cycle commits superseded them.",
-        "Close those six issues by hand and leave issue 258 open.",
-        "Record the closures as done or expired so nexus/dev_queue.py drops them on the next cycle.",
-        "Do not open a replacement analysis issue."
+        "Confirm issues 251, 253, 254, 255, 256, 257, 258, and 259 have no linked open PR.",
+        "Close each by hand with a one-line note that the cycle already landed in git.",
+        "Do not add an auto-closer to nexus/dev_queue.py and do not open a replacement Dev Cycle issue."
       ],
-      "issueTitle": "Close superseded Nexus analysis issues",
-      "issueBody": "Issues 251, 253, 254, 255, 256, and 257 are stale dated reports with no open PR behind them. Close them and keep Dev Cycle 258 as the only live tracker item."
+      "issueTitle": "Close stale cycle issues 251 and 253-259",
+      "issueBody": "These eight open issues are cycle artifacts and no PR is waiting on them. Close them in place so the tracker matches the empty PR list."
     },
     {
-      "id": "refresh-presence-to-usage",
-      "title": "Refresh presence to usage 83",
-      "why": "Presence generated 2026-11-09 still shows 82 analyses and self_audit 12, while usage on 2026-11-11 shows 83 and self_audit 13.",
+      "id": "file-presence-usage-drift",
+      "title": "File one issue for presence lagging usage",
+      "why": "Presence from 2026-11-16 still shows 86 analyses and self_audit 13 after the 2026-11-18 self-audit set usage to 87.",
       "effort": "S",
       "files": [
         "config/astra.json"
       ],
       "steps": [
-        "Regenerate the presence_state artifact already written by pulse commits e82a7b1 and 02fa06b from usage last_updated 2026-11-11T16:52:26Z.",
-        "Set total_successful_analyses to 83 and by_type.self_audit to 13, and leave layer1_enabled false.",
-        "Confirm config/astra.json still shows balance 10.5 and do not change it.",
-        "Do not edit STATUS.md or README.md."
+        "Compare Presence (86 analyses, self_audit 13, generated 2026-11-16) with usage (87, self_audit 14, last_updated 2026-11-18T17:46:50Z).",
+        "Open one issue using the title and body below; do not enable Layer 1.",
+        "Read config/astra.json and leave balance 10.5 unchanged so nobody recomputes Astra from the stale queue note."
       ],
-      "issueTitle": "Align presence with usage after self-audit",
-      "issueBody": "Presence still reports 82 analyses from 2026-11-09 after usage moved to 83 on 2026-11-11. Refresh presence_state from usage and leave Astra and Layer 1 unchanged."
+      "issueTitle": "Presence snapshot lags usage by one self-audit",
+      "issueBody": "Presence still reports 86 analyses and self_audit 13 from 2026-11-16, while usage is 87 and self_audit 14 as of 2026-11-18T17:46:50Z. Refresh that snapshot only; Astra balance 10.5 already matches the collaborative score."
     },
     {
-      "id": "land-queue-note-pr",
-      "title": "Land a PR that fixes stale queue notes",
-      "why": "Queue 1.0.17 notes still describe usage 61 and a 2026-10-08 compute, which will mislead the next human cycle.",
+      "id": "refresh-queue-notes",
+      "title": "Refresh dev queue notes off usage 61",
+      "why": "Queue notes still cite 61 analyses and a 2026-10-08 compute time even though usage is 87.",
       "effort": "S",
       "files": [
         "nexus/dev_queue.py"
       ],
       "steps": [
-        "Update the queue notes to cite usage 83, last_type self_audit, last_updated 2026-11-11T16:52:26Z, and Astra balance 10.5.",
-        "Point the note at closed issues 251 and 253–257 and still-open issue 258.",
-        "Open one PR for the note fix plus the presence refresh.",
-        "Do not enable auto-merge; a human reviews and lands the PR."
+        "Read the queue payload that nexus/dev_queue.py already writes before editing.",
+        "Replace the instrument note that says usage 61 and last_computed 2026-10-08T17:07Z with usage 87, last_type self_audit, and last_updated 2026-11-18T17:46:50Z.",
+        "Keep the existing done history and do not add auto-merge or a new subsystem."
       ],
-      "issueTitle": "Refresh dev queue notes to usage 83",
-      "issueBody": "Queue notes still cite 61 analyses and a 2026-10-08 compute after usage reached 83. Ship one human-landed PR that rewrites those notes and does not turn on auto-merge."
+      "issueTitle": "Refresh queue notes past the usage-61 snapshot",
+      "issueBody": "Queue notes still describe instruments at 61 analyses and a 2026-10-08 compute time. Update that note to usage 87 and the 2026-11-18 self-audit without dropping done history."
     }
   ],
   "outcome": "ok",
